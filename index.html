@@ -13,29 +13,24 @@ tailwind.config = {
     extend: {
       colors: {
         brand: {
-          50: '#eef2ff',
-          100: '#e0e7ff',
-          200: '#c7d2fe',
-          300: '#a5b4fc',
-          400: '#818cf8',
-          500: '#6366f1',
-          600: '#4f46e5',
-          700: '#4338ca',
-          800: '#3730a3',
-          900: '#1e1b4b',
-          950: '#0c0a24'
+          50: '#eff6ff',
+          100: '#dbeafe',
+          200: '#bfdbfe',
+          300: '#93c5fd',
+          400: '#60a5fa',
+          500: '#3b82f6',
+          600: '#2563eb',
+          700: '#1d4ed8',
+          800: '#1e40af',
+          900: '#1e3a8a',
+          950: '#172554'
         },
         obsidian: {
           700: '#1e293b',
-          800: '#111827',
-          850: '#0d1321',
-          900: '#090d16',
-          950: '#05080f'
-        },
-        cyber: {
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7'
+          800: '#0f172a',
+          850: '#0a0f1d',
+          900: '#060a12',
+          950: '#020408'
         }
       },
       fontFamily: {
@@ -55,21 +50,22 @@ tailwind.config = {
   h1, h2, h3, .font-display { font-family: 'Outfit', sans-serif; }
   .font-mono { font-family: 'JetBrains Mono', monospace; }
   
-  body { background: #f8fafc; color: #1e293b; }
+  body { background: #f8fafc; color: #090d16; }
   
-  /* Modern custom scrollbar */
+  /* Modern clean scrollbar */
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 6px; }
   ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-  .sidebar-scroll::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 6px; }
-  .sidebar-scroll::-webkit-scrollbar-thumb:hover { background: #334155; }
   
-  .fade-in { animation: fadeIn .25s cubic-bezier(0.16, 1, 0.3, 1); }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+  .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
   
-  .slide-in { animation: slideIn .25s cubic-bezier(0.16, 1, 0.3, 1); }
-  @keyframes slideIn { from { transform: scale(0.96) translateY(8px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+  .fade-in { animation: fadeIn .2s cubic-bezier(0.16, 1, 0.3, 1); }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+  
+  .slide-in { animation: slideIn .2s cubic-bezier(0.16, 1, 0.3, 1); }
+  @keyframes slideIn { from { transform: scale(0.97) translateY(6px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
   
   .pulse-dot { animation: pulseDot 2s infinite ease-in-out; }
   @keyframes pulseDot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .4; transform: scale(1.15); } }
@@ -77,42 +73,20 @@ tailwind.config = {
   .card-hover { transition: all .2s cubic-bezier(0.16, 1, 0.3, 1); }
   .card-hover:hover { transform: translateY(-2px); box-shadow: 0 12px 30px -8px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04); }
   
-  .toast-enter { animation: toastEnter .3s cubic-bezier(0.16, 1, 0.3, 1); }
-  @keyframes toastEnter { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-  
-  .nav-item.active {
-    background: linear-gradient(90deg, rgba(99, 102, 241, 0.16), rgba(99, 102, 241, 0.04));
-    border-left: 3px solid #818cf8;
+  .top-tab.active {
     color: #ffffff;
-    box-shadow: inset 0 0 12px rgba(99, 102, 241, 0.1);
+    background: #2563eb;
+    box-shadow: 0 4px 14px -2px rgba(37, 99, 235, 0.45);
   }
   
-  .nav-item:not(.active):hover {
-    background: rgba(255, 255, 255, 0.04);
-    color: #e2e8f0;
-  }
-  
-  .glow-border {
-    position: relative;
-  }
-  .glow-border::before {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    background: linear-gradient(90deg, #6366f1, #06b6d4, #10b981);
-    border-radius: inherit;
-    z-index: -1;
-    opacity: 0.7;
-  }
-  
-  .dot-bg {
-    background-image: radial-gradient(rgba(148, 163, 184, 0.15) 1px, transparent 1px);
-    background-size: 20px 20px;
+  .top-tab:not(.active):hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.08);
   }
 </style>
 </head>
-<body class="h-full bg-slate-50 selection:bg-brand-500 selection:text-white">
-<div id="app"></div>
+<body class="min-h-full flex flex-col bg-slate-50 selection:bg-brand-600 selection:text-white">
+<div id="app" class="flex-1 flex flex-col"></div>
 <div id="toast-container" class="fixed top-4 right-4 z-[9999] space-y-2"></div>
 <div id="modal-container"></div>
 <div id="command-container"></div>
@@ -121,10 +95,10 @@ tailwind.config = {
 // ==================== MOCK DATA ====================
 const CATEGORIES = ['Electronics','Office Supplies','Home & Living','Tools','Accessories'];
 const ZONES = [
-  {id:'A',name:'Zone A — High Velocity Electronics',color:'#3b82f6'},
-  {id:'B',name:'Zone B — Office & Paper Supplies',color:'#10b981'},
+  {id:'A',name:'Zone A — High Velocity Electronics',color:'#2563eb'},
+  {id:'B',name:'Zone B — Office & Paper Supplies',color:'#0284c7'},
   {id:'C',name:'Zone C — Home & Living Goods',color:'#f59e0b'},
-  {id:'D',name:'Zone D — Heavy Tools & Equipment',color:'#8b5cf6'}
+  {id:'D',name:'Zone D — Heavy Tools & Equipment',color:'#475569'}
 ];
 const SUPPLIERS = ['TechSource Inc','GlobalGoods Co','PrimeSupply Ltd','FastChain Trading','Metro Distributors','Excel Logistics'];
 const CARRIERS = ['FedEx Express','UPS Priority','DHL Worldwide','BlueDart Air','Shadowfax Quick'];
@@ -290,12 +264,11 @@ const FEED_EVENTS = [
 const state = {
   user: EMPLOYEES[0], // Default Sai Rakesh (Admin)
   view: 'dashboard',
-  sidebarOpen: window.innerWidth > 1024,
+  mobileMenuOpen: false,
   warehouse: 'WH-01 Seattle Central',
   whDropdownOpen: false,
   notifDropdownOpen: false,
   userDropdownOpen: false,
-  commandPaletteOpen: false,
   searchQuery: '',
   filters: { priority:'all', status:'all', zone:'all' },
   feed: [...FEED_EVENTS],
@@ -339,37 +312,36 @@ function showToast(type,msg){
 
 function showModal(html){
   document.getElementById('modal-container').innerHTML = `
-    <div class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-[9998] flex items-center justify-center p-4 fade-in" onclick="if(event.target===this)closeModal()">
-      <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-auto slide-in border border-slate-200/80">${html}</div>
+    <div class="fixed inset-0 bg-obsidian-950/75 backdrop-blur-xs z-[9998] flex items-center justify-center p-4 fade-in" onclick="if(event.target===this)closeModal()">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-auto slide-in border border-slate-200">${html}</div>
     </div>`;
   lucide.createIcons();
 }
 function closeModal(){ document.getElementById('modal-container').innerHTML=''; }
 
-// ==================== COMPONENTS ====================
+// ==================== BADGES & COMPONENTS ====================
 function badge(text,color){
   const colors = {
-    green:'bg-emerald-50 text-emerald-700 border-emerald-200/80',
-    red:'bg-rose-50 text-rose-700 border-rose-200/80',
-    amber:'bg-amber-50 text-amber-700 border-amber-200/80',
-    blue:'bg-blue-50 text-blue-700 border-blue-200/80',
-    purple:'bg-purple-50 text-purple-700 border-purple-200/80',
-    gray:'bg-slate-100 text-slate-700 border-slate-200/80',
-    indigo:'bg-indigo-50 text-indigo-700 border-indigo-200/80'
+    green:'bg-emerald-50 text-emerald-700 border-emerald-200',
+    red:'bg-rose-50 text-rose-700 border-rose-200',
+    amber:'bg-amber-50 text-amber-700 border-amber-200',
+    blue:'bg-brand-50 text-brand-700 border-brand-200',
+    purple:'bg-blue-50 text-blue-800 border-blue-200',
+    gray:'bg-slate-100 text-slate-700 border-slate-200'
   };
   return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${colors[color]||colors.gray}">${esc(text)}</span>`;
 }
 
 function priorityBadge(p){
-  const map = {Critical:'rose',High:'amber',Medium:'blue',Low:'slate'};
-  const dot = {Critical:'bg-rose-500',High:'bg-amber-500',Medium:'bg-blue-500',Low:'bg-slate-400'};
-  return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-${map[p]}-50 text-${map[p]}-700 border border-${map[p]}-200/80">
+  const map = {Critical:'red',High:'amber',Medium:'blue',Low:'gray'};
+  const dot = {Critical:'bg-rose-500',High:'bg-amber-500',Medium:'bg-brand-500',Low:'bg-slate-400'};
+  return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${map[p]==='red'?'bg-rose-50 text-rose-700 border border-rose-200':map[p]==='amber'?'bg-amber-50 text-amber-700 border border-amber-200':map[p]==='blue'?'bg-brand-50 text-brand-700 border border-brand-200':'bg-slate-100 text-slate-700 border border-slate-200'}">
     <span class="w-1.5 h-1.5 rounded-full ${dot[p]} ${p==='Critical'?'pulse-dot':''}"></span>${p}</span>`;
 }
 
 function statusBadge(s){
   const map = {
-    'New':'gray','Confirmed':'blue','Allocated':'indigo','Partially Allocated':'amber',
+    'New':'gray','Confirmed':'blue','Allocated':'blue','Partially Allocated':'amber',
     'Picking':'purple','Picked':'blue','Packing':'purple','Quality Check':'amber',
     'Ready for Dispatch':'green','Dispatched':'green','Delivered':'green',
     'In Stock':'green','Low Stock':'amber','Critical Stock':'red','Out of Stock':'red',
@@ -379,11 +351,11 @@ function statusBadge(s){
 }
 
 function statCard(title,value,icon,color,sub,trend,trendType='up',onClick){
-  const trendBg = trendType==='up' ? 'text-emerald-700 bg-emerald-50 border-emerald-200/60' : trendType==='down' ? 'text-rose-700 bg-rose-50 border-rose-200/60' : 'text-blue-700 bg-blue-50 border-blue-200/60';
+  const trendBg = trendType==='up' ? 'text-emerald-700 bg-emerald-50 border-emerald-200' : trendType==='down' ? 'text-rose-700 bg-rose-50 border-rose-200' : 'text-brand-700 bg-brand-50 border-brand-200';
   const trendIcon = trendType==='up' ? 'trending-up' : trendType==='down' ? 'trending-down' : 'activity';
 
   return `
-  <div class="bg-white rounded-2xl p-4 border border-slate-200/80 card-hover cursor-pointer relative overflow-hidden group shadow-2xs ${onClick?`onclick="${onClick}"`:''}">
+  <div class="bg-white rounded-2xl p-4 border border-slate-200/90 card-hover cursor-pointer relative overflow-hidden group shadow-2xs ${onClick?`onclick="${onClick}"`:''}">
     <div class="flex items-start justify-between mb-2">
       <div class="w-10 h-10 rounded-xl ${color} flex items-center justify-center flex-shrink-0 shadow-sm text-white group-hover:scale-105 transition-transform">
         <i data-lucide="${icon}" class="w-5 h-5"></i>
@@ -396,16 +368,9 @@ function statCard(title,value,icon,color,sub,trend,trendType='up',onClick){
     </div>
     <div>
       <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">${esc(title)}</p>
-      <div class="text-2xl font-black text-slate-800 font-display mt-0.5 tracking-tight">${value}</div>
+      <div class="text-2xl font-black text-slate-900 font-display mt-0.5 tracking-tight">${value}</div>
       ${sub ? `<p class="text-[11px] text-slate-500 font-medium mt-1">${sub}</p>` : ''}
     </div>
-  </div>`;
-}
-
-function progressBar(val,max,color='bg-brand-600'){
-  const pct = Math.min(100,(val/max)*100);
-  return `<div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-    <div class="${color} h-2 rounded-full transition-all duration-500" style="width:${pct}%"></div>
   </div>`;
 }
 
@@ -414,7 +379,7 @@ function avatar(name,bg='bg-brand-600'){
   return `<div class="rounded-full ${bg} flex items-center justify-center text-white font-bold">${initials}</div>`;
 }
 
-// ==================== ENGINE: PRIORITY & ALLOCATION ====================
+// ==================== ENGINE LOGIC ====================
 function calcPriority(order){
   let score = 0;
   const reasons = [];
@@ -483,27 +448,6 @@ function detectLowStock(){
   }).sort((a,b)=>parseFloat(a.daysRemaining)-parseFloat(b.daysRemaining));
 }
 
-function detectBottlenecks(){
-  const bottlenecks = [];
-  const stages = [
-    {name:'Picking',status:'Picking',threshold:4,expected:10},
-    {name:'Packing',status:'Packing',threshold:3,expected:6},
-    {name:'Quality Check',status:'Quality Check',threshold:2,expected:4},
-    {name:'Dispatch',status:'Ready for Dispatch',threshold:3,expected:20}
-  ];
-  stages.forEach(st=>{
-    const count = ORDERS.filter(o=>o.status===st.status).length;
-    if(count >= st.threshold){
-      bottlenecks.push({
-        stage:st.name, count, expected:`${st.expected}min`, avgTime:`${st.expected+Math.floor(count*2.5)}min`,
-        deviation:`+${Math.floor(count*25)}%`,
-        recommendation:`Assign +${Math.min(3,Math.ceil(count/2))} temporary staff to ${st.name} station immediately.`
-      });
-    }
-  });
-  return bottlenecks;
-}
-
 function optimizeRoute(order){
   const items = [...order.items].sort((a,b)=>{
     if(a.zone!==b.zone) return a.zone.localeCompare(b.zone);
@@ -525,29 +469,17 @@ function getSmartDecisions(){
   const conflict = resolveAllocation('SKU-101');
   if(conflict && conflict.shortfall > 0){
     recs.push({
-      id:'rec-alloc-1', type:'Stock Allocation', icon:'git-branch', color:'red',
-      problem:`Stock conflict on SKU-101 — ${conflict.totalDemand} units demanded, only ${conflict.available} available`,
+      id:'rec-alloc-1', type:'Stock Allocation', icon:'git-branch', color:'blue',
+      problem:`Stock contention on SKU-101 — ${conflict.totalDemand} units demanded, only ${conflict.available} available in Zone A`,
       data:`ORD-1001 (${conflict.competing[0]._priority.priority}) needs ${conflict.competing[0].items.find(i=>i.sku==='SKU-101').qty} | ORD-1002 (${conflict.competing[1]._priority.priority}) needs ${conflict.competing[1].items.find(i=>i.sku==='SKU-101').qty}`,
       decision:`Allocate ${conflict.decisions[0].allocated} units to ${conflict.decisions[0].orderId} (Critical priority). Mark as Partially Allocated.`,
       impact:`Critical VIP order partially fulfilled. Exception ticket auto-created. Reorder batch triggered.`,
       action:'Apply AI Allocation', actionType:'allocate', actionData:{conflict}
     });
   }
-  const bottlenecks = detectBottlenecks();
-  bottlenecks.slice(0,2).forEach(b=>{
-    recs.push({
-      id:'rec-bn-'+b.stage, type:'Staffing Optimization', icon:'users', color:'purple',
-      problem:`${b.stage} stage queue elevated — ${b.deviation} delay deviation`,
-      data:`Current queue: ${b.count} orders | Avg time: ${b.avgTime} | Expected: ${b.expected}`,
-      decision:b.recommendation,
-      impact:`Reduces cycle time by ~32%. Prevents dock dispatch bottlenecks.`,
-      action:'View Flow Analytics', actionType:'navigate', actionData:{view:'analytics'}
-    });
-  });
   return recs;
 }
 
-// ==================== LIVE FEED ====================
 function addFeedEvent(){
   const pool = [
     'Order {ORD} assigned to picking route in Zone {ZONE}',
@@ -578,21 +510,17 @@ function destroyCharts(){ Object.keys(charts).forEach(k=>{ if(charts[k]) { chart
 // ==================== VIEWS: LOGIN ====================
 function renderLogin(){
   return `
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-obsidian-950 via-obsidian-900 to-brand-950 p-4 dot-bg">
-    <div class="absolute inset-0 overflow-hidden pointer-events-none">
-      <div class="absolute top-1/4 left-1/3 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl"></div>
-      <div class="absolute bottom-1/4 right-1/3 w-96 h-96 bg-cyber-500/10 rounded-full blur-3xl"></div>
-    </div>
-    <div class="relative bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl p-8 w-full max-w-md fade-in border border-slate-200/80">
+  <div class="min-h-screen flex items-center justify-center bg-obsidian-950 p-4">
+    <div class="relative bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md fade-in border border-slate-200">
       <div class="text-center mb-8">
-        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-600 via-indigo-600 to-brand-800 shadow-xl shadow-brand-500/25 mb-4 border border-brand-400/30">
-          <i data-lucide="warehouse" class="w-8 h-8 text-white"></i>
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-black shadow-xl mb-4 border border-brand-500/30">
+          <i data-lucide="warehouse" class="w-8 h-8 text-brand-500"></i>
         </div>
         <div class="flex items-center justify-center gap-2 mb-1">
           <h1 class="text-2xl font-black text-slate-900 font-display tracking-tight">WearAI</h1>
-          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-100 text-brand-700">v2.4 PRO</span>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-50 text-brand-700 border border-brand-200">ENTERPRISE</span>
         </div>
-        <p class="text-slate-500 text-xs font-medium">Autonomous AI Warehouse Operations Console</p>
+        <p class="text-slate-500 text-xs font-medium">Autonomous Warehouse Operations & AI Logistics</p>
       </div>
 
       <div class="space-y-4">
@@ -600,44 +528,44 @@ function renderLogin(){
           <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">User Identity / Email</label>
           <div class="relative">
             <i data-lucide="mail" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-            <input type="email" value="rakesh@wearai.io" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-xs font-medium text-slate-800 outline-none transition-all"/>
+            <input type="email" value="rakesh@wearai.io" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-xs font-semibold text-slate-800 outline-none transition-all"/>
           </div>
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Security Token</label>
           <div class="relative">
             <i data-lucide="lock" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-            <input type="password" value="demo1234" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-xs font-medium text-slate-800 outline-none transition-all"/>
+            <input type="password" value="demo1234" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-xs font-semibold text-slate-800 outline-none transition-all"/>
           </div>
         </div>
-        <button onclick="actions.login()" class="w-full py-3 bg-gradient-to-r from-brand-600 via-indigo-600 to-brand-700 hover:from-brand-500 hover:to-indigo-500 text-white rounded-xl font-bold text-xs shadow-lg shadow-brand-500/25 transition-all hover:scale-[1.01] active:scale-[0.99]">
+        <button onclick="actions.login()" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold text-xs shadow-lg shadow-brand-600/30 transition-all hover:scale-[1.01] active:scale-[0.99]">
           Authenticate & Launch Workspace →
         </button>
       </div>
 
-      <div class="mt-6 pt-6 border-t border-slate-200/80">
-        <p class="text-[11px] font-semibold text-slate-400 text-center mb-3">1-Click Fast Workspace Sign-In:</p>
+      <div class="mt-6 pt-6 border-t border-slate-200">
+        <p class="text-[11px] font-semibold text-slate-400 text-center mb-3">1-Click Fast Sign-In:</p>
         <div class="grid grid-cols-3 gap-2">
-          <button onclick="actions.quickLogin('admin')" class="flex flex-col items-center gap-1.5 p-2.5 rounded-xl border border-slate-200 hover:border-brand-400 hover:bg-brand-50/50 transition-all group">
+          <button onclick="actions.quickLogin('admin')" class="flex flex-col items-center gap-1.5 p-2.5 rounded-xl border border-slate-200 hover:border-brand-500 hover:bg-brand-50/50 transition-all group">
             <div class="w-7 h-7 rounded-lg bg-brand-100 flex items-center justify-center text-brand-700 group-hover:scale-110 transition-transform">
               <i data-lucide="shield-check" class="w-4 h-4"></i>
             </div>
-            <span class="text-[11px] font-bold text-slate-700">Sai Rakesh</span>
+            <span class="text-[11px] font-bold text-slate-800">Sai Rakesh</span>
             <span class="text-[9px] text-brand-600 font-semibold uppercase">Admin</span>
           </button>
-          <button onclick="actions.quickLogin('manager')" class="flex flex-col items-center gap-1.5 p-2.5 rounded-xl border border-slate-200 hover:border-emerald-400 hover:bg-emerald-50/50 transition-all group">
-            <div class="w-7 h-7 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-700 group-hover:scale-110 transition-transform">
+          <button onclick="actions.quickLogin('manager')" class="flex flex-col items-center gap-1.5 p-2.5 rounded-xl border border-slate-200 hover:border-brand-500 hover:bg-brand-50/50 transition-all group">
+            <div class="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center text-slate-700 group-hover:scale-110 transition-transform">
               <i data-lucide="clipboard-list" class="w-4 h-4"></i>
             </div>
-            <span class="text-[11px] font-bold text-slate-700">Vikram</span>
-            <span class="text-[9px] text-emerald-600 font-semibold uppercase">Manager</span>
+            <span class="text-[11px] font-bold text-slate-800">Vikram</span>
+            <span class="text-[9px] text-slate-600 font-semibold uppercase">Manager</span>
           </button>
-          <button onclick="actions.quickLogin('staff')" class="flex flex-col items-center gap-1.5 p-2.5 rounded-xl border border-slate-200 hover:border-amber-400 hover:bg-amber-50/50 transition-all group">
-            <div class="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center text-amber-700 group-hover:scale-110 transition-transform">
+          <button onclick="actions.quickLogin('staff')" class="flex flex-col items-center gap-1.5 p-2.5 rounded-xl border border-slate-200 hover:border-brand-500 hover:bg-brand-50/50 transition-all group">
+            <div class="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center text-slate-700 group-hover:scale-110 transition-transform">
               <i data-lucide="package" class="w-4 h-4"></i>
             </div>
-            <span class="text-[11px] font-bold text-slate-700">Arjun</span>
-            <span class="text-[9px] text-amber-600 font-semibold uppercase">Staff</span>
+            <span class="text-[11px] font-bold text-slate-800">Arjun</span>
+            <span class="text-[9px] text-slate-600 font-semibold uppercase">Staff</span>
           </button>
         </div>
       </div>
@@ -645,289 +573,223 @@ function renderLogin(){
   </div>`;
 }
 
-// ==================== COMPONENT: SIDEBAR ====================
-function renderSidebar(){
-  if(!state.user) return '';
+// ==================== COMPONENT: TOP BAR (LAPTOP / DESKTOP / MOBILE) ====================
+function renderTopbar(){
+  const unreadCount = state.notifications.filter(n=>!n.read).length;
 
-  const groups = [
-    {
-      label: 'OVERVIEW',
-      items: [
-        {id:'dashboard',label:'Dashboard',icon:'layout-dashboard'},
-        {id:'analytics',label:'Analytics & KPIs',icon:'bar-chart-3'}
-      ]
-    },
-    {
-      label: 'WAREHOUSE FLOOR',
-      items: [
-        {id:'orders',label:'Live Orders',icon:'shopping-cart'},
-        {id:'inventory',label:'Inventory Stock',icon:'package'},
-        {id:'allocation',label:'Stock Allocation',icon:'git-branch',badge:'AI Conflict'},
-        {id:'picking',label:'Pick & Route',icon:'map-pin'},
-        {id:'packing',label:'Pack Station',icon:'box'},
-        {id:'qualityCheck',label:'Quality Check',icon:'check-square'},
-        {id:'dispatch',label:'Dock & Dispatch',icon:'truck'}
-      ]
-    },
-    {
-      label: 'AUTONOMOUS AI',
-      items: [
-        {id:'smartDecisions',label:'Smart Decisions',icon:'brain',badge:'Engine'},
-        {id:'exceptions',label:'Exceptions',icon:'alert-triangle',badge:EXCEPTIONS.filter(e=>e.status==='Open').length},
-        {id:'notifications',label:'Alerts Center',icon:'bell',badge:state.notifications.filter(n=>!n.read).length}
-      ]
-    },
-    {
-      label: 'SYSTEM',
-      items: [
-        {id:'settings',label:'Settings & Config',icon:'settings'}
-      ]
-    }
+  const navTabs = [
+    {id:'dashboard',label:'Dashboard',icon:'layout-dashboard'},
+    {id:'orders',label:'Live Orders',icon:'shopping-cart'},
+    {id:'inventory',label:'Inventory',icon:'package'},
+    {id:'allocation',label:'Allocation',icon:'git-branch',badge:'AI Conflict'},
+    {id:'picking',label:'Pick & Route',icon:'map-pin'},
+    {id:'packing',label:'Pack Station',icon:'box'},
+    {id:'qualityCheck',label:'Quality Check',icon:'check-square'},
+    {id:'dispatch',label:'Dispatch',icon:'truck'},
+    {id:'smartDecisions',label:'AI Decisions',icon:'brain',badge:'AI'},
+    {id:'exceptions',label:'Exceptions',icon:'alert-triangle',badge:EXCEPTIONS.filter(e=>e.status==='Open').length},
+    {id:'analytics',label:'Analytics',icon:'bar-chart-3'},
+    {id:'settings',label:'Settings',icon:'settings'}
   ];
 
-  const roleLabels = {admin:'Lead Administrator',manager:'Warehouse Manager',staff:'Operations Specialist'};
-
   return `
-  <aside class="fixed lg:sticky top-0 left-0 h-screen w-64 bg-obsidian-900 text-slate-300 z-50 transform ${state.sidebarOpen?'translate-x-0':'-translate-x-full'} lg:translate-x-0 transition-transform duration-300 sidebar-scroll overflow-y-auto border-r border-slate-800/80 flex flex-col justify-between shadow-2xl">
-    <div>
-      <!-- Brand Logo Header -->
-      <div class="p-4 pb-3 border-b border-slate-800/70">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 via-indigo-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-brand-500/20 border border-brand-400/30">
-              <i data-lucide="warehouse" class="w-5 h-5 text-white"></i>
+  <header class="sticky top-0 z-40 bg-black text-white shadow-xl">
+    <!-- Tier 1: Global Utility & Executive Bar -->
+    <div class="border-b border-slate-800/90">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-between gap-3">
+        <!-- Brand & Facility Node -->
+        <div class="flex items-center gap-3">
+          <button onclick="actions.toggleMobileMenu()" class="lg:hidden p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
+            <i data-lucide="menu" class="w-5 h-5"></i>
+          </button>
+
+          <!-- Brand Logo -->
+          <div onclick="navigate('dashboard')" class="flex items-center gap-2.5 cursor-pointer">
+            <div class="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center shadow-lg shadow-brand-600/40 text-white font-bold border border-brand-400/30">
+              <i data-lucide="warehouse" class="w-5 h-5"></i>
             </div>
             <div>
               <div class="flex items-center gap-1.5">
-                <h1 class="text-white font-black text-base font-display tracking-tight">WearAI</h1>
-                <span class="px-1.5 py-0.2 rounded text-[9px] font-black bg-brand-500/25 text-brand-300 border border-brand-500/30">PRO</span>
+                <h1 class="text-white font-black text-lg font-display tracking-tight">WearAI</h1>
+                <span class="px-1.5 py-0.2 rounded text-[9px] font-black bg-brand-600/30 text-brand-300 border border-brand-500/40">PRO</span>
               </div>
-              <p class="text-[10px] text-slate-400 font-medium">Warehouse AI Intelligence</p>
+              <p class="text-[9px] text-slate-400 font-medium hidden sm:block">Intelligent Logistics Engine</p>
             </div>
+          </div>
+
+          <!-- Facility Location Switcher -->
+          <div class="relative ml-2 hidden sm:block">
+            <button onclick="actions.toggleWarehouseDropdown()" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition-all text-xs font-bold border border-slate-800">
+              <span class="w-2 h-2 rounded-full bg-brand-500 pulse-dot"></span>
+              <span class="font-display tracking-wide">${state.warehouse}</span>
+              <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
+            </button>
+
+            ${state.whDropdownOpen ? `
+              <div class="absolute left-0 mt-2 w-64 bg-white text-slate-900 rounded-2xl shadow-2xl border border-slate-200 p-2 z-50 fade-in">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 py-1">Select Facility Node</p>
+                ${[
+                  {name:'WH-01 Seattle Central',status:'Primary Hub • Active',sub:'94.8% Capacity'},
+                  {name:'WH-02 Chicago Hub',status:'Secondary Node • Active',sub:'76.2% Capacity'},
+                  {name:'WH-03 Dallas Depot',status:'Regional Crossdock',sub:'82.1% Capacity'},
+                  {name:'WH-04 Frankfurt Euro',status:'Cross-Continent Bay',sub:'61.4% Capacity'}
+                ].map(wh=>`
+                  <button onclick="actions.setWarehouse('${wh.name}')" class="w-full text-left p-2 rounded-xl hover:bg-slate-100 flex items-center justify-between transition-colors ${state.warehouse===wh.name?'bg-brand-50 text-brand-700 font-bold':''}">
+                    <div>
+                      <p class="text-xs font-bold">${wh.name}</p>
+                      <p class="text-[10px] text-slate-500">${wh.status} · ${wh.sub}</p>
+                    </div>
+                    ${state.warehouse===wh.name?`<i data-lucide="check" class="w-4 h-4 text-brand-600"></i>`:''}
+                  </button>
+                `).join('')}
+              </div>
+            ` : ''}
+          </div>
+        </div>
+
+        <!-- Center Spotlight Search -->
+        <div class="flex-1 max-w-md mx-2 hidden md:block">
+          <div onclick="actions.openCommandPalette()" class="relative flex items-center w-full bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl px-3 py-1.5 cursor-pointer transition-all group">
+            <i data-lucide="search" class="w-4 h-4 text-slate-400 group-hover:text-brand-400 transition-colors mr-2.5"></i>
+            <span class="text-xs text-slate-400 flex-1 truncate">Search orders, SKU, bins, pickers...</span>
+            <kbd class="inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono text-slate-400 bg-slate-800 border border-slate-700 rounded font-bold">Ctrl K</kbd>
+          </div>
+        </div>
+
+        <!-- Right Utilities & Profile -->
+        <div class="flex items-center gap-2">
+          <!-- Live Shift Clock -->
+          <div class="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs">
+            <span class="w-2 h-2 rounded-full bg-brand-500 pulse-dot"></span>
+            <span class="font-mono font-bold text-white" id="live-top-clock">14:48:20</span>
+            <span class="text-[10px] font-bold text-brand-400 bg-brand-950 px-1.5 py-0.2 rounded border border-brand-800">Shift 1</span>
+          </div>
+
+          <!-- Quick Action: AI Optimize -->
+          <button onclick="actions.openAiOptimizerModal()" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-xs font-bold shadow-md shadow-brand-600/30 transition-all hover:scale-[1.02] active:scale-[0.98]">
+            <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+            <span>AI Optimize</span>
+          </button>
+
+          <!-- Quick Action: + New Order -->
+          <button onclick="actions.openNewOrderModal()" class="inline-flex items-center gap-1 px-3 py-1.5 bg-white text-black hover:bg-slate-100 rounded-xl text-xs font-bold shadow-sm transition-all">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            <span class="hidden sm:inline">Order</span>
+          </button>
+
+          <!-- Notifications Dropdown -->
+          <div class="relative">
+            <button onclick="actions.toggleNotifDropdown()" class="relative p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
+              <i data-lucide="bell" class="w-4 h-4"></i>
+              ${unreadCount ? `<span class="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] flex items-center justify-center font-black">${unreadCount}</span>` : ''}
+            </button>
+
+            ${state.notifDropdownOpen ? `
+              <div class="absolute right-0 mt-2 w-80 sm:w-96 bg-white text-slate-900 rounded-2xl shadow-2xl border border-slate-200 p-3 z-50 fade-in">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-100 mb-2">
+                  <div class="flex items-center gap-2">
+                    <h4 class="font-bold text-xs text-slate-800">Live Alerts</h4>
+                    <span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-brand-100 text-brand-700">${unreadCount} New</span>
+                  </div>
+                  <button onclick="actions.markAllRead()" class="text-[11px] font-bold text-brand-600 hover:underline">Mark all read</button>
+                </div>
+                <div class="space-y-1.5 max-h-72 overflow-y-auto">
+                  ${state.notifications.slice(0, 5).map(n => `
+                    <div class="p-2.5 rounded-xl ${n.read ? 'bg-slate-50 opacity-60' : 'bg-brand-50/50 border border-brand-100'} hover:bg-slate-100 transition-colors flex items-start gap-2.5">
+                      <div class="w-2 h-2 rounded-full ${n.type==='critical'?'bg-rose-500':n.type==='warning'?'bg-amber-500':'bg-brand-600'} mt-1.5 flex-shrink-0"></div>
+                      <div class="flex-1 min-w-0">
+                        <p class="text-xs font-bold text-slate-800 truncate">${n.title}</p>
+                        <p class="text-[11px] text-slate-600 line-clamp-2">${n.message}</p>
+                        <p class="text-[9px] text-slate-400 mt-1">${timeAgo(n.time)}</p>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+                <button onclick="navigate('notifications'); state.notifDropdownOpen=false;" class="w-full text-center mt-2 pt-2 border-t border-slate-100 text-xs font-bold text-brand-600 hover:text-brand-700">View All Alerts →</button>
+              </div>
+            ` : ''}
+          </div>
+
+          <!-- User Profile -->
+          <div class="relative">
+            <button onclick="actions.toggleUserDropdown()" class="flex items-center gap-2 p-1 sm:px-2.5 sm:py-1 rounded-xl bg-slate-900 hover:bg-slate-800 transition-all border border-slate-800">
+              ${avatar(state.user.name, 'bg-brand-600 w-7 h-7 text-[11px] shadow-sm')}
+              <div class="hidden sm:block text-left">
+                <p class="text-xs font-bold text-white leading-tight">${state.user.name}</p>
+                <p class="text-[9px] text-brand-400 font-bold uppercase tracking-wider">${state.user.role}</p>
+              </div>
+              <i data-lucide="chevron-down" class="hidden sm:block w-3.5 h-3.5 text-slate-400"></i>
+            </button>
+
+            ${state.userDropdownOpen ? `
+              <div class="absolute right-0 mt-2 w-56 bg-white text-slate-900 rounded-2xl shadow-2xl border border-slate-200 p-2 z-50 fade-in">
+                <div class="p-2 border-b border-slate-100 mb-1">
+                  <p class="text-xs font-bold text-slate-900">${state.user.name}</p>
+                  <p class="text-[11px] text-slate-500 truncate">${state.user.email}</p>
+                  <span class="inline-block mt-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-100 text-brand-700 capitalize">${state.user.role}</span>
+                </div>
+                <button onclick="navigate('settings'); state.userDropdownOpen=false;" class="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-lg flex items-center gap-2">
+                  <i data-lucide="settings" class="w-4 h-4 text-slate-500"></i> Settings & Console
+                </button>
+                <button onclick="actions.quickLogin('admin'); state.userDropdownOpen=false;" class="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-lg flex items-center gap-2">
+                  <i data-lucide="shield" class="w-4 h-4 text-brand-600"></i> Sai Rakesh (Admin)
+                </button>
+                <button onclick="actions.quickLogin('manager'); state.userDropdownOpen=false;" class="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-lg flex items-center gap-2">
+                  <i data-lucide="clipboard" class="w-4 h-4 text-slate-600"></i> Vikram (Manager)
+                </button>
+                <button onclick="actions.quickLogin('staff'); state.userDropdownOpen=false;" class="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-lg flex items-center gap-2">
+                  <i data-lucide="package" class="w-4 h-4 text-slate-600"></i> Arjun (Staff)
+                </button>
+                <div class="pt-1 mt-1 border-t border-slate-100">
+                  <button onclick="actions.logout(); state.userDropdownOpen=false;" class="w-full text-left px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 rounded-lg flex items-center gap-2">
+                    <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
+                  </button>
+                </div>
+              </div>
+            ` : ''}
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Navigation Groups -->
-      <div class="p-3 space-y-4">
-        ${groups.map(g=>`
-          <div>
-            <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">${g.label}</p>
-            <nav class="space-y-0.5">
-              ${g.items.map(item=>`
-                <button onclick="navigate('${item.id}')" class="nav-item w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-400 transition-all ${state.view===item.id?'active':''}">
-                  <i data-lucide="${item.icon}" class="w-4 h-4 flex-shrink-0 ${state.view===item.id?'text-brand-400':''}"></i>
-                  <span class="flex-1 text-left truncate">${item.label}</span>
-                  ${item.badge !== undefined && item.badge !== '' ? `
-                    <span class="px-1.5 py-0.5 rounded-md text-[9px] font-extrabold ${item.badge==='AI Conflict'?'bg-rose-500 text-white animate-pulse':item.badge==='Engine'?'bg-purple-500/30 text-purple-300 border border-purple-500/40':'bg-rose-500 text-white'}">
-                      ${item.badge}
-                    </span>
-                  ` : ''}
-                </button>
-              `).join('')}
-            </nav>
-          </div>
+    <!-- Tier 2: Horizontal Navigation Bar (Laptop / Desktop) -->
+    <div class="bg-obsidian-950 border-b border-slate-800/80 hidden lg:block">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-1 overflow-x-auto py-1 scrollbar-none">
+        ${navTabs.map(item=>`
+          <button onclick="navigate('${item.id}')" class="top-tab flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-slate-400 transition-all flex-shrink-0 ${state.view===item.id?'active':''}">
+            <i data-lucide="${item.icon}" class="w-3.5 h-3.5"></i>
+            <span>${item.label}</span>
+            ${item.badge !== undefined && item.badge !== '' ? `
+              <span class="px-1.5 py-0.2 rounded-md text-[9px] font-black ${item.badge==='AI Conflict'?'bg-rose-500 text-white animate-pulse':item.badge==='AI'?'bg-brand-500 text-white':'bg-slate-800 text-slate-300'}">
+                ${item.badge}
+              </span>
+            ` : ''}
+          </button>
         `).join('')}
       </div>
     </div>
 
-    <!-- Sidebar Bottom: Floor Throughput Widget & User Card -->
-    <div class="p-3 border-t border-slate-800/80 bg-obsidian-950/80 space-y-3">
-      <!-- Mini System Throughput Meter -->
-      <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
-        <div class="flex items-center justify-between text-[11px] mb-1.5">
-          <span class="text-slate-400 font-medium">Throughput Capacity</span>
-          <span class="text-emerald-400 font-bold font-mono">94.8%</span>
-        </div>
-        <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
-          <div class="bg-gradient-to-r from-brand-500 to-emerald-400 h-1.5 rounded-full" style="width: 94.8%"></div>
-        </div>
-        <p class="text-[9px] text-slate-500 mt-1">Autonomous dispatch operating at peak</p>
-      </div>
-
-      <!-- User Card -->
-      <div class="flex items-center gap-2.5 p-2 rounded-xl bg-slate-900/60 border border-slate-800/70">
-        <div class="relative">
-          ${avatar(state.user.name,'bg-gradient-to-br from-brand-500 to-indigo-600 w-8 h-8 text-xs shadow-sm')}
-          <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-obsidian-950"></span>
-        </div>
-        <div class="flex-1 min-w-0">
-          <p class="text-white text-xs font-bold truncate">${state.user.name}</p>
-          <p class="text-[10px] text-slate-400 truncate">${roleLabels[state.user.role]}</p>
-        </div>
-        <button onclick="actions.logout()" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all" title="Logout">
-          <i data-lucide="log-out" class="w-4 h-4"></i>
-        </button>
-      </div>
-    </div>
-  </aside>
-  ${state.sidebarOpen?`<div class="fixed inset-0 bg-slate-950/60 z-40 lg:hidden backdrop-blur-xs" onclick="state.sidebarOpen=false;render()"></div>`:''}`;
-}
-
-// ==================== COMPONENT: TOP BAR ====================
-function renderTopbar(){
-  const unreadCount = state.notifications.filter(n=>!n.read).length;
-
-  return `
-  <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-slate-200/80 px-4 lg:px-6 py-2.5 shadow-2xs">
-    <div class="flex items-center justify-between gap-3">
-      <!-- Left Section: Mobile Menu + Facility Switcher + Breadcrumb -->
-      <div class="flex items-center gap-3">
-        <button onclick="state.sidebarOpen=!state.sidebarOpen;render()" class="lg:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition-colors">
-          <i data-lucide="menu" class="w-5 h-5"></i>
-        </button>
-
-        <!-- Warehouse Facility Switcher -->
-        <div class="relative">
-          <button onclick="actions.toggleWarehouseDropdown()" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition-all text-xs font-bold shadow-xs border border-slate-800">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-dot"></span>
-            <i data-lucide="building-2" class="w-3.5 h-3.5 text-cyan-400"></i>
-            <span class="font-display tracking-wide">${state.warehouse}</span>
-            <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
-          </button>
-
-          ${state.whDropdownOpen ? `
-            <div class="absolute left-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-slate-200 p-2 z-50 fade-in">
-              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 py-1">Select Facility Node</p>
-              ${[
-                {name:'WH-01 Seattle Central',status:'Primary Hub • Active',sub:'94.8% Capacity'},
-                {name:'WH-02 Chicago Hub',status:'Secondary Node • Active',sub:'76.2% Capacity'},
-                {name:'WH-03 Dallas Depot',status:'Regional Crossdock',sub:'82.1% Capacity'},
-                {name:'WH-04 Frankfurt Euro',status:'Cross-Continent Bay',sub:'61.4% Capacity'}
-              ].map(wh=>`
-                <button onclick="actions.setWarehouse('${wh.name}')" class="w-full text-left p-2 rounded-xl hover:bg-slate-50 flex items-center justify-between transition-colors ${state.warehouse===wh.name?'bg-brand-50 border border-brand-200':''}">
-                  <div>
-                    <p class="text-xs font-bold text-slate-800">${wh.name}</p>
-                    <p class="text-[10px] text-slate-500">${wh.status} · ${wh.sub}</p>
-                  </div>
-                  ${state.warehouse===wh.name?`<i data-lucide="check" class="w-4 h-4 text-brand-600"></i>`:''}
-                </button>
-              `).join('')}
-            </div>
-          ` : ''}
-        </div>
-
-        <!-- Breadcrumbs -->
-        <div class="hidden xl:flex items-center gap-1.5 text-xs text-slate-400 font-medium pl-2 border-l border-slate-200">
-          <span class="text-slate-500 font-semibold">WearAI</span>
-          <span class="text-slate-300">/</span>
-          <span class="text-slate-700 capitalize font-bold">${state.view}</span>
-          <span class="text-slate-300">/</span>
-          <span class="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-[10px] font-extrabold flex items-center gap-1 border border-emerald-200">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-dot"></span> Live Sync
-          </span>
-        </div>
-      </div>
-
-      <!-- Center Section: Command Spotlight Search -->
-      <div class="flex-1 max-w-md mx-2">
-        <div onclick="actions.openCommandPalette()" class="relative flex items-center w-full bg-slate-100 hover:bg-slate-200/80 border border-slate-200/80 rounded-xl px-3 py-1.5 cursor-pointer transition-all group">
-          <i data-lucide="search" class="w-4 h-4 text-slate-400 group-hover:text-brand-600 transition-colors mr-2.5"></i>
-          <span class="text-xs text-slate-400 flex-1 truncate">Search orders, SKU, bins, pickers...</span>
-          <kbd class="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono text-slate-500 bg-white border border-slate-300 rounded shadow-2xs font-bold">Ctrl K</kbd>
-        </div>
-      </div>
-
-      <!-- Right Section: Live Clock + AI SLA + CTAs + Notifications + Profile -->
-      <div class="flex items-center gap-2">
-        <!-- Live Shift Clock -->
-        <div class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100/90 border border-slate-200/80 text-xs">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-dot"></span>
-          <span class="font-mono font-bold text-slate-800" id="live-top-clock">14:42:15</span>
-          <span class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded-md">Shift 1 Peak</span>
-        </div>
-
-        <!-- AI Engine SLA Badge -->
-        <div class="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-purple-500/10 via-indigo-500/10 to-brand-500/10 border border-purple-200 text-xs text-purple-700 font-bold">
-          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-purple-600"></i>
-          <span class="text-[11px]">99.8% SLA</span>
-        </div>
-
-        <!-- Action CTA: Run AI Optimizer -->
-        <button onclick="actions.openAiOptimizerModal()" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white rounded-xl text-xs font-bold shadow-xs shadow-brand-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]">
-          <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-300"></i>
-          <span>AI Optimize</span>
-        </button>
-
-        <!-- Action CTA: + New Order -->
-        <button onclick="actions.openNewOrderModal()" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold shadow-xs transition-all">
-          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-          <span class="hidden sm:inline">Order</span>
-        </button>
-
-        <!-- Notifications Dropdown -->
-        <div class="relative">
-          <button onclick="actions.toggleNotifDropdown()" class="relative p-2 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors border border-transparent hover:border-slate-200">
-            <i data-lucide="bell" class="w-4 h-4"></i>
-            ${unreadCount ? `<span class="absolute 0 top-0.5 right-0.5 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] flex items-center justify-center font-black shadow-xs">${unreadCount}</span>` : ''}
-          </button>
-
-          ${state.notifDropdownOpen ? `
-            <div class="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 p-3 z-50 fade-in">
-              <div class="flex items-center justify-between pb-2 border-b border-slate-100 mb-2">
-                <div class="flex items-center gap-2">
-                  <h4 class="font-bold text-xs text-slate-800">Operational Alerts</h4>
-                  <span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-brand-100 text-brand-700">${unreadCount} Pending</span>
-                </div>
-                <button onclick="actions.markAllRead()" class="text-[11px] font-bold text-brand-600 hover:underline">Mark all read</button>
+    <!-- Mobile Drawer Menu (Phones / Tablets) -->
+    ${state.mobileMenuOpen ? `
+      <div class="lg:hidden fixed inset-0 top-[53px] z-50 bg-black/80 backdrop-blur-md p-4 fade-in">
+        <div class="bg-obsidian-900 border border-slate-800 rounded-2xl p-4 space-y-1 max-h-[85vh] overflow-y-auto">
+          <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-3 py-1">Navigation Menu</p>
+          ${navTabs.map(item=>`
+            <button onclick="navigate('${item.id}'); actions.toggleMobileMenu();" class="w-full flex items-center justify-between p-3 rounded-xl text-xs font-bold ${state.view===item.id?'bg-brand-600 text-white':'text-slate-300 hover:bg-slate-800'}">
+              <div class="flex items-center gap-2.5">
+                <i data-lucide="${item.icon}" class="w-4 h-4"></i>
+                <span>${item.label}</span>
               </div>
-              <div class="space-y-1.5 max-h-72 overflow-y-auto">
-                ${state.notifications.slice(0, 5).map(n => `
-                  <div class="p-2.5 rounded-xl ${n.read ? 'bg-slate-50 opacity-60' : 'bg-brand-50/40 border border-brand-100'} hover:bg-slate-100 transition-colors flex items-start gap-2.5">
-                    <div class="w-2 h-2 rounded-full ${n.type==='critical'?'bg-rose-500':n.type==='warning'?'bg-amber-500':'bg-brand-500'} mt-1.5 flex-shrink-0"></div>
-                    <div class="flex-1 min-w-0">
-                      <p class="text-xs font-bold text-slate-800 truncate">${n.title}</p>
-                      <p class="text-[11px] text-slate-600 line-clamp-2">${n.message}</p>
-                      <p class="text-[9px] text-slate-400 mt-1">${timeAgo(n.time)}</p>
-                    </div>
-                  </div>
-                `).join('')}
-              </div>
-              <button onclick="navigate('notifications'); state.notifDropdownOpen=false;" class="w-full text-center mt-2 pt-2 border-t border-slate-100 text-xs font-bold text-brand-600 hover:text-brand-700">View All Notifications →</button>
-            </div>
-          ` : ''}
-        </div>
-
-        <!-- User Profile Pill -->
-        <div class="relative">
-          <button onclick="actions.toggleUserDropdown()" class="flex items-center gap-2 p-1 sm:px-2.5 sm:py-1 rounded-xl bg-slate-100 hover:bg-slate-200/80 transition-all border border-slate-200">
-            ${avatar(state.user.name, 'bg-gradient-to-br from-brand-600 to-indigo-700 w-7 h-7 text-[11px] shadow-xs')}
-            <div class="hidden sm:block text-left">
-              <p class="text-xs font-bold text-slate-800 leading-tight">${state.user.name}</p>
-              <p class="text-[9px] text-brand-700 font-bold uppercase tracking-wider">${state.user.role}</p>
-            </div>
-            <i data-lucide="chevron-down" class="hidden sm:block w-3.5 h-3.5 text-slate-400"></i>
-          </button>
-
-          ${state.userDropdownOpen ? `
-            <div class="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-slate-200 p-2 z-50 fade-in">
-              <div class="p-2 border-b border-slate-100 mb-1">
-                <p class="text-xs font-bold text-slate-900">${state.user.name}</p>
-                <p class="text-[11px] text-slate-500 truncate">${state.user.email}</p>
-                <span class="inline-block mt-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-100 text-brand-700 capitalize">${state.user.role}</span>
-              </div>
-              <button onclick="navigate('settings'); state.userDropdownOpen=false;" class="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-lg flex items-center gap-2">
-                <i data-lucide="settings" class="w-4 h-4 text-slate-500"></i> Settings & Console
-              </button>
-              <button onclick="actions.quickLogin('admin'); state.userDropdownOpen=false;" class="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-lg flex items-center gap-2">
-                <i data-lucide="shield" class="w-4 h-4 text-indigo-600"></i> Sai Rakesh (Admin)
-              </button>
-              <button onclick="actions.quickLogin('manager'); state.userDropdownOpen=false;" class="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-lg flex items-center gap-2">
-                <i data-lucide="clipboard" class="w-4 h-4 text-emerald-600"></i> Vikram (Manager)
-              </button>
-              <button onclick="actions.quickLogin('staff'); state.userDropdownOpen=false;" class="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-lg flex items-center gap-2">
-                <i data-lucide="package" class="w-4 h-4 text-amber-600"></i> Arjun (Staff)
-              </button>
-              <div class="pt-1 mt-1 border-t border-slate-100">
-                <button onclick="actions.logout(); state.userDropdownOpen=false;" class="w-full text-left px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 rounded-lg flex items-center gap-2">
-                  <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
-                </button>
-              </div>
-            </div>
-          ` : ''}
+              ${item.badge !== undefined && item.badge !== '' ? `
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-black ${item.badge==='AI Conflict'?'bg-rose-500 text-white':'bg-brand-500 text-white'}">
+                  ${item.badge}
+                </span>
+              ` : ''}
+            </button>
+          `).join('')}
         </div>
       </div>
-    </div>
+    ` : ''}
   </header>`;
 }
 
@@ -942,111 +804,109 @@ function renderDashboard(){
   const dispatched = ORDERS.filter(o=>o.status==='Dispatched'||o.status==='Delivered').length;
   const lowStock = PRODUCTS.filter(p=>p.status==='Low Stock'||p.status==='Critical Stock').length;
   const outOfStock = PRODUCTS.filter(p=>p.status==='Out of Stock').length;
-  const damagedItems = EXCEPTIONS.filter(e=>e.type==='Damaged Item').length;
-  const delayedOrders = ORDERS.filter(o=>o.exceptionStatus!=='None').length;
   const inventoryValue = PRODUCTS.reduce((s,p)=>s+(p.stock*p.price),0);
   const fulfillmentRate = totalOrders > 0 ? Math.round((dispatched/totalOrders)*100) : 0;
 
   return `
   <div class="fade-in space-y-6">
-    <!-- Active Stock Contention Alert Banner -->
-    <div class="relative bg-gradient-to-r from-rose-950 via-slate-900 to-brand-950 border border-rose-500/30 rounded-2xl p-5 text-white shadow-xl shadow-rose-950/20 overflow-hidden">
-      <div class="absolute right-0 top-0 bottom-0 w-80 bg-gradient-to-l from-rose-500/10 to-transparent pointer-events-none"></div>
+    <!-- Active Stock Contention Alert Banner (Black & Royal Blue & White) -->
+    <div class="relative bg-black border-2 border-brand-600 rounded-3xl p-5 sm:p-6 text-white shadow-2xl overflow-hidden">
+      <div class="absolute right-0 top-0 bottom-0 w-96 bg-gradient-to-l from-brand-600/20 to-transparent pointer-events-none"></div>
       <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative z-10">
         <div class="flex items-start gap-4">
-          <div class="w-12 h-12 rounded-2xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center flex-shrink-0 text-rose-400">
+          <div class="w-12 h-12 rounded-2xl bg-brand-600 text-white flex items-center justify-center flex-shrink-0 shadow-lg shadow-brand-600/50">
             <i data-lucide="zap" class="w-6 h-6 animate-pulse"></i>
           </div>
           <div>
             <div class="flex items-center gap-2 mb-1">
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white uppercase tracking-wider">Active Contention</span>
-              <span class="text-xs text-rose-200 font-mono">SKU-101 (Wireless Headphones Pro)</span>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-brand-600 text-white uppercase tracking-wider">AI Contention</span>
+              <span class="text-xs text-brand-300 font-mono">SKU-101 (Wireless Headphones Pro)</span>
             </div>
-            <h3 class="font-bold text-sm sm:text-base text-white">Stock Allocation Conflict: ORD-1001 (VIP) & ORD-1002</h3>
+            <h3 class="font-bold text-base sm:text-lg text-white font-display">Stock Allocation Conflict: ORD-1001 (VIP) & ORD-1002</h3>
             <p class="text-xs text-slate-300 mt-0.5 max-w-2xl">15 units demanded across 2 orders, but only 7 units in shelf location A1. WearAI recommends allocating 7 units to Critical VIP order ORD-1001.</p>
           </div>
         </div>
         <div class="flex items-center gap-2 self-end md:self-center flex-shrink-0">
-          <button onclick="actions.applyAllocation('SKU-101')" class="px-4 py-2.5 bg-gradient-to-r from-rose-500 to-brand-600 hover:from-rose-600 hover:to-brand-700 text-white text-xs font-bold rounded-xl shadow-lg transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
+          <button onclick="actions.applyAllocation('SKU-101')" class="px-4 py-2.5 bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-brand-600/40 transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
             <i data-lucide="sparkles" class="w-4 h-4"></i> Auto-Resolve with AI
           </button>
-          <button onclick="navigate('allocation')" class="px-3 py-2.5 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-xl transition-all border border-white/10">
+          <button onclick="navigate('allocation')" class="px-4 py-2.5 bg-white text-black hover:bg-slate-100 text-xs font-bold rounded-xl transition-all">
             Details →
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Enhanced KPI Grid -->
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3.5">
-      ${statCard('Total Orders',totalOrders,'shopping-cart','bg-gradient-to-br from-brand-600 to-indigo-700',`${pendingOrders} in pipeline`,'+14.2%','up','navigate("orders")')}
-      ${statCard('Urgent Orders',`<span class="text-rose-600">${urgentOrders}</span>`,'alert-octagon','bg-gradient-to-br from-rose-500 to-red-600','Action needed','3 VIP','down','navigate("orders")')}
-      ${statCard('In Picking',pickingOrders,'map-pin','bg-gradient-to-br from-purple-500 to-indigo-600',`${packingOrders} in packing`,'Zone A/B','neutral','navigate("picking")')}
-      ${statCard('Ready to Ship',readyOrders,'package-check','bg-gradient-to-br from-emerald-500 to-teal-600',`${dispatched} dispatched`,'Dock 02','up','navigate("dispatch")')}
-      ${statCard('Low Stock',`<span class="text-amber-600">${lowStock}</span>`,'trending-down','bg-gradient-to-br from-amber-500 to-orange-600',`${outOfStock} stockout`,'Reorder req','down','navigate("inventory")')}
-      ${statCard('Inventory Value',fmtCur(inventoryValue),'dollar-sign','bg-gradient-to-br from-indigo-600 to-slate-800','Total warehouse asset','+4.1%','up','navigate("inventory")')}
-      ${statCard('Fulfillment Rate',`${fulfillmentRate}%`,'target','bg-gradient-to-br from-emerald-600 to-teal-700',`${dispatched}/${totalOrders} orders`,'99.2% SLA','up','navigate("analytics")')}
-      ${statCard('Exceptions',`<span class="text-rose-600">${EXCEPTIONS.filter(e=>e.status==='Open').length}</span>`,'alert-triangle','bg-gradient-to-br from-rose-600 to-pink-700','Open tickets','1 Damaged','down','navigate("exceptions")')}
-      ${statCard('Active Pickers','4','users','bg-gradient-to-br from-blue-500 to-cyan-600','Across 4 zones','Optimal','up','navigate("picking")')}
-      ${statCard('Avg Cycle Time','12m','timer','bg-gradient-to-br from-teal-500 to-emerald-600','Per completed order','-2.4m','up','navigate("analytics")')}
-      ${statCard('Dispatch Queue',readyOrders,'truck','bg-gradient-to-br from-slate-700 to-slate-900','Dock Bays 1-4','FedEx/UPS','neutral','navigate("dispatch")')}
-      ${statCard('AI Interventions','18','brain','bg-gradient-to-br from-purple-600 to-brand-700','Auto-handled today','100% SLA','up','navigate("smartDecisions")')}
+    <!-- Enhanced Responsive KPI Grid (Laptop 6 cols, Tablet 3 cols, Mobile 2 cols) -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
+      ${statCard('Total Orders',totalOrders,'shopping-cart','bg-black',`${pendingOrders} in pipeline`,'+14.2%','up','navigate("orders")')}
+      ${statCard('Urgent Orders',`<span class="text-rose-600">${urgentOrders}</span>`,'alert-octagon','bg-rose-600','Action needed','3 VIP','down','navigate("orders")')}
+      ${statCard('In Picking',pickingOrders,'map-pin','bg-brand-600',`${packingOrders} in packing`,'Zone A/B','neutral','navigate("picking")')}
+      ${statCard('Ready to Ship',readyOrders,'package-check','bg-emerald-600',`${dispatched} dispatched`,'Dock 02','up','navigate("dispatch")')}
+      ${statCard('Low Stock',`<span class="text-amber-600">${lowStock}</span>`,'trending-down','bg-amber-600',`${outOfStock} stockout`,'Reorder req','down','navigate("inventory")')}
+      ${statCard('Inventory Value',fmtCur(inventoryValue),'dollar-sign','bg-brand-700','Total warehouse asset','+4.1%','up','navigate("inventory")')}
+      ${statCard('Fulfillment Rate',`${fulfillmentRate}%`,'target','bg-black',`${dispatched}/${totalOrders} orders`,'99.2% SLA','up','navigate("analytics")')}
+      ${statCard('Exceptions',`<span class="text-rose-600">${EXCEPTIONS.filter(e=>e.status==='Open').length}</span>`,'alert-triangle','bg-rose-600','Open tickets','1 Damaged','down','navigate("exceptions")')}
+      ${statCard('Active Pickers','4','users','bg-brand-600','Across 4 zones','Optimal','up','navigate("picking")')}
+      ${statCard('Avg Cycle Time','12m','timer','bg-slate-900','Per completed order','-2.4m','up','navigate("analytics")')}
+      ${statCard('Dispatch Queue',readyOrders,'truck','bg-black','Dock Bays 1-4','FedEx/UPS','neutral','navigate("dispatch")')}
+      ${statCard('AI Decisions','18','brain','bg-brand-600','Auto-handled today','100% SLA','up','navigate("smartDecisions")')}
     </div>
 
     <!-- Charts Row -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-2xs">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div class="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-2xs">
         <div class="flex items-center justify-between mb-4">
           <div>
-            <h3 class="font-bold text-slate-800 text-sm">Orders by Pipeline Status</h3>
+            <h3 class="font-bold text-slate-900 text-sm font-display">Orders by Pipeline Status</h3>
             <p class="text-xs text-slate-500">Live distribution across fulfillment stages</p>
           </div>
-          <div class="p-2 rounded-xl bg-slate-50 text-slate-500"><i data-lucide="pie-chart" class="w-4 h-4"></i></div>
+          <div class="p-2 rounded-xl bg-slate-50 text-brand-600"><i data-lucide="pie-chart" class="w-4 h-4"></i></div>
         </div>
         <div class="h-64"><canvas id="chartOrderStatus"></canvas></div>
       </div>
       
-      <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-2xs">
+      <div class="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-2xs">
         <div class="flex items-center justify-between mb-4">
           <div>
-            <h3 class="font-bold text-slate-800 text-sm">Orders by Priority Distribution</h3>
-            <p class="text-xs text-slate-500">AI multi-factor scoring (VIP, SLA, Value, Exceptions)</p>
+            <h3 class="font-bold text-slate-900 text-sm font-display">Orders by Priority Distribution</h3>
+            <p class="text-xs text-slate-500">Multi-factor SLA & customer tier prioritization</p>
           </div>
-          <div class="p-2 rounded-xl bg-slate-50 text-slate-500"><i data-lucide="bar-chart-3" class="w-4 h-4"></i></div>
+          <div class="p-2 rounded-xl bg-slate-50 text-brand-600"><i data-lucide="bar-chart-3" class="w-4 h-4"></i></div>
         </div>
         <div class="h-64"><canvas id="chartPriority"></canvas></div>
       </div>
     </div>
 
-    <!-- Live Floor Feed & Performance Trends -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-      <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-2xs lg:col-span-2">
+    <!-- Trends & Live Activity Stream -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <div class="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-2xs lg:col-span-2">
         <div class="flex items-center justify-between mb-4">
           <div>
-            <h3 class="font-bold text-slate-800 text-sm">Fulfillment Performance (7-Day Rolling)</h3>
+            <h3 class="font-bold text-slate-900 text-sm font-display">Fulfillment Velocity (7-Day Rolling)</h3>
             <p class="text-xs text-slate-500">On-time delivery vs target threshold</p>
           </div>
-          <div class="flex items-center gap-3 text-xs font-semibold">
-            <span class="flex items-center gap-1.5 text-emerald-700"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Fulfilled (94%)</span>
-            <span class="flex items-center gap-1.5 text-brand-700"><span class="w-2 h-2 rounded-full bg-brand-500"></span> Target (90%)</span>
+          <div class="flex items-center gap-3 text-xs font-bold">
+            <span class="flex items-center gap-1.5 text-brand-600"><span class="w-2 h-2 rounded-full bg-brand-600"></span> Fulfilled (94%)</span>
+            <span class="flex items-center gap-1.5 text-slate-400"><span class="w-2 h-2 rounded-full bg-slate-400"></span> Target (90%)</span>
           </div>
         </div>
         <div class="h-56"><canvas id="chartFulfillment"></canvas></div>
       </div>
 
       <!-- Real-Time Activity Ticker -->
-      <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-2xs flex flex-col justify-between">
+      <div class="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-2xs flex flex-col justify-between">
         <div>
           <div class="flex items-center justify-between mb-3">
-            <h3 class="font-bold text-slate-800 text-sm">Floor Operations Feed</h3>
-            <span class="flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-dot"></span> Live
+            <h3 class="font-bold text-slate-900 text-sm font-display">Floor Activity Ticker</h3>
+            <span class="flex items-center gap-1 text-[10px] font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded-full border border-brand-200">
+              <span class="w-1.5 h-1.5 rounded-full bg-brand-600 pulse-dot"></span> Live
             </span>
           </div>
           <div class="space-y-2.5 max-h-60 overflow-y-auto pr-1">
             ${state.feed.slice(0, 5).map(f=>`
-              <div class="flex items-start gap-2.5 p-2 rounded-xl bg-slate-50/80 border border-slate-100 hover:bg-slate-100 transition-colors">
-                <div class="w-2 h-2 rounded-full ${f.type==='critical'?'bg-rose-500':f.type==='warning'?'bg-amber-500':f.type==='success'?'bg-emerald-500':'bg-blue-500'} mt-1.5 flex-shrink-0"></div>
+              <div class="flex items-start gap-2.5 p-2 rounded-xl bg-slate-50 border border-slate-100 hover:bg-slate-100 transition-colors">
+                <div class="w-2 h-2 rounded-full ${f.type==='critical'?'bg-rose-500':f.type==='warning'?'bg-amber-500':'bg-brand-600'} mt-1.5 flex-shrink-0"></div>
                 <div class="flex-1 min-w-0">
                   <p class="text-xs font-semibold text-slate-800 leading-snug">${f.message}</p>
                   <p class="text-[10px] text-slate-400 mt-0.5">${timeAgo(f.time)}</p>
@@ -1055,7 +915,7 @@ function renderDashboard(){
             `).join('')}
           </div>
         </div>
-        <button onclick="navigate('analytics')" class="w-full mt-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all">
+        <button onclick="navigate('analytics')" class="w-full mt-3 py-2.5 bg-black hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all">
           View Complete Telemetry Stream →
         </button>
       </div>
@@ -1079,22 +939,22 @@ function renderOrders(){
   <div class="fade-in space-y-4">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
       <div>
-        <h2 class="text-xl font-bold text-slate-900 font-display">Live Orders Hub</h2>
+        <h2 class="text-2xl font-black text-slate-900 font-display">Live Orders Hub</h2>
         <p class="text-xs text-slate-500">Real-time fulfillment tracking and automated priority routing</p>
       </div>
-      <button onclick="actions.openNewOrderModal()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold shadow-sm flex items-center gap-1.5 self-start">
+      <button onclick="actions.openNewOrderModal()" class="px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-md shadow-brand-600/30 flex items-center gap-1.5 self-start">
         <i data-lucide="plus" class="w-4 h-4"></i> Create Priority Order
       </button>
     </div>
 
-    <!-- Filters & Search Toolbar -->
-    <div class="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-wrap items-center justify-between gap-3">
+    <!-- Filters Toolbar -->
+    <div class="bg-white p-3.5 rounded-2xl border border-slate-200/90 shadow-2xs flex flex-wrap items-center justify-between gap-3">
       <div class="flex flex-wrap items-center gap-2">
-        <select onchange="state.filters.status=this.value;render()" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-slate-50 outline-none">
+        <select onchange="state.filters.status=this.value;render()" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 bg-slate-50 outline-none">
           <option value="all">All Stages</option>
           ${ORDER_STATUSES.map(s=>`<option value="${s}" ${state.filters.status===s?'selected':''}>${s}</option>`).join('')}
         </select>
-        <select onchange="state.filters.priority=this.value;render()" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-slate-50 outline-none">
+        <select onchange="state.filters.priority=this.value;render()" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 bg-slate-50 outline-none">
           <option value="all">All Priorities</option>
           <option value="Critical" ${state.filters.priority==='Critical'?'selected':''}>Critical</option>
           <option value="High" ${state.filters.priority==='High'?'selected':''}>High</option>
@@ -1102,23 +962,23 @@ function renderOrders(){
           <option value="Low" ${state.filters.priority==='Low'?'selected':''}>Low</option>
         </select>
       </div>
-      <p class="text-xs text-slate-500 font-semibold">${filtered.length} of ${ORDERS.length} orders matched</p>
+      <p class="text-xs text-slate-500 font-bold">${filtered.length} of ${ORDERS.length} orders listed</p>
     </div>
 
     <!-- Orders Table -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
+    <div class="bg-white rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs">
-          <thead class="bg-slate-50 text-slate-500 font-bold border-b border-slate-200">
+          <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
             <tr>
-              <th class="p-3.5">Order ID</th>
-              <th class="p-3.5">Customer / Tier</th>
-              <th class="p-3.5">Items</th>
-              <th class="p-3.5">Total Value</th>
-              <th class="p-3.5">Priority</th>
-              <th class="p-3.5">Status</th>
-              <th class="p-3.5">Shipment</th>
-              <th class="p-3.5 text-right">Actions</th>
+              <th class="p-4">Order ID</th>
+              <th class="p-4">Customer / Tier</th>
+              <th class="p-4">Items</th>
+              <th class="p-4">Total Value</th>
+              <th class="p-4">Priority</th>
+              <th class="p-4">Status</th>
+              <th class="p-4">Shipment</th>
+              <th class="p-4 text-right">Actions</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
@@ -1126,20 +986,20 @@ function renderOrders(){
               const pri = calcPriority(o);
               return `
               <tr class="hover:bg-slate-50/80 transition-colors">
-                <td class="p-3.5 font-mono font-bold text-brand-600">${o.id}</td>
-                <td class="p-3.5">
-                  <p class="font-bold text-slate-800">${o.customer}</p>
+                <td class="p-4 font-mono font-bold text-brand-600">${o.id}</td>
+                <td class="p-4">
+                  <p class="font-bold text-slate-900">${o.customer}</p>
                   <p class="text-[10px] text-slate-400 font-semibold">${o.customerTier} Customer</p>
                 </td>
-                <td class="p-3.5 font-medium text-slate-600">${o.items.length} SKUs (${o.items.reduce((s,i)=>s+i.qty,0)} units)</td>
-                <td class="p-3.5 font-bold font-mono text-slate-800">${fmtCur(o.total)}</td>
-                <td class="p-3.5">${priorityBadge(pri.priority)}</td>
-                <td class="p-3.5">${statusBadge(o.status)}</td>
-                <td class="p-3.5">
-                  <span class="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700">${o.shipMethod}</span>
+                <td class="p-4 font-medium text-slate-600">${o.items.length} SKUs (${o.items.reduce((s,i)=>s+i.qty,0)} units)</td>
+                <td class="p-4 font-bold font-mono text-slate-900">${fmtCur(o.total)}</td>
+                <td class="p-4">${priorityBadge(pri.priority)}</td>
+                <td class="p-4">${statusBadge(o.status)}</td>
+                <td class="p-4">
+                  <span class="inline-block px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-800">${o.shipMethod}</span>
                 </td>
-                <td class="p-3.5 text-right">
-                  <button onclick="actions.viewOrder('${o.id}')" class="px-2.5 py-1 bg-brand-50 hover:bg-brand-100 text-brand-700 font-bold rounded-lg text-xs transition-colors">
+                <td class="p-4 text-right">
+                  <button onclick="actions.viewOrder('${o.id}')" class="px-3 py-1 bg-brand-50 hover:bg-brand-100 text-brand-700 font-bold rounded-lg text-xs transition-colors">
                     Inspect
                   </button>
                 </td>
@@ -1159,68 +1019,66 @@ function renderInventory(){
   <div class="fade-in space-y-4">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
       <div>
-        <h2 class="text-xl font-bold text-slate-900 font-display">Inventory Matrix</h2>
+        <h2 class="text-2xl font-black text-slate-900 font-display">Inventory Stock Matrix</h2>
         <p class="text-xs text-slate-500">Autonomous stock replenishment, slotting zones, and cycle auditing</p>
       </div>
-      <div class="flex items-center gap-2">
-        <span class="px-3 py-1 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 text-xs font-bold">
-          ${lowStock.length} Low Stock SKUs
-        </span>
-      </div>
+      <span class="px-3 py-1 rounded-xl bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold self-start">
+        ${lowStock.length} Low Stock SKUs Identified
+      </span>
     </div>
 
     <!-- Zone Capacity Overview -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
       ${ZONES.map(z=>{
         const count = PRODUCTS.filter(p=>p.zone===z.id).length;
         const totalStock = PRODUCTS.filter(p=>p.zone===z.id).reduce((s,p)=>s+p.stock,0);
         return `
-        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs">
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-2xs">
           <div class="flex items-center justify-between mb-2">
             <span class="w-3 h-3 rounded-full" style="background:${z.color}"></span>
-            <span class="text-xs font-bold font-mono text-slate-700">${totalStock} Units</span>
+            <span class="text-xs font-bold font-mono text-slate-800">${totalStock} Units</span>
           </div>
-          <h4 class="font-bold text-xs text-slate-800 truncate">${z.name}</h4>
+          <h4 class="font-bold text-xs text-slate-900 truncate">${z.name}</h4>
           <p class="text-[10px] text-slate-400 mt-0.5">${count} Active SKUs</p>
         </div>`;
       }).join('')}
     </div>
 
-    <!-- Low Stock Critical Alert Table -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
+    <!-- Critical Queue Table -->
+    <div class="bg-white rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden">
       <div class="p-4 border-b border-slate-200 flex items-center justify-between">
-        <h3 class="font-bold text-xs text-slate-800">Replenishment Priority Queue</h3>
-        <button onclick="showToast('success','Triggered automated purchase order for all critical SKUs')" class="text-xs font-bold text-brand-600 hover:underline">
+        <h3 class="font-bold text-xs text-slate-900 uppercase tracking-wider">Replenishment Priority Queue</h3>
+        <button onclick="showToast('success','Triggered automated purchase orders for all critical SKUs')" class="text-xs font-bold text-brand-600 hover:underline">
           Bulk Reorder All →
         </button>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs">
-          <thead class="bg-slate-50 text-slate-500 font-bold border-b border-slate-200">
+          <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
             <tr>
-              <th class="p-3.5">SKU / Item</th>
-              <th class="p-3.5">Zone & Bin</th>
-              <th class="p-3.5">Current Stock</th>
-              <th class="p-3.5">Safety Reorder Level</th>
-              <th class="p-3.5">Runway</th>
-              <th class="p-3.5">Risk Level</th>
-              <th class="p-3.5 text-right">Action</th>
+              <th class="p-4">SKU / Product</th>
+              <th class="p-4">Location</th>
+              <th class="p-4">Current Stock</th>
+              <th class="p-4">Reorder Point</th>
+              <th class="p-4">Runway</th>
+              <th class="p-4">Risk Level</th>
+              <th class="p-4 text-right">Action</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
             ${lowStock.map(p=>`
               <tr class="hover:bg-slate-50/80">
-                <td class="p-3.5">
-                  <p class="font-mono font-bold text-slate-800">${p.sku}</p>
+                <td class="p-4">
+                  <p class="font-mono font-bold text-slate-900">${p.sku}</p>
                   <p class="text-slate-500 text-[11px]">${p.name}</p>
                 </td>
-                <td class="p-3.5 font-mono text-slate-600">Zone ${p.zone} (S${p.shelf}/R${p.rack}/B${p.bin})</td>
-                <td class="p-3.5 font-bold font-mono ${p.stock===0?'text-rose-600':p.stock<=10?'text-rose-600':'text-amber-600'}">${p.stock} units</td>
-                <td class="p-3.5 font-mono text-slate-600">${p.reorderLevel} units</td>
-                <td class="p-3.5 font-bold ${p.daysRemaining<2?'text-rose-600':'text-amber-600'}">${p.daysRemaining>0?p.daysRemaining+' days':'STOCKOUT'}</td>
-                <td class="p-3.5">${badge(p.risk,p.risk==='Critical'?'red':p.risk==='High'?'amber':'blue')}</td>
-                <td class="p-3.5 text-right">
-                  <button onclick="actions.triggerReorder('${p.sku}',${p.reorderQty})" class="px-3 py-1 bg-brand-50 hover:bg-brand-100 text-brand-700 font-bold rounded-lg transition-colors">
+                <td class="p-4 font-mono text-slate-600">Zone ${p.zone} (S${p.shelf}/R${p.rack}/B${p.bin})</td>
+                <td class="p-4 font-bold font-mono ${p.stock===0?'text-rose-600':p.stock<=10?'text-rose-600':'text-amber-600'}">${p.stock} units</td>
+                <td class="p-4 font-mono text-slate-700">${p.reorderLevel} units</td>
+                <td class="p-4 font-bold ${p.daysRemaining<2?'text-rose-600':'text-amber-600'}">${p.daysRemaining>0?p.daysRemaining+' days':'STOCKOUT'}</td>
+                <td class="p-4">${badge(p.risk,p.risk==='Critical'?'red':p.risk==='High'?'amber':'blue')}</td>
+                <td class="p-4 text-right">
+                  <button onclick="actions.triggerReorder('${p.sku}',${p.reorderQty})" class="px-3 py-1 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg transition-colors">
                     Reorder ${p.reorderQty}
                   </button>
                 </td>
@@ -1239,31 +1097,30 @@ function renderAllocation(){
   return `
   <div class="fade-in space-y-4">
     <div>
-      <h2 class="text-xl font-bold text-slate-900 font-display">Stock Allocation Engine</h2>
+      <h2 class="text-2xl font-black text-slate-900 font-display">Stock Allocation Engine</h2>
       <p class="text-xs text-slate-500">Autonomous resolution of competing order demand & inventory contention</p>
     </div>
 
     ${conflict ? `
-      <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-2xs space-y-5">
-        <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+      <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-2xs space-y-5">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-200">
           <div>
-            <h3 class="text-base font-bold text-slate-800">Contention Analysis: ${conflict.sku}</h3>
-            <p class="text-xs text-slate-500">${conflict.product.name} · Available: <span class="font-bold text-slate-800">${conflict.available}</span> · Demanded: <span class="font-bold text-rose-600">${conflict.totalDemand}</span> · Shortfall: <span class="font-bold text-rose-600">${conflict.shortfall}</span></p>
+            <h3 class="text-lg font-bold text-slate-900">Contention Analysis: ${conflict.sku}</h3>
+            <p class="text-xs text-slate-500">${conflict.product.name} · Available: <span class="font-bold text-slate-900">${conflict.available}</span> · Demanded: <span class="font-bold text-rose-600">${conflict.totalDemand}</span> · Shortfall: <span class="font-bold text-rose-600">${conflict.shortfall}</span></p>
           </div>
           <span class="px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
             Critical Contention
           </span>
         </div>
 
-        <!-- Competing Orders Breakdown -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           ${conflict.decisions.map(d=>`
-            <div class="p-4 rounded-2xl ${d.allocated>0?'bg-brand-50/50 border border-brand-200':'bg-slate-50 border border-slate-200'}">
+            <div class="p-4 rounded-2xl ${d.allocated>0?'bg-brand-50/60 border border-brand-200':'bg-slate-50 border border-slate-200'}">
               <div class="flex items-center justify-between mb-2">
-                <span class="font-mono font-bold text-sm text-slate-800">${d.orderId}</span>
+                <span class="font-mono font-bold text-sm text-slate-900">${d.orderId}</span>
                 ${priorityBadge(d.priority)}
               </div>
-              <p class="text-xs font-semibold text-slate-700 mb-1">${d.customer} (${d.customerTier} Customer)</p>
+              <p class="text-xs font-semibold text-slate-800 mb-1">${d.customer} (${d.customerTier} Customer)</p>
               <div class="space-y-1 text-xs text-slate-600 my-2">
                 <p>Requested: <span class="font-bold font-mono">${d.requested} units</span></p>
                 <p>AI Allocated: <span class="font-bold font-mono ${d.allocated>0?'text-emerald-600':'text-slate-400'}">${d.allocated} units</span></p>
@@ -1276,27 +1133,26 @@ function renderAllocation(){
           `).join('')}
         </div>
 
-        <!-- AI Recommendation Callout -->
-        <div class="p-4 rounded-xl bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 flex items-start justify-between gap-4">
+        <div class="p-4 rounded-2xl bg-brand-50 border border-brand-200 flex items-start justify-between gap-4">
           <div>
             <div class="flex items-center gap-2 mb-1">
-              <i data-lucide="sparkles" class="w-4 h-4 text-purple-600"></i>
-              <h4 class="text-xs font-bold text-purple-900 uppercase tracking-wider">AI Recommendation</h4>
+              <i data-lucide="sparkles" class="w-4 h-4 text-brand-600"></i>
+              <h4 class="text-xs font-bold text-brand-900 uppercase tracking-wider">AI Policy Recommendation</h4>
             </div>
-            <p class="text-xs text-purple-800 font-medium">${conflict.recommendation}</p>
+            <p class="text-xs text-brand-800 font-medium">${conflict.recommendation}</p>
           </div>
           <div class="flex items-center gap-2 flex-shrink-0">
-            <button onclick="actions.applyAllocation('${conflict.sku}')" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all">
+            <button onclick="actions.applyAllocation('${conflict.sku}')" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all">
               Apply AI Allocation
             </button>
             <button onclick="actions.overrideAllocation('${conflict.sku}')" class="px-3 py-2 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl border border-slate-300 transition-all">
-              Manual Override
+              Override
             </button>
           </div>
         </div>
       </div>
     ` : `
-      <div class="bg-white rounded-2xl p-8 text-center border border-slate-200">
+      <div class="bg-white rounded-3xl p-8 text-center border border-slate-200">
         <i data-lucide="check-circle" class="w-12 h-12 text-emerald-500 mx-auto mb-2"></i>
         <h3 class="text-base font-bold text-slate-800">Zero Stock Conflicts</h3>
         <p class="text-xs text-slate-500">All pending orders are fully allocatable from existing shelf inventory.</p>
@@ -1314,32 +1170,32 @@ function renderPicking(){
   return `
   <div class="fade-in space-y-4">
     <div>
-      <h2 class="text-xl font-bold text-slate-900 font-display">Picking & Route Optimization</h2>
+      <h2 class="text-2xl font-black text-slate-900 font-display">Picking & Route Optimization</h2>
       <p class="text-xs text-slate-500">Dynamic shortest-path aisle routing to reduce warehouse floor transit time</p>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
       <!-- Task List -->
       <div class="space-y-3">
         <h3 class="font-bold text-xs text-slate-700 uppercase tracking-wider">Active Picking Tasks</h3>
         ${pickingOrders.map(o=>{
           const pri = calcPriority(o);
           return `
-          <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs card-hover cursor-pointer">
+          <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-2xs card-hover cursor-pointer">
             <div class="flex items-center justify-between mb-2">
               <span class="font-mono font-bold text-brand-600 text-xs">${o.id}</span>
               ${priorityBadge(pri.priority)}
             </div>
-            <p class="text-xs font-bold text-slate-800">${o.customer}</p>
+            <p class="text-xs font-bold text-slate-900">${o.customer}</p>
             <p class="text-[11px] text-slate-500 mb-2">${o.items.length} items (${o.items.reduce((s,i)=>s+i.qty,0)} units)</p>
             <div class="flex items-center justify-between pt-2 border-t border-slate-100">
               <span class="text-[10px] text-slate-400 font-mono">${o.picker || 'Unassigned'}</span>
               ${o.status==='Picking' ? `
-                <button onclick="actions.completePicking('${o.id}')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[11px] font-bold">
+                <button onclick="actions.completePicking('${o.id}')" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[11px] font-bold">
                   Complete Pick
                 </button>
               ` : `
-                <button onclick="actions.startPicking('${o.id}')" class="px-2.5 py-1 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-[11px] font-bold">
+                <button onclick="actions.startPicking('${o.id}')" class="px-3 py-1 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-[11px] font-bold">
                   Start Pick
                 </button>
               `}
@@ -1349,48 +1205,46 @@ function renderPicking(){
       </div>
 
       <!-- Route Details -->
-      <div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-4">
+      <div class="lg:col-span-2 bg-white p-6 rounded-3xl border border-slate-200/90 shadow-2xs space-y-4">
         ${route ? `
           <div class="flex items-center justify-between pb-3 border-b border-slate-200">
             <div>
-              <h3 class="font-bold text-sm text-slate-800">Optimized Pick Path: ${activeOrder.id}</h3>
+              <h3 class="font-bold text-sm text-slate-900">Optimized Pick Path: ${activeOrder.id}</h3>
               <p class="text-xs text-slate-500">Shortest path sequence through Zone A, B, C, D</p>
             </div>
-            <div class="flex items-center gap-2">
-              <span class="px-2.5 py-1 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
-                ${route.efficiency}% Travel Efficiency
-              </span>
-            </div>
+            <span class="px-3 py-1 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
+              ${route.efficiency}% Travel Efficiency
+            </span>
           </div>
 
           <div class="grid grid-cols-3 gap-3 text-center">
-            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
               <p class="text-[10px] font-bold text-slate-400 uppercase">Est. Distance</p>
-              <p class="text-lg font-black text-slate-800 font-display">${route.distance}m</p>
+              <p class="text-xl font-black text-slate-900 font-display">${route.distance}m</p>
             </div>
-            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
               <p class="text-[10px] font-bold text-slate-400 uppercase">Est. Pick Time</p>
-              <p class="text-lg font-black text-slate-800 font-display">${route.time} min</p>
+              <p class="text-xl font-black text-slate-900 font-display">${route.time} min</p>
             </div>
-            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
-              <p class="text-[10px] font-bold text-slate-400 uppercase">Pick Sequence</p>
-              <p class="text-lg font-black text-brand-600 font-display">${route.items.length} Stops</p>
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+              <p class="text-[10px] font-bold text-slate-400 uppercase">Pick Stops</p>
+              <p class="text-xl font-black text-brand-600 font-display">${route.items.length}</p>
             </div>
           </div>
 
           <!-- Stops List -->
           <div class="space-y-2">
-            <p class="text-xs font-bold text-slate-700">Aisle Waypoint Sequence:</p>
+            <p class="text-xs font-bold text-slate-700">Aisle Sequence:</p>
             ${route.items.map((it,idx)=>`
-              <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50/80 border border-slate-200 text-xs">
+              <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs">
                 <div class="flex items-center gap-3">
                   <span class="w-6 h-6 rounded-full bg-brand-600 text-white font-bold flex items-center justify-center text-[10px]">${idx+1}</span>
                   <div>
-                    <p class="font-bold text-slate-800">${it.name}</p>
+                    <p class="font-bold text-slate-900">${it.name}</p>
                     <p class="text-[10px] text-slate-400 font-mono">${it.sku} · Zone ${it.zone} (Shelf ${it.shelf}, Rack ${it.rack}, Bin ${it.bin})</p>
                   </div>
                 </div>
-                <span class="font-bold font-mono text-slate-700">${it.qty} units</span>
+                <span class="font-bold font-mono text-slate-800">${it.qty} units</span>
               </div>
             `).join('')}
           </div>
@@ -1408,26 +1262,24 @@ function renderPacking(){
   return `
   <div class="fade-in space-y-4">
     <div>
-      <h2 class="text-xl font-bold text-slate-900 font-display">Packing Station Console</h2>
+      <h2 class="text-2xl font-black text-slate-900 font-display">Packing Station Console</h2>
       <p class="text-xs text-slate-500">Barcode validation, custom packaging specifications, and weight verification</p>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       ${packingOrders.map(o=>`
-        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-3">
+        <div class="bg-white p-5 rounded-3xl border border-slate-200/90 shadow-2xs space-y-3">
           <div class="flex items-center justify-between">
             <span class="font-mono font-bold text-xs text-brand-600">${o.id}</span>
             ${statusBadge(o.status)}
           </div>
-          <p class="font-bold text-xs text-slate-800">${o.customer}</p>
+          <p class="font-bold text-xs text-slate-900">${o.customer}</p>
           <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
-            <p class="text-slate-600">Items: <span class="font-bold text-slate-800">${o.items.length} items</span></p>
-            <p class="text-slate-600">Shipping: <span class="font-bold text-slate-800">${o.shipMethod}</span></p>
+            <p class="text-slate-600">Items: <span class="font-bold text-slate-900">${o.items.length} SKUs</span></p>
+            <p class="text-slate-600">Carrier: <span class="font-bold text-slate-900">${o.shipMethod}</span></p>
           </div>
-          <div class="flex items-center justify-between pt-2">
-            <button onclick="actions.completePacking('${o.id}')" class="w-full py-2 bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white rounded-xl text-xs font-bold shadow-xs">
-              Complete Pack & Send to QC →
-            </button>
-          </div>
+          <button onclick="actions.completePacking('${o.id}')" class="w-full py-2.5 bg-black hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
+            Complete Pack & Send to QC →
+          </button>
         </div>
       `).join('')}
     </div>
@@ -1439,26 +1291,26 @@ function renderQualityCheck(){
   return `
   <div class="fade-in space-y-4">
     <div>
-      <h2 class="text-xl font-bold text-slate-900 font-display">Quality Control Gate</h2>
+      <h2 class="text-2xl font-black text-slate-900 font-display">Quality Control Gate</h2>
       <p class="text-xs text-slate-500">Scan inspection, seal check, and damage prevention</p>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       ${qcOrders.map(o=>`
-        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-3">
+        <div class="bg-white p-5 rounded-3xl border border-slate-200/90 shadow-2xs space-y-3">
           <div class="flex items-center justify-between">
             <span class="font-mono font-bold text-xs text-brand-600">${o.id}</span>
-            <span class="text-xs font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">Awaiting QC Inspection</span>
+            <span class="text-xs font-semibold text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">Awaiting QC Inspection</span>
           </div>
-          <p class="font-bold text-xs text-slate-800">${o.customer}</p>
+          <p class="font-bold text-xs text-slate-900">${o.customer}</p>
           <div class="space-y-1 text-xs text-slate-600">
             ${o.items.map(it=>`<p>• ${it.name} (${it.qty} units)</p>`).join('')}
           </div>
           <div class="flex items-center gap-2 pt-2 border-t border-slate-100">
-            <button onclick="actions.passQC('${o.id}')" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold">
+            <button onclick="actions.passQC('${o.id}')" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold">
               ✓ Pass QC
             </button>
-            <button onclick="actions.failQC('${o.id}')" class="flex-1 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold">
-              ✕ Fail QC (Exception)
+            <button onclick="actions.failQC('${o.id}')" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold">
+              ✕ Fail QC
             </button>
           </div>
         </div>
@@ -1472,36 +1324,36 @@ function renderDispatch(){
   return `
   <div class="fade-in space-y-4">
     <div>
-      <h2 class="text-xl font-bold text-slate-900 font-display">Dock & Dispatch Terminal</h2>
+      <h2 class="text-2xl font-black text-slate-900 font-display">Dock & Dispatch Terminal</h2>
       <p class="text-xs text-slate-500">Carrier coordination, shipping manifests, and outbound dock assignment</p>
     </div>
-    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
+    <div class="bg-white rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs">
-          <thead class="bg-slate-50 text-slate-500 font-bold border-b border-slate-200">
+          <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
             <tr>
-              <th class="p-3.5">Order ID</th>
-              <th class="p-3.5">Customer</th>
-              <th class="p-3.5">Carrier</th>
-              <th class="p-3.5">Dock Bay</th>
-              <th class="p-3.5">Status</th>
-              <th class="p-3.5 text-right">Dispatch Action</th>
+              <th class="p-4">Order ID</th>
+              <th class="p-4">Customer</th>
+              <th class="p-4">Carrier</th>
+              <th class="p-4">Dock Bay</th>
+              <th class="p-4">Status</th>
+              <th class="p-4 text-right">Dispatch Action</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
             ${dispatchOrders.map(o=>`
               <tr class="hover:bg-slate-50">
-                <td class="p-3.5 font-mono font-bold text-brand-600">${o.id}</td>
-                <td class="p-3.5 font-bold text-slate-800">${o.customer}</td>
-                <td class="p-3.5 font-semibold text-slate-700">${o.shipMethod}</td>
-                <td class="p-3.5 font-mono text-slate-600">Bay 0${Math.floor(Math.random()*4)+1}</td>
-                <td class="p-3.5">${statusBadge(o.status)}</td>
-                <td class="p-3.5 text-right">
+                <td class="p-4 font-mono font-bold text-brand-600">${o.id}</td>
+                <td class="p-4 font-bold text-slate-900">${o.customer}</td>
+                <td class="p-4 font-semibold text-slate-700">${o.shipMethod}</td>
+                <td class="p-4 font-mono text-slate-600">Bay 0${Math.floor(Math.random()*4)+1}</td>
+                <td class="p-4">${statusBadge(o.status)}</td>
+                <td class="p-4 text-right">
                   ${o.status==='Ready for Dispatch' ? `
-                    <button onclick="actions.dispatch('${o.id}')" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold">
+                    <button onclick="actions.dispatch('${o.id}')" class="px-3 py-1 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold">
                       Confirm Dispatch →
                     </button>
-                  ` : `<span class="text-slate-400 text-xs">Dispatched</span>`}
+                  ` : `<span class="text-slate-400 text-xs font-semibold">Dispatched</span>`}
                 </td>
               </tr>
             `).join('')}
@@ -1517,26 +1369,26 @@ function renderExceptions(){
   return `
   <div class="fade-in space-y-4">
     <div>
-      <h2 class="text-xl font-bold text-slate-900 font-display">Exception Resolution Hub</h2>
+      <h2 class="text-2xl font-black text-slate-900 font-display">Exception Resolution Hub</h2>
       <p class="text-xs text-slate-500">Autonomous triage for damaged goods, missing items, and picking deviations</p>
     </div>
     <div class="space-y-3">
       ${EXCEPTIONS.map(e=>`
-        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-3">
+        <div class="bg-white p-5 rounded-3xl border border-slate-200/90 shadow-2xs space-y-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <span class="font-mono font-bold text-xs text-rose-600">${e.id}</span>
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">${e.severity} Severity</span>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">${e.severity} Severity</span>
             </div>
             ${statusBadge(e.status)}
           </div>
-          <h4 class="font-bold text-xs text-slate-800">${e.type} on ${e.order} (${e.sku})</h4>
-          <p class="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-200">💡 <span class="font-semibold text-slate-800">Recommendation:</span> ${e.recommendation}</p>
+          <h4 class="font-bold text-xs text-slate-900">${e.type} on ${e.order} (${e.sku})</h4>
+          <p class="text-xs text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-200">💡 <span class="font-semibold text-slate-900">Recommendation:</span> ${e.recommendation}</p>
           <div class="flex items-center justify-between pt-2 border-t border-slate-100">
-            <span class="text-[10px] text-slate-400">Assigned: ${e.assigned}</span>
+            <span class="text-[10px] text-slate-400 font-medium">Assigned: ${e.assigned}</span>
             ${e.status==='Open'?`
-              <button onclick="actions.resolveException('${e.id}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold">
-                Mark as Resolved
+              <button onclick="actions.resolveException('${e.id}')" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold">
+                Mark Resolved
               </button>
             `:''}
           </div>
@@ -1551,27 +1403,27 @@ function renderSmartDecisions(){
   return `
   <div class="fade-in space-y-4">
     <div>
-      <h2 class="text-xl font-bold text-slate-900 font-display">Autonomous AI Decision Engine</h2>
+      <h2 class="text-2xl font-black text-slate-900 font-display">Autonomous AI Decision Engine</h2>
       <p class="text-xs text-slate-500">Machine learning models actively optimizing inventory, staffing, and picking routes</p>
     </div>
     <div class="space-y-4">
       ${decisions.map(d=>`
-        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-3">
+        <div class="bg-white p-6 rounded-3xl border border-slate-200/90 shadow-2xs space-y-3">
           <div class="flex items-center justify-between">
-            <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-purple-50 text-purple-700 border border-purple-200 flex items-center gap-1.5">
+            <span class="px-3 py-1 rounded-full text-xs font-bold bg-brand-50 text-brand-700 border border-brand-200 flex items-center gap-1.5">
               <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> ${d.type}
             </span>
           </div>
           <h3 class="font-bold text-sm text-slate-900">${d.problem}</h3>
-          <p class="text-xs text-slate-600"><span class="font-semibold text-slate-800">Telemetry Data:</span> ${d.data}</p>
-          <div class="p-3.5 rounded-xl bg-purple-50/60 border border-purple-200 text-xs text-purple-900">
+          <p class="text-xs text-slate-600"><span class="font-semibold text-slate-900">Telemetry Data:</span> ${d.data}</p>
+          <div class="p-3.5 rounded-2xl bg-brand-50/60 border border-brand-200 text-xs text-brand-950">
             <p class="font-bold mb-1">AI Recommendation:</p>
             <p>${d.decision}</p>
           </div>
           <div class="flex items-center justify-between pt-2">
             <span class="text-xs text-emerald-700 font-semibold">Impact: ${d.impact}</span>
             ${d.actionType==='allocate'?`
-              <button onclick="actions.applyAllocation('SKU-101')" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl text-xs font-bold shadow-xs">
+              <button onclick="actions.applyAllocation('SKU-101')" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-xs">
                 ${d.action} →
               </button>
             `:''}
@@ -1587,16 +1439,16 @@ function renderAnalytics(){
   return `
   <div class="fade-in space-y-4">
     <div>
-      <h2 class="text-xl font-bold text-slate-900 font-display">Warehouse Intelligence & Telemetry</h2>
+      <h2 class="text-2xl font-black text-slate-900 font-display">Warehouse Intelligence & Telemetry</h2>
       <p class="text-xs text-slate-500">Real-time throughput metrics, stage cycle times, and SLA compliance</p>
     </div>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs">
-        <h3 class="font-bold text-xs text-slate-800 mb-3">Stage Cycle Duration (Actual vs SLA)</h3>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-2xs">
+        <h3 class="font-bold text-xs text-slate-900 uppercase tracking-wider mb-3">Stage Cycle Duration (Actual vs SLA)</h3>
         <div class="h-64"><canvas id="chartProcessingTime"></canvas></div>
       </div>
-      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs">
-        <h3 class="font-bold text-xs text-slate-800 mb-3">Fulfillment Accuracy & On-Time Performance</h3>
+      <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-2xs">
+        <h3 class="font-bold text-xs text-slate-900 uppercase tracking-wider mb-3">Fulfillment Accuracy & On-Time Performance</h3>
         <div class="h-64"><canvas id="chartPerformance"></canvas></div>
       </div>
     </div>
@@ -1608,7 +1460,7 @@ function renderNotifications(){
   <div class="fade-in space-y-4">
     <div class="flex items-center justify-between">
       <div>
-        <h2 class="text-xl font-bold text-slate-900 font-display">Alerts & System Notifications</h2>
+        <h2 class="text-2xl font-black text-slate-900 font-display">Alerts & Notifications</h2>
         <p class="text-xs text-slate-500">Live operational events, threshold breaches, and carrier updates</p>
       </div>
       <button onclick="actions.markAllRead()" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold hover:bg-slate-50">
@@ -1617,11 +1469,11 @@ function renderNotifications(){
     </div>
     <div class="space-y-2">
       ${state.notifications.map(n=>`
-        <div class="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-2xs flex items-start gap-3.5 ${n.read?'opacity-60':''}">
-          <div class="w-3 h-3 rounded-full ${n.type==='critical'?'bg-rose-500':n.type==='warning'?'bg-amber-500':'bg-brand-500'} mt-1 flex-shrink-0"></div>
+        <div class="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs flex items-start gap-3.5 ${n.read?'opacity-60':''}">
+          <div class="w-3 h-3 rounded-full ${n.type==='critical'?'bg-rose-500':n.type==='warning'?'bg-amber-500':'bg-brand-600'} mt-1 flex-shrink-0"></div>
           <div class="flex-1 min-w-0">
             <div class="flex items-center justify-between mb-1">
-              <h4 class="font-bold text-xs text-slate-800">${n.title}</h4>
+              <h4 class="font-bold text-xs text-slate-900">${n.title}</h4>
               <span class="text-[10px] text-slate-400">${timeAgo(n.time)}</span>
             </div>
             <p class="text-xs text-slate-600">${n.message}</p>
@@ -1636,30 +1488,30 @@ function renderSettings(){
   return `
   <div class="fade-in space-y-5">
     <div>
-      <h2 class="text-xl font-bold text-slate-900 font-display">System Configuration & Profile</h2>
+      <h2 class="text-2xl font-black text-slate-900 font-display">System Configuration & Profile</h2>
       <p class="text-xs text-slate-500">Autonomous operational rules, facility thresholds, and identity</p>
     </div>
 
-    <!-- Developer & Platform Badge -->
-    <div class="bg-gradient-to-r from-obsidian-950 via-brand-950 to-indigo-950 rounded-2xl p-6 text-white shadow-xl border border-brand-500/20">
+    <!-- Developer & Platform Badge (Black, Blue, White) -->
+    <div class="bg-black rounded-3xl p-6 sm:p-8 text-white shadow-2xl border-2 border-brand-600">
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div class="flex items-center gap-2 mb-1.5">
-            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-brand-500/30 text-brand-300 border border-brand-400/30">WearAI Platform</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-brand-600 text-white">WearAI Platform</span>
             <span class="text-xs text-slate-400 font-mono">v2.4.0 (Enterprise AI Edition)</span>
           </div>
           <h3 class="text-2xl font-black font-display tracking-tight text-white">Created & Managed by Sai Rakesh</h3>
           <p class="text-xs text-slate-300 mt-1 max-w-xl">Autonomous AI-driven Warehouse Management Platform with real-time stock conflict resolution, dynamic allocation, intelligent routing, and predictive replenishment.</p>
         </div>
-        <a href="https://github.com/sairakesh-143/wearai" target="_blank" class="px-4 py-2.5 bg-white text-slate-950 rounded-xl text-xs font-bold hover:bg-slate-100 transition-all flex items-center gap-2 shadow-lg flex-shrink-0">
-          <i data-lucide="github" class="w-4 h-4"></i> GitHub Repository
+        <a href="https://github.com/sairakesh-143/wearai" target="_blank" class="px-5 py-3 bg-white text-black rounded-2xl text-xs font-bold hover:bg-slate-100 transition-all flex items-center gap-2 shadow-xl flex-shrink-0">
+          <i data-lucide="github" class="w-4 h-4 text-brand-600"></i> GitHub Repository
         </a>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs space-y-3">
-        <h3 class="font-bold text-xs text-slate-800 uppercase tracking-wider mb-2">Operator Profile</h3>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-2xs space-y-3">
+        <h3 class="font-bold text-xs text-slate-900 uppercase tracking-wider mb-2">Operator Profile</h3>
         <div>
           <label class="block text-xs text-slate-500 mb-1">Name</label>
           <input type="text" value="${state.user.name}" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold"/>
@@ -1674,25 +1526,25 @@ function renderSettings(){
         </div>
       </div>
 
-      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs space-y-3">
-        <h3 class="font-bold text-xs text-slate-800 uppercase tracking-wider mb-2">Autonomous AI Engine Policies</h3>
-        <label class="flex items-center justify-between p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+      <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-2xs space-y-3">
+        <h3 class="font-bold text-xs text-slate-900 uppercase tracking-wider mb-2">Autonomous AI Policies</h3>
+        <label class="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
           <div>
-            <p class="text-xs font-bold text-slate-800">Auto-Allocation Solver</p>
+            <p class="text-xs font-bold text-slate-900">Auto-Allocation Solver</p>
             <p class="text-[10px] text-slate-400">Resolve stock conflicts without manual supervisor approval</p>
           </div>
           <input type="checkbox" checked class="w-4 h-4 rounded text-brand-600"/>
         </label>
-        <label class="flex items-center justify-between p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+        <label class="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
           <div>
-            <p class="text-xs font-bold text-slate-800">Dynamic Pick Route Reordering</p>
+            <p class="text-xs font-bold text-slate-900">Dynamic Pick Route Optimization</p>
             <p class="text-[10px] text-slate-400">Sort pick stops based on shortest aisle sequence</p>
           </div>
           <input type="checkbox" checked class="w-4 h-4 rounded text-brand-600"/>
         </label>
-        <label class="flex items-center justify-between p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+        <label class="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
           <div>
-            <p class="text-xs font-bold text-slate-800">Automated PO Reorder Triggers</p>
+            <p class="text-xs font-bold text-slate-900">Automated PO Reorder Triggers</p>
             <p class="text-[10px] text-slate-400">Generate supplier orders when stock dips below threshold</p>
           </div>
           <input type="checkbox" checked class="w-4 h-4 rounded text-brand-600"/>
@@ -1710,13 +1562,17 @@ const actions = {
     state.user = user;
     state.view = 'dashboard';
     showToast('success',`Welcome back, ${user.name}!`);
-    addActivityLog(user.name,'Logged in to workspace','System','-','Active');
+    addActivityLog(user.name,'Logged in to console','System','-','Active');
     render();
   },
   logout(){
     state.user = null;
     state.view = 'login';
     destroyCharts();
+    render();
+  },
+  toggleMobileMenu(){
+    state.mobileMenuOpen = !state.mobileMenuOpen;
     render();
   },
   toggleWarehouseDropdown(){
@@ -1750,33 +1606,33 @@ const actions = {
   },
   openCommandPalette(){
     document.getElementById('command-container').innerHTML = `
-      <div class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-[9999] flex items-start justify-center pt-20 p-4 fade-in" onclick="if(event.target===this)actions.closeCommandPalette()">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full border border-slate-200 overflow-hidden slide-in">
-          <div class="p-3 border-b border-slate-200 flex items-center gap-2">
-            <i data-lucide="search" class="w-4 h-4 text-slate-400 ml-2"></i>
-            <input type="text" id="cmd-input" oninput="actions.filterCommand(this.value)" placeholder="Search commands, SKU, or jump to view..." class="w-full px-2 py-1.5 text-xs text-slate-800 outline-none font-medium" autofocus/>
-            <kbd class="px-2 py-0.5 bg-slate-100 border border-slate-200 text-slate-500 rounded text-[10px] font-mono">ESC</kbd>
+      <div class="fixed inset-0 bg-black/80 backdrop-blur-xs z-[9999] flex items-start justify-center pt-20 p-4 fade-in" onclick="if(event.target===this)actions.closeCommandPalette()">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-xl w-full border border-slate-200 overflow-hidden slide-in">
+          <div class="p-3.5 border-b border-slate-200 flex items-center gap-2">
+            <i data-lucide="search" class="w-4 h-4 text-brand-600 ml-2"></i>
+            <input type="text" id="cmd-input" placeholder="Type a command or jump to page..." class="w-full px-2 py-1.5 text-xs text-slate-900 outline-none font-semibold" autofocus/>
+            <kbd class="px-2 py-0.5 bg-slate-100 border border-slate-200 text-slate-500 rounded text-[10px] font-mono font-bold">ESC</kbd>
           </div>
-          <div class="p-2 max-h-80 overflow-y-auto space-y-1" id="cmd-results">
-            <button onclick="navigate('dashboard');actions.closeCommandPalette()" class="w-full text-left p-2 rounded-xl hover:bg-slate-100 flex items-center justify-between text-xs font-semibold text-slate-800">
+          <div class="p-2 max-h-80 overflow-y-auto space-y-1">
+            <button onclick="navigate('dashboard');actions.closeCommandPalette()" class="w-full text-left p-2.5 rounded-xl hover:bg-slate-100 flex items-center justify-between text-xs font-bold text-slate-900">
               <span class="flex items-center gap-2"><i data-lucide="layout-dashboard" class="w-4 h-4 text-brand-600"></i> Go to Dashboard</span>
               <span class="text-[10px] text-slate-400 font-mono">View</span>
             </button>
-            <button onclick="navigate('orders');actions.closeCommandPalette()" class="w-full text-left p-2 rounded-xl hover:bg-slate-100 flex items-center justify-between text-xs font-semibold text-slate-800">
-              <span class="flex items-center gap-2"><i data-lucide="shopping-cart" class="w-4 h-4 text-blue-600"></i> Browse Orders Hub</span>
+            <button onclick="navigate('orders');actions.closeCommandPalette()" class="w-full text-left p-2.5 rounded-xl hover:bg-slate-100 flex items-center justify-between text-xs font-bold text-slate-900">
+              <span class="flex items-center gap-2"><i data-lucide="shopping-cart" class="w-4 h-4 text-brand-600"></i> Browse Orders Hub</span>
               <span class="text-[10px] text-slate-400 font-mono">View</span>
             </button>
-            <button onclick="navigate('allocation');actions.closeCommandPalette()" class="w-full text-left p-2 rounded-xl hover:bg-slate-100 flex items-center justify-between text-xs font-semibold text-slate-800">
-              <span class="flex items-center gap-2"><i data-lucide="git-branch" class="w-4 h-4 text-rose-600"></i> Stock Contention Resolver</span>
-              <span class="text-[10px] text-rose-500 font-mono">AI Action</span>
+            <button onclick="navigate('allocation');actions.closeCommandPalette()" class="w-full text-left p-2.5 rounded-xl hover:bg-slate-100 flex items-center justify-between text-xs font-bold text-slate-900">
+              <span class="flex items-center gap-2"><i data-lucide="git-branch" class="w-4 h-4 text-brand-600"></i> Stock Contention Resolver</span>
+              <span class="text-[10px] text-brand-600 font-mono font-bold">AI Action</span>
             </button>
-            <button onclick="actions.openNewOrderModal();actions.closeCommandPalette()" class="w-full text-left p-2 rounded-xl hover:bg-slate-100 flex items-center justify-between text-xs font-semibold text-slate-800">
-              <span class="flex items-center gap-2"><i data-lucide="plus-circle" class="w-4 h-4 text-emerald-600"></i> Create New Priority Order</span>
-              <span class="text-[10px] text-emerald-500 font-mono">Create</span>
+            <button onclick="actions.openNewOrderModal();actions.closeCommandPalette()" class="w-full text-left p-2.5 rounded-xl hover:bg-slate-100 flex items-center justify-between text-xs font-bold text-slate-900">
+              <span class="flex items-center gap-2"><i data-lucide="plus-circle" class="w-4 h-4 text-brand-600"></i> Create Priority Order</span>
+              <span class="text-[10px] text-brand-600 font-mono font-bold">Create</span>
             </button>
-            <button onclick="actions.openAiOptimizerModal();actions.closeCommandPalette()" class="w-full text-left p-2 rounded-xl hover:bg-slate-100 flex items-center justify-between text-xs font-semibold text-slate-800">
-              <span class="flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4 text-purple-600"></i> Run Full AI Optimizer</span>
-              <span class="text-[10px] text-purple-500 font-mono">Optimize</span>
+            <button onclick="actions.openAiOptimizerModal();actions.closeCommandPalette()" class="w-full text-left p-2.5 rounded-xl hover:bg-slate-100 flex items-center justify-between text-xs font-bold text-slate-900">
+              <span class="flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4 text-brand-600"></i> Run AI Optimizer</span>
+              <span class="text-[10px] text-brand-600 font-mono font-bold">Optimize</span>
             </button>
           </div>
         </div>
@@ -1791,7 +1647,7 @@ const actions = {
     showModal(`
       <div class="p-6">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-base font-bold text-slate-800">Generate Priority Order</h3>
+          <h3 class="text-base font-bold text-slate-900 font-display">Generate Priority Order</h3>
           <button onclick="closeModal()" class="p-1 text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
         </div>
         <div class="space-y-3">
@@ -1821,8 +1677,8 @@ const actions = {
           </div>
         </div>
         <div class="flex justify-end gap-2 mt-6 pt-4 border-t border-slate-100">
-          <button onclick="closeModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
-          <button onclick="actions.submitNewOrder()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-xs">Create Order</button>
+          <button onclick="closeModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50">Cancel</button>
+          <button onclick="actions.submitNewOrder()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-sm">Create Order</button>
         </div>
       </div>
     `);
@@ -1844,7 +1700,7 @@ const actions = {
       exceptionStatus: 'None', createdAt: new Date()
     });
     closeModal();
-    showToast('success', `Created order ${newId} for ${custName}!`);
+    showToast('success', `Created priority order ${newId} for ${custName}!`);
     addActivityLog(state.user.name, 'created priority order', newId, '-', 'New');
     render();
   },
@@ -1853,20 +1709,20 @@ const actions = {
       <div class="p-6">
         <div class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-xl bg-purple-100 flex items-center justify-center text-purple-700">
-              <i data-lucide="sparkles" class="w-5 h-5"></i>
+            <div class="w-8 h-8 rounded-xl bg-brand-50 flex items-center justify-center text-brand-600">
+              <i data-lucide="zap" class="w-5 h-5"></i>
             </div>
             <div>
-              <h3 class="text-base font-bold text-slate-800">WearAI Multi-Factor Optimizer</h3>
+              <h3 class="text-base font-bold text-slate-900 font-display">WearAI Logistics Optimizer</h3>
               <p class="text-xs text-slate-500">Autonomous resolution of inventory constraints & warehouse routing</p>
             </div>
           </div>
           <button onclick="closeModal()" class="p-1 text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
         </div>
-        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2 mb-4">
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-2 mb-4">
           <div class="flex items-center justify-between">
             <span class="text-slate-600">Pending Orders Scanned:</span>
-            <span class="font-bold text-slate-800">${ORDERS.length}</span>
+            <span class="font-bold text-slate-900">${ORDERS.length}</span>
           </div>
           <div class="flex items-center justify-between">
             <span class="text-slate-600">Active Conflicts Identified:</span>
@@ -1874,12 +1730,12 @@ const actions = {
           </div>
           <div class="flex items-center justify-between">
             <span class="text-slate-600">Aisle Path Optimization:</span>
-            <span class="font-bold text-emerald-600">35% Travel Time Reduction</span>
+            <span class="font-bold text-brand-600">35% Travel Time Reduction</span>
           </div>
         </div>
         <div class="flex justify-end gap-2">
           <button onclick="closeModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-xs font-semibold text-slate-700">Cancel</button>
-          <button onclick="actions.applyAllocation('SKU-101');closeModal();" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl text-xs font-bold shadow-xs">
+          <button onclick="actions.applyAllocation('SKU-101');closeModal();" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-sm">
             Execute All AI Recommendations →
           </button>
         </div>
@@ -1907,7 +1763,7 @@ const actions = {
   overrideAllocation(sku){
     showModal(`
       <div class="p-6">
-        <h3 class="text-base font-bold text-slate-800 mb-3">Manual Allocation Override</h3>
+        <h3 class="text-base font-bold text-slate-900 mb-3">Manual Allocation Override</h3>
         <div class="space-y-2 text-xs mb-4">
           <label class="flex items-center gap-2 p-3 border rounded-xl cursor-pointer hover:bg-slate-50">
             <input type="radio" name="ov" checked class="text-brand-600"/>
@@ -1933,7 +1789,7 @@ const actions = {
       <div class="p-6">
         <div class="flex items-center justify-between mb-4">
           <div>
-            <h3 class="text-base font-bold text-slate-800 font-mono">${order.id}</h3>
+            <h3 class="text-base font-bold text-slate-900 font-mono">${order.id}</h3>
             <p class="text-xs text-slate-500">${order.customer} (${order.customerTier} Tier)</p>
           </div>
           <button onclick="closeModal()" class="p-1 text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
@@ -1943,7 +1799,7 @@ const actions = {
           <div class="p-3 bg-slate-50 rounded-xl">Priority: <div class="mt-1">${priorityBadge(pri.priority)}</div></div>
         </div>
         <div class="space-y-2 text-xs">
-          <p class="font-bold text-slate-700">Order Items:</p>
+          <p class="font-bold text-slate-800">Order Items:</p>
           ${order.items.map(it=>`
             <div class="flex justify-between p-2 rounded-lg bg-slate-50 border border-slate-200">
               <span>${it.name} (${it.sku})</span>
@@ -2002,7 +1858,7 @@ const actions = {
   }
 };
 
-// Keydown listener for Ctrl+K command palette
+// Keyboard listener for Ctrl+K
 window.addEventListener('keydown', (e)=>{
   if((e.ctrlKey || e.metaKey) && e.key === 'k'){
     e.preventDefault();
@@ -2033,7 +1889,7 @@ function renderCharts(){
           labels: Object.keys(statusCounts),
           datasets: [{
             data: Object.values(statusCounts),
-            backgroundColor: ['#94a3b8','#3b82f6','#6366f1','#f59e0b','#8b5cf6','#06b6d4','#ec4899','#f97316','#10b981','#059669','#047857'],
+            backgroundColor: ['#94a3b8','#2563eb','#1d4ed8','#f59e0b','#3b82f6','#0284c7','#06b6d4','#f97316','#10b981','#059669','#047857'],
             borderWidth: 2,
             borderColor: '#ffffff'
           }]
@@ -2041,7 +1897,7 @@ function renderCharts(){
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          cutout: '68%',
+          cutout: '70%',
           plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10, family: 'Plus Jakarta Sans' } } } }
         }
       });
@@ -2057,7 +1913,7 @@ function renderCharts(){
           labels: ['Critical', 'High', 'Medium', 'Low'],
           datasets: [{
             data: Object.values(priCounts),
-            backgroundColor: ['#f43f5e','#f59e0b','#3b82f6','#94a3b8'],
+            backgroundColor: ['#e11d48','#f59e0b','#2563eb','#94a3b8'],
             borderRadius: 8,
             borderSkipped: false
           }]
@@ -2068,7 +1924,7 @@ function renderCharts(){
           plugins: { legend: { display: false } },
           scales: {
             y: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } },
-            x: { grid: { display: false }, ticks: { font: { size: 11, weight: '600' } } }
+            x: { grid: { display: false }, ticks: { font: { size: 11, weight: '700' } } }
           }
         }
       });
@@ -2081,8 +1937,8 @@ function renderCharts(){
         data: {
           labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
           datasets: [
-            { label: 'Fulfilled %', data: [88, 91, 89, 94, 96, 92, 95], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.08)', fill: true, tension: 0.4 },
-            { label: 'Target %', data: [90, 90, 90, 90, 90, 90, 90], borderColor: '#6366f1', borderDash: [4, 4], fill: false, tension: 0 }
+            { label: 'Fulfilled %', data: [88, 91, 89, 94, 96, 92, 95], borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.08)', fill: true, tension: 0.4 },
+            { label: 'Target %', data: [90, 90, 90, 90, 90, 90, 90], borderColor: '#000000', borderDash: [4, 4], fill: false, tension: 0 }
           ]
         },
         options: {
@@ -2106,8 +1962,8 @@ function renderCharts(){
         data: {
           labels: ['Picking', 'Packing', 'QC', 'Dispatch'],
           datasets: [
-            { label: 'Actual Time (min)', data: [12, 8, 4, 18], backgroundColor: '#6366f1', borderRadius: 6 },
-            { label: 'SLA Target (min)', data: [10, 6, 3, 15], backgroundColor: '#c7d2fe', borderRadius: 6 }
+            { label: 'Actual Time (min)', data: [12, 8, 4, 18], backgroundColor: '#2563eb', borderRadius: 6 },
+            { label: 'SLA Target (min)', data: [10, 6, 3, 15], backgroundColor: '#bfdbfe', borderRadius: 6 }
           ]
         },
         options: { responsive: true, maintainAspectRatio: false, scales: { y: { grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } }
@@ -2120,8 +1976,8 @@ function renderCharts(){
         data: {
           labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
           datasets: [
-            { label: 'Accuracy %', data: [98.2, 99.1, 98.8, 99.4, 99.7, 99.2, 99.8], borderColor: '#10b981', tension: 0.4 },
-            { label: 'On-Time %', data: [91, 94, 92, 96, 97, 95, 98], borderColor: '#3b82f6', tension: 0.4 }
+            { label: 'Accuracy %', data: [98.2, 99.1, 98.8, 99.4, 99.7, 99.2, 99.8], borderColor: '#2563eb', tension: 0.4 },
+            { label: 'On-Time %', data: [91, 94, 92, 96, 97, 95, 98], borderColor: '#000000', tension: 0.4 }
           ]
         },
         options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 85, max: 100 } } }
@@ -2133,7 +1989,6 @@ function renderCharts(){
 // ==================== ROUTER & RENDER ====================
 function navigate(view){
   state.view = view;
-  state.sidebarOpen = window.innerWidth <= 1024 ? false : state.sidebarOpen;
   render();
 }
 
@@ -2163,14 +2018,20 @@ function render(){
 
   const viewFn = views[state.view] || renderDashboard;
   document.getElementById('app').innerHTML = `
-    <div class="flex min-h-screen bg-slate-50">
-      ${renderSidebar()}
-      <div class="flex-1 min-w-0 flex flex-col">
-        ${renderTopbar()}
-        <main class="flex-1 p-4 lg:p-6 overflow-x-hidden">
-          ${viewFn()}
-        </main>
-      </div>
+    <div class="min-h-screen flex flex-col bg-slate-50">
+      ${renderTopbar()}
+      <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        ${viewFn()}
+      </main>
+      <footer class="border-t border-slate-200 bg-white py-4 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+          <p>© 2026 <strong class="text-slate-800">WearAI Platform</strong> — Developed & Managed by <strong class="text-brand-600">Sai Rakesh</strong></p>
+          <div class="flex items-center gap-4">
+            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> 99.8% System Uptime</span>
+            <a href="https://github.com/sairakesh-143/wearai" target="_blank" class="hover:text-brand-600 font-bold">GitHub Repo</a>
+          </div>
+        </div>
+      </footer>
     </div>
   `;
   lucide.createIcons();
