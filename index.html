@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WearAI — Intelligent AI Warehouse Operations Platform | By Sai Rakesh</title>
+<title>WareMind AI — Smart Warehouse Operations & Fulfillment Platform</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
@@ -25,17 +25,14 @@ tailwind.config = {
           900: '#1e3a8a',
           950: '#172554'
         },
-        obsidian: {
-          700: '#1e293b',
-          800: '#0f172a',
-          850: '#0a0f1d',
-          900: '#060a12',
-          950: '#020408'
+        slate: {
+          850: '#0f172a',
+          900: '#0b0f17',
+          950: '#05070c'
         }
       },
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
-        display: ['"Outfit"', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'monospace']
       }
     }
@@ -44,64 +41,57 @@ tailwind.config = {
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   * { font-family: 'Plus Jakarta Sans', sans-serif; }
-  h1, h2, h3, .font-display { font-family: 'Outfit', sans-serif; }
   .font-mono { font-family: 'JetBrains Mono', monospace; }
   
-  body { background: #f8fafc; color: #090d16; }
+  body { background: #f8fafc; color: #0f172a; }
   
-  /* Modern clean scrollbar */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  /* Scrollbar styling */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 6px; }
+  ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
   ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
   
   .scrollbar-none::-webkit-scrollbar { display: none; }
   .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
   
-  .fade-in { animation: fadeIn .2s cubic-bezier(0.16, 1, 0.3, 1); }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-in { animation: fadeIn .15s cubic-bezier(0.16, 1, 0.3, 1); }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: translateY(0); } }
   
-  .slide-in { animation: slideIn .2s cubic-bezier(0.16, 1, 0.3, 1); }
-  @keyframes slideIn { from { transform: scale(0.97) translateY(6px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+  .slide-in { animation: slideIn .15s cubic-bezier(0.16, 1, 0.3, 1); }
+  @keyframes slideIn { from { transform: scale(0.98) translateY(4px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
   
   .pulse-dot { animation: pulseDot 2s infinite ease-in-out; }
   @keyframes pulseDot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .4; transform: scale(1.15); } }
   
-  .card-hover { transition: all .2s cubic-bezier(0.16, 1, 0.3, 1); }
-  .card-hover:hover { transform: translateY(-2px); box-shadow: 0 12px 30px -8px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04); }
-  
-  .top-tab.active {
+  .nav-item.active {
     color: #ffffff;
     background: #2563eb;
-    box-shadow: 0 4px 14px -2px rgba(37, 99, 235, 0.45);
   }
-  
-  .top-tab:not(.active):hover {
+  .nav-item:not(.active):hover {
     color: #ffffff;
     background: rgba(255, 255, 255, 0.08);
   }
 </style>
 </head>
-<body class="min-h-full flex flex-col bg-slate-50 selection:bg-brand-600 selection:text-white">
+<body class="min-h-full flex flex-col bg-slate-50 text-slate-900 selection:bg-brand-600 selection:text-white">
 <div id="app" class="flex-1 flex flex-col"></div>
 <div id="toast-container" class="fixed top-4 right-4 z-[9999] space-y-2"></div>
 <div id="modal-container"></div>
 <div id="command-container"></div>
 
 <script>
-// ==================== MOCK DATA ====================
-const CATEGORIES = ['Electronics','Office Supplies','Home & Living','Tools','Accessories'];
+// ==================== DATA STORE ====================
+const CATEGORIES = ['Electronics','Office Supplies','Home & Living','Tools'];
 const ZONES = [
-  {id:'A',name:'Zone A — High Velocity Electronics',color:'#2563eb'},
+  {id:'A',name:'Zone A — Electronics & Devices',color:'#2563eb'},
   {id:'B',name:'Zone B — Office & Paper Supplies',color:'#0284c7'},
   {id:'C',name:'Zone C — Home & Living Goods',color:'#f59e0b'},
   {id:'D',name:'Zone D — Heavy Tools & Equipment',color:'#475569'}
 ];
 const SUPPLIERS = ['TechSource Inc','GlobalGoods Co','PrimeSupply Ltd','FastChain Trading','Metro Distributors','Excel Logistics'];
-const CARRIERS = ['FedEx Express','UPS Priority','DHL Worldwide','BlueDart Air','Shadowfax Quick'];
 
 const PRODUCTS = [
   { id: 1, sku: 'SKU-101', name: 'Wireless Headphones Pro', category: 'Electronics', price: 89.99, zone: 'A', shelf: 1, rack: 5, bin: 3, stock: 7, reserved: 7, reorderLevel: 25, reorderQty: 100, dailyDemand: 8, supplier: 'TechSource Inc', status: 'Critical Stock' },
@@ -139,7 +129,6 @@ const EMPLOYEES = [
   {id:6,name:'Sneha Reddy',role:'staff',email:'sneha@wearai.io',avatar:'SR',zone:'D'}
 ];
 
-const SHIP_METHODS = ['Express','Standard','Same-Day','Economy'];
 const ORDER_STATUSES = ['New','Confirmed','Allocated','Partially Allocated','Picking','Picked','Packing','Quality Check','Ready for Dispatch','Dispatched','Delivered'];
 
 const ORDERS = [
@@ -147,14 +136,14 @@ const ORDERS = [
     id: 'ORD-1001', customer: 'TechCorp Industries', customerTier: 'VIP',
     items: [{ sku: 'SKU-101', name: 'Wireless Headphones Pro', qty: 10, price: 89.99, zone: 'A', shelf: 1, rack: 5, bin: 3 }],
     total: 899.90, date: new Date(Date.now() - 3*3600000), deadline: new Date(Date.now() + 2*3600000),
-    shipMethod: 'Express', warehouse: 'WH-01', status: 'New', picker: null, packer: null,
+    shipMethod: 'Express', warehouse: 'WH-01 Seattle Central', status: 'New', picker: null, packer: null,
     exceptionStatus: 'None', createdAt: new Date(Date.now() - 3*3600000)
   },
   {
     id: 'ORD-1002', customer: 'RetailCo Stores', customerTier: 'Regular',
     items: [{ sku: 'SKU-101', name: 'Wireless Headphones Pro', qty: 5, price: 89.99, zone: 'A', shelf: 1, rack: 5, bin: 3 }],
     total: 449.95, date: new Date(Date.now() - 5*3600000), deadline: new Date(Date.now() + 5*24*3600000),
-    shipMethod: 'Standard', warehouse: 'WH-01', status: 'New', picker: null, packer: null,
+    shipMethod: 'Standard', warehouse: 'WH-01 Seattle Central', status: 'New', picker: null, packer: null,
     exceptionStatus: 'None', createdAt: new Date(Date.now() - 5*3600000)
   },
   {
@@ -164,7 +153,7 @@ const ORDERS = [
       { sku: 'SKU-105', name: '4K Ultra HD Webcam', qty: 1, price: 79.99, zone: 'A', shelf: 3, rack: 9, bin: 1 }
     ],
     total: 339.97, date: new Date(Date.now() - 6*3600000), deadline: new Date(Date.now() + 24*3600000),
-    shipMethod: 'Express', warehouse: 'WH-01', status: 'Allocated', picker: null, packer: null,
+    shipMethod: 'Express', warehouse: 'WH-01 Seattle Central', status: 'Allocated', picker: null, packer: null,
     exceptionStatus: 'None', createdAt: new Date(Date.now() - 6*3600000)
   },
   {
@@ -174,7 +163,7 @@ const ORDERS = [
       { sku: 'SKU-103', name: 'Precision Wireless Mouse', qty: 2, price: 29.99, zone: 'A', shelf: 3, rack: 2, bin: 5 }
     ],
     total: 239.98, date: new Date(Date.now() - 8*3600000), deadline: new Date(Date.now() + 18*3600000),
-    shipMethod: 'Same-Day', warehouse: 'WH-01', status: 'Picking', picker: 'Arjun Mehta', packer: null,
+    shipMethod: 'Same-Day', warehouse: 'WH-01 Seattle Central', status: 'Picking', picker: 'Arjun Mehta', packer: null,
     exceptionStatus: 'None', createdAt: new Date(Date.now() - 8*3600000)
   },
   {
@@ -184,55 +173,31 @@ const ORDERS = [
       { sku: 'SKU-107', name: 'Smooth Gel Pen Set (12pc)', qty: 5, price: 11.99, zone: 'B', shelf: 1, rack: 5, bin: 3 }
     ],
     total: 149.85, date: new Date(Date.now() - 12*3600000), deadline: new Date(Date.now() + 48*3600000),
-    shipMethod: 'Standard', warehouse: 'WH-01', status: 'Ready for Dispatch', picker: 'Priya Nair', packer: 'Priya Nair',
+    shipMethod: 'Standard', warehouse: 'WH-01 Seattle Central', status: 'Ready for Dispatch', picker: 'Priya Nair', packer: 'Priya Nair',
     exceptionStatus: 'None', createdAt: new Date(Date.now() - 12*3600000)
   },
   {
     id: 'ORD-1006', customer: 'MetroElectronics', customerTier: 'VIP',
     items: [{ sku: 'SKU-112', name: 'Brushless Impact Drill 20V', qty: 3, price: 89.99, zone: 'D', shelf: 1, rack: 2, bin: 3 }],
     total: 269.97, date: new Date(Date.now() - 14*3600000), deadline: new Date(Date.now() + 12*3600000),
-    shipMethod: 'Express', warehouse: 'WH-01', status: 'Dispatched', picker: 'Arjun Mehta', packer: 'Vikram Patel',
+    shipMethod: 'Express', warehouse: 'WH-01 Seattle Central', status: 'Dispatched', picker: 'Arjun Mehta', packer: 'Vikram Patel',
     exceptionStatus: 'None', createdAt: new Date(Date.now() - 14*3600000)
   }
 ];
 
 const EXCEPTIONS = [
-  {id:'EX-101',type:'Insufficient Stock',order:'ORD-1001',sku:'SKU-101',severity:'Critical',status:'Open',created:new Date(Date.now()-30*60000),assigned:'Vikram Patel',recommendation:'Allocate available 7 units to ORD-1001 (Critical priority). Reserve remaining 3 units. Generate reorder for 100 units.'},
-  {id:'EX-102',type:'Missing Item',order:'ORD-1005',sku:'SKU-115',severity:'High',status:'Investigating',created:new Date(Date.now()-2*3600000),assigned:'Arjun Mehta',recommendation:'Search alternate warehouse location WH-02. Check reserved inventory. If not found, reallocate from safety stock.'},
-  {id:'EX-103',type:'Damaged Item',order:'ORD-1008',sku:'SKU-128',severity:'Medium',status:'Open',created:new Date(Date.now()-4*3600000),assigned:'Priya Nair',recommendation:'Replace damaged item from available stock. Update inventory. File damage report with supplier.'},
-  {id:'EX-104',type:'Delayed Picking',order:'ORD-1012',sku:'Multiple',severity:'High',status:'Open',created:new Date(Date.now()-90*60000),assigned:'Rohan Das',recommendation:'Reassign picking task to available picker in Zone C. Adjust dispatch timeline.'},
-  {id:'EX-105',type:'Quality Check Failure',order:'ORD-1015',sku:'SKU-140',severity:'Critical',status:'Open',created:new Date(Date.now()-15*60000),assigned:'Sneha Reddy',recommendation:'Re-run quality check. If failed again, create replacement order and notify customer of delay.'},
-  {id:'EX-106',type:'Dispatch Delay',order:'ORD-1009',sku:'Multiple',severity:'High',status:'Investigating',created:new Date(Date.now()-45*60000),assigned:'Vikram Patel',recommendation:'Contact carrier for priority pickup. If delay >30min, switch to alternate carrier.'}
+  {id:'EX-101',type:'Insufficient Stock',order:'ORD-1001',sku:'SKU-101',severity:'Critical',status:'Open',created:new Date(Date.now()-30*60000),assigned:'Vikram Patel',recommendation:'Allocate available 7 units to ORD-1001 (Critical priority). Reserve remaining 3 units.'}
 ];
 
 const NOTIFICATIONS = [
   {id:1,type:'critical',title:'Stock Contention Conflict',message:'ORD-1001 (VIP) & ORD-1002 demand SKU-101. Only 7 units available.',time:new Date(Date.now()-5*60000),read:false},
   {id:2,type:'critical',title:'Critical Stock Threshold',message:'SKU-101 (Wireless Headphones Pro) has only 7 units left — below reorder 25.',time:new Date(Date.now()-12*60000),read:false},
-  {id:3,type:'warning',title:'Carrier Pickup Delay',message:'FedEx driver delayed by 25 minutes for Dock 04.',time:new Date(Date.now()-30*60000),read:false},
-  {id:4,type:'warning',title:'Picking Delay Warning',message:'Picker Arjun Mehta is running behind on ORD-1012 in Zone A.',time:new Date(Date.now()-45*60000),read:false},
-  {id:5,type:'info',title:'AI Allocation Routine Complete',message:'WearAI optimized 18 orders in batch #984 with 0 human intervention.',time:new Date(Date.now()-2*3600000),read:true},
-  {id:6,type:'info',title:'Inbound Shipment Received',message:'Supplier TechSource delivered 200 units of SKU-110 to Inbound Bay 2.',time:new Date(Date.now()-3*3600000),read:true}
+  {id:3,type:'warning',title:'Carrier Pickup Delay',message:'FedEx driver delayed by 25 minutes for Dock 04.',time:new Date(Date.now()-30*60000),read:false}
 ];
 
-const ACTIVITY_LOGS = [
-  {user:'Sai Rakesh',action:'Logged in to console',target:'System',time:new Date(Date.now()-5*3600000),prev:'-',next:'Active'},
-  {user:'Sai Rakesh',action:'Approved AI allocation',target:'ORD-1003',time:new Date(Date.now()-4*3600000),prev:'Pending',next:'Allocated'},
-  {user:'Arjun Mehta',action:'Started picking task',target:'ORD-1004',time:new Date(Date.now()-3*3600000),prev:'Assigned',next:'Picking'},
-  {user:'WearAI Engine',action:'Triggered conflict resolver',target:'SKU-101',time:new Date(Date.now()-10*60000),prev:'New',next:'Optimized'},
-  {user:'System',action:'Created exception ticket',target:'EX-101',time:new Date(Date.now()-30*60000),prev:'-',next:'Open'}
-];
-
-const FEED_EVENTS = [
-  {type:'critical',message:'Order ORD-1001 marked CRITICAL — delivery deadline in 2 hours',time:new Date(Date.now()-2*60000)},
-  {type:'warning',message:'SKU-101 running low — only 7 units remaining in Shelf A1',time:new Date(Date.now()-5*60000)},
-  {type:'info',message:'Picker Arjun Mehta started picking ORD-1004 in Zone A',time:new Date(Date.now()-8*60000)},
-  {type:'success',message:'Order ORD-1006 successfully packed at Station 3',time:new Date(Date.now()-25*60000)},
-  {type:'success',message:'Order ORD-1003 dispatched via FedEx Priority',time:new Date(Date.now()-60*60000)}
-];
-
-// ==================== STATE ====================
+// ==================== APPLICATION STATE ====================
 const state = {
-  user: EMPLOYEES[0], // Default Sai Rakesh (Admin)
+  user: EMPLOYEES[0], // Sai Rakesh (Admin)
   view: 'dashboard',
   mobileMenuOpen: false,
   warehouse: 'WH-01 Seattle Central',
@@ -240,20 +205,18 @@ const state = {
   notifDropdownOpen: false,
   userDropdownOpen: false,
   searchQuery: '',
-  filters: { priority:'all', status:'all', zone:'all' },
-  feed: [...FEED_EVENTS],
+  filters: { priority:'all', status:'all', customer:'all', shipMethod:'all' },
   notifications: [...NOTIFICATIONS],
-  activityLog: [...ACTIVITY_LOGS],
-  selectedOrder: null,
-  pageSize: 8
+  testResults: null,
+  testingRunning: false,
+  lastTestedAt: null
 };
 
-// ==================== UTILS ====================
+// ==================== HELPER UTILITIES ====================
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const fmtCur = (n) => '$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 const fmtDate = (d) => { const dt=new Date(d); return dt.toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); };
-const fmtDateShort = (d) => { const dt=new Date(d); return dt.toLocaleDateString('en-US',{month:'short',day:'numeric'}); };
 const timeAgo = (d) => {
   const diff = Date.now()-new Date(d).getTime();
   const min = Math.floor(diff/60000);
@@ -266,14 +229,14 @@ const timeAgo = (d) => {
 const hoursUntil = (d) => { return Math.floor((new Date(d).getTime()-Date.now())/3600000); };
 
 function showToast(type,msg){
-  const colors = {success:'bg-emerald-600 border-emerald-500',error:'bg-rose-600 border-rose-500',warning:'bg-amber-600 border-amber-500',info:'bg-brand-600 border-brand-500'};
-  const icons = {success:'check-circle-2',error:'alert-octagon',warning:'alert-triangle',info:'info'};
+  const colors = {success:'bg-emerald-700 border-emerald-600',error:'bg-rose-700 border-rose-600',warning:'bg-amber-700 border-amber-600',info:'bg-blue-700 border-blue-600'};
+  const icons = {success:'check-circle',error:'alert-circle',warning:'alert-triangle',info:'info'};
   const id = 'toast-'+Date.now();
   const html = `
-    <div id="${id}" class="toast-enter ${colors[type]} border text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 min-w-[320px] max-w-md backdrop-blur-md">
-      <i data-lucide="${icons[type]}" class="w-5 h-5 flex-shrink-0"></i>
-      <span class="text-xs font-semibold flex-1 leading-snug">${esc(msg)}</span>
-      <button onclick="document.getElementById('${id}').remove()" class="opacity-70 hover:opacity-100 p-1"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+    <div id="${id}" class="fade-in ${colors[type]} border text-white px-3.5 py-2.5 rounded-lg shadow-lg flex items-center gap-2.5 min-w-[300px] max-w-md">
+      <i data-lucide="${icons[type]}" class="w-4 h-4 flex-shrink-0"></i>
+      <span class="text-xs font-medium flex-1">${esc(msg)}</span>
+      <button onclick="document.getElementById('${id}').remove()" class="opacity-70 hover:opacity-100 p-0.5"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
     </div>`;
   document.getElementById('toast-container').insertAdjacentHTML('beforeend',html);
   lucide.createIcons();
@@ -282,74 +245,77 @@ function showToast(type,msg){
 
 function showModal(html){
   document.getElementById('modal-container').innerHTML = `
-    <div class="fixed inset-0 bg-obsidian-950/75 backdrop-blur-xs z-[9998] flex items-center justify-center p-4 fade-in" onclick="if(event.target===this)closeModal()">
-      <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-auto slide-in border border-slate-200">${html}</div>
+    <div class="fixed inset-0 bg-slate-950/60 z-[9998] flex items-center justify-center p-4 fade-in" onclick="if(event.target===this)closeModal()">
+      <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-auto border border-slate-200 slide-in">${html}</div>
     </div>`;
   lucide.createIcons();
 }
 function closeModal(){ document.getElementById('modal-container').innerHTML=''; }
 
-// ==================== BADGES & COMPONENTS ====================
+// ==================== SEMANTIC BADGES ====================
 function badge(text,color){
   const colors = {
     green:'bg-emerald-50 text-emerald-700 border-emerald-200',
     red:'bg-rose-50 text-rose-700 border-rose-200',
     amber:'bg-amber-50 text-amber-700 border-amber-200',
-    blue:'bg-brand-50 text-brand-700 border-brand-200',
-    purple:'bg-blue-50 text-blue-800 border-blue-200',
+    blue:'bg-blue-50 text-blue-700 border-blue-200',
     gray:'bg-slate-100 text-slate-700 border-slate-200'
   };
-  return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${colors[color]||colors.gray}">${esc(text)}</span>`;
+  return `<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold border ${colors[color]||colors.gray}">${esc(text)}</span>`;
 }
 
 function priorityBadge(p){
   const map = {Critical:'red',High:'amber',Medium:'blue',Low:'gray'};
-  const dot = {Critical:'bg-rose-500',High:'bg-amber-500',Medium:'bg-brand-500',Low:'bg-slate-400'};
-  return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${map[p]==='red'?'bg-rose-50 text-rose-700 border border-rose-200':map[p]==='amber'?'bg-amber-50 text-amber-700 border border-amber-200':map[p]==='blue'?'bg-brand-50 text-brand-700 border border-brand-200':'bg-slate-100 text-slate-700 border border-slate-200'}">
+  const dot = {Critical:'bg-rose-600',High:'bg-amber-500',Medium:'bg-blue-600',Low:'bg-slate-400'};
+  return `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold border ${map[p]==='red'?'bg-rose-50 text-rose-700 border-rose-200':map[p]==='amber'?'bg-amber-50 text-amber-700 border-amber-200':map[p]==='blue'?'bg-blue-50 text-blue-700 border-blue-200':'bg-slate-100 text-slate-700 border-slate-200'}">
     <span class="w-1.5 h-1.5 rounded-full ${dot[p]} ${p==='Critical'?'pulse-dot':''}"></span>${p}</span>`;
 }
 
 function statusBadge(s){
   const map = {
     'New':'gray','Confirmed':'blue','Allocated':'blue','Partially Allocated':'amber',
-    'Picking':'purple','Picked':'blue','Packing':'purple','Quality Check':'amber',
+    'Picking':'blue','Picked':'blue','Packing':'blue','Quality Check':'amber',
     'Ready for Dispatch':'green','Dispatched':'green','Delivered':'green',
     'In Stock':'green','Low Stock':'amber','Critical Stock':'red','Out of Stock':'red',
-    'Reserved':'blue','Damaged':'red','Open':'red','Investigating':'amber','Resolved':'green','Closed':'gray'
+    'Open':'red','Investigating':'amber','Resolved':'green','Closed':'gray'
   };
   return badge(s, map[s]||'gray');
 }
 
-function statCard(title,value,icon,color,sub,trend,trendType='up',onClick){
-  const trendBg = trendType==='up' ? 'text-emerald-700 bg-emerald-50 border-emerald-200' : trendType==='down' ? 'text-rose-700 bg-rose-50 border-rose-200' : 'text-brand-700 bg-brand-50 border-brand-200';
-  const trendIcon = trendType==='up' ? 'trending-up' : trendType==='down' ? 'trending-down' : 'activity';
-
+function kpiBlock(title,value,icon,sub,trend,trendType='up',onClick){
+  const trendColor = trendType==='up' ? 'text-emerald-600' : trendType==='down' ? 'text-rose-600' : 'text-slate-500';
   return `
-  <div class="bg-white rounded-2xl p-4 border border-slate-200/90 card-hover cursor-pointer relative overflow-hidden group shadow-2xs ${onClick?`onclick="${onClick}"`:''}">
-    <div class="flex items-start justify-between mb-2">
-      <div class="w-10 h-10 rounded-xl ${color} flex items-center justify-center flex-shrink-0 shadow-sm text-white group-hover:scale-105 transition-transform">
-        <i data-lucide="${icon}" class="w-5 h-5"></i>
-      </div>
-      ${trend ? `
-        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold border ${trendBg}">
-          <i data-lucide="${trendIcon}" class="w-3 h-3"></i> ${trend}
-        </span>
-      ` : ''}
+  <div class="bg-white rounded-lg p-3.5 border border-slate-200 shadow-2xs ${onClick?`cursor-pointer hover:border-slate-300 transition-colors`:''}" ${onClick?`onclick="${onClick}"`:''}>
+    <div class="flex items-center justify-between mb-1">
+      <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">${esc(title)}</span>
+      <i data-lucide="${icon}" class="w-4 h-4 text-slate-400"></i>
     </div>
-    <div>
-      <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">${esc(title)}</p>
-      <div class="text-2xl font-black text-slate-900 font-display mt-0.5 tracking-tight">${value}</div>
-      ${sub ? `<p class="text-[11px] text-slate-500 font-medium mt-1">${sub}</p>` : ''}
+    <div class="text-xl font-bold text-slate-900 tracking-tight font-mono">${value}</div>
+    <div class="flex items-center justify-between mt-1 text-[11px]">
+      <span class="text-slate-500 font-medium">${sub || ''}</span>
+      ${trend ? `<span class="font-bold ${trendColor}">${trend}</span>` : ''}
     </div>
   </div>`;
 }
 
-function avatar(name,bg='bg-brand-600'){
-  const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2);
-  return `<div class="rounded-full ${bg} flex items-center justify-center text-white font-bold">${initials}</div>`;
+function pageHeader(category, title, description, actionHtml=''){
+  return `
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 border-b border-slate-200 pb-4">
+    <div>
+      <span class="text-[10px] font-bold tracking-widest text-slate-400 uppercase">${esc(category)}</span>
+      <h2 class="text-xl font-bold text-slate-900 tracking-tight mt-0.5">${esc(title)}</h2>
+      <p class="text-xs text-slate-500 font-medium mt-0.5">${esc(description)}</p>
+    </div>
+    ${actionHtml ? `<div class="self-start sm:self-center">${actionHtml}</div>` : ''}
+  </div>`;
 }
 
-// ==================== ENGINE LOGIC ====================
+function avatar(name){
+  const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2);
+  return `<div class="w-7 h-7 rounded-md bg-blue-600 flex items-center justify-center text-white font-bold text-xs">${initials}</div>`;
+}
+
+// ==================== ENGINE COMPUTATIONS ====================
 function calcPriority(order){
   let score = 0;
   const reasons = [];
@@ -357,14 +323,12 @@ function calcPriority(order){
   if(hrsLeft < 0){ score += 40; reasons.push('Past deadline'); }
   else if(hrsLeft < 4){ score += 35; reasons.push(`Deadline in ${hrsLeft}h`); }
   else if(hrsLeft < 24){ score += 20; reasons.push(`Deadline in ${Math.floor(hrsLeft)}h`); }
-  else if(hrsLeft < 72){ score += 10; reasons.push(`Deadline in ${Math.floor(hrsLeft/24)}d`); }
 
   if(order.customerTier === 'VIP'){ score += 25; reasons.push('VIP Tier'); }
   else if(order.customerTier === 'Premium'){ score += 15; reasons.push('Premium Tier'); }
 
   if(order.shipMethod === 'Express' || order.shipMethod === 'Same-Day'){ score += 15; reasons.push(`${order.shipMethod} shipping`); }
   if(order.total > 500){ score += 10; reasons.push('High value'); }
-  if(order.exceptionStatus !== 'None'){ score += 15; reasons.push(`Exception: ${order.exceptionStatus}`); }
 
   let priority = 'Low';
   if(score >= 70) priority = 'Critical';
@@ -374,48 +338,30 @@ function calcPriority(order){
   return { priority, score, reasons };
 }
 
-function checkAllocationConflict(sku){
+function resolveAllocation(sku){
   const product = PRODUCTS.find(p=>p.sku===sku);
   if(!product) return null;
   const competing = ORDERS.filter(o=>o.status==='New'||o.status==='Confirmed')
     .filter(o=>o.items.some(it=>it.sku===sku));
   if(competing.length === 0) return null;
   const totalDemand = competing.reduce((s,o)=>s+(o.items.find(it=>it.sku===sku)?.qty||0),0);
-  if(totalDemand <= product.stock) return null;
   competing.forEach(o=>{ o._priority = calcPriority(o); });
   competing.sort((a,b)=>b._priority.score - a._priority.score);
-  return { sku, product, competing, available: product.stock, totalDemand, shortfall: totalDemand - product.stock };
-}
 
-function resolveAllocation(sku){
-  const conflict = checkAllocationConflict(sku);
-  if(!conflict) return null;
-  let remaining = conflict.available;
-  const decisions = [];
-  for(const order of conflict.competing){
+  let remaining = product.stock;
+  const decisions = competing.map(order=>{
     const need = order.items.find(it=>it.sku===sku)?.qty || 0;
     const allocated = Math.min(need, remaining);
     remaining -= allocated;
-    decisions.push({
+    return {
       orderId: order.id, priority: order._priority.priority, score: order._priority.score,
       requested: need, allocated, remaining: need - allocated,
       fullyAllocated: allocated === need, customer: order.customer, customerTier: order.customerTier,
       reasons: order._priority.reasons
-    });
-  }
-  return { ...conflict, decisions, recommendation: decisions[0].allocated > 0 ?
-    `Allocate ${decisions[0].allocated} units to ${decisions[0].orderId} (${decisions[0].priority} priority — ${decisions[0].reasons.join(', ')})` : 'No stock available' };
-}
+    };
+  });
 
-function detectLowStock(){
-  return PRODUCTS.filter(p=>p.stock <= p.reorderLevel).map(p=>{
-    const daysRemaining = p.stock > 0 ? (p.stock / p.dailyDemand).toFixed(1) : 0;
-    let risk = 'Low';
-    if(p.stock === 0) risk = 'Critical';
-    else if(parseFloat(daysRemaining) < 2) risk = 'High';
-    else if(parseFloat(daysRemaining) < 5) risk = 'Medium';
-    return { ...p, daysRemaining, risk };
-  }).sort((a,b)=>parseFloat(a.daysRemaining)-parseFloat(b.daysRemaining));
+  return { sku, product, available: product.stock, totalDemand, shortfall: Math.max(0, totalDemand - product.stock), competing, decisions };
 }
 
 function optimizeRoute(order){
@@ -425,117 +371,58 @@ function optimizeRoute(order){
     return a.rack - b.rack;
   });
   const dist = items.reduce((d,it,i)=>{
-    if(i===0) return 20;
+    if(i===0) return 15;
     const prev = items[i-1];
-    const zDiff = Math.abs(prev.zone.charCodeAt(0)-it.zone.charCodeAt(0))*40;
-    const sDiff = Math.abs(prev.shelf-it.shelf)*10;
-    return d + zDiff + sDiff + 15;
+    return d + Math.abs(prev.zone.charCodeAt(0)-it.zone.charCodeAt(0))*30 + Math.abs(prev.shelf-it.shelf)*8 + 10;
   },0);
-  return { items, distance: dist, time: Math.ceil(dist/15), efficiency: Math.min(98, Math.max(75, 100 - items.length*2)) };
+  return { items, distance: dist, time: Math.ceil(dist/12), efficiency: Math.min(98, Math.max(80, 100 - items.length*2)) };
 }
 
-function getSmartDecisions(){
-  const recs = [];
-  const conflict = resolveAllocation('SKU-101');
-  if(conflict && conflict.shortfall > 0){
-    recs.push({
-      id:'rec-alloc-1', type:'Stock Allocation', icon:'git-branch', color:'blue',
-      problem:`Stock contention on SKU-101 — ${conflict.totalDemand} units demanded, only ${conflict.available} available in Zone A`,
-      data:`ORD-1001 (${conflict.competing[0]._priority.priority}) needs ${conflict.competing[0].items.find(i=>i.sku==='SKU-101').qty} | ORD-1002 (${conflict.competing[1]._priority.priority}) needs ${conflict.competing[1].items.find(i=>i.sku==='SKU-101').qty}`,
-      decision:`Allocate ${conflict.decisions[0].allocated} units to ${conflict.decisions[0].orderId} (Critical priority). Mark as Partially Allocated.`,
-      impact:`Critical VIP order partially fulfilled. Exception ticket auto-created. Reorder batch triggered.`,
-      action:'Apply AI Allocation', actionType:'allocate', actionData:{conflict}
-    });
-  }
-  return recs;
-}
-
-function addFeedEvent(){
-  const pool = [
-    'Order {ORD} assigned to picking route in Zone {ZONE}',
-    'Order {ORD} completed picking with 100% barcode match',
-    'Station 2 completed packing for order {ORD}',
-    'Quality control passed for order {ORD}',
-    'SKU-{SKU} stock levels dipped below safety threshold',
-    'Carrier scan registered for order {ORD}'
-  ];
-  const template = pool[Math.floor(Math.random()*pool.length)];
-  const ordNum = 1000 + Math.floor(Math.random()*30);
-  const skuNum = 101 + Math.floor(Math.random()*40);
-  const zone = ['A','B','C','D'][Math.floor(Math.random()*4)];
-  const msg = template.replace('{ORD}',`ORD-${ordNum}`).replace('{SKU}',String(skuNum).padStart(3,'0')).replace('{ZONE}',zone);
-  state.feed.unshift({type:'info',message:msg,time:new Date()});
-  if(state.feed.length > 20) state.feed.pop();
-}
-
-function addActivityLog(user,action,target,prev,next){
-  state.activityLog.unshift({user,action,target,time:new Date(),prev,next});
-  if(state.activityLog.length > 50) state.activityLog.pop();
-}
-
-// ==================== CHART MANAGEMENT ====================
+// ==================== CHARTS MANAGEMENT ====================
 let charts = {};
 function destroyCharts(){ Object.keys(charts).forEach(k=>{ if(charts[k]) { charts[k].destroy(); delete charts[k]; } }); }
 
 // ==================== VIEWS: LOGIN ====================
 function renderLogin(){
   return `
-  <div class="min-h-screen flex items-center justify-center bg-obsidian-950 p-4">
-    <div class="relative bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md fade-in border border-slate-200">
+  <div class="min-h-screen flex items-center justify-center bg-slate-900 p-4">
+    <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md border border-slate-200 fade-in">
       <div class="text-center mb-8">
-        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-black shadow-xl mb-4 border border-brand-500/30">
-          <i data-lucide="warehouse" class="w-8 h-8 text-brand-500"></i>
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-blue-600 text-white mb-3 shadow-sm">
+          <i data-lucide="warehouse" class="w-6 h-6"></i>
         </div>
-        <div class="flex items-center justify-center gap-2 mb-1">
-          <h1 class="text-2xl font-black text-slate-900 font-display tracking-tight">WearAI</h1>
-          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-50 text-brand-700 border border-brand-200">ENTERPRISE</span>
-        </div>
-        <p class="text-slate-500 text-xs font-medium">Autonomous Warehouse Operations & AI Logistics</p>
+        <h1 class="text-xl font-bold text-slate-900 tracking-tight">WareMind AI</h1>
+        <p class="text-xs text-slate-500 mt-1">Smart Warehouse Operations & Order Fulfillment System</p>
       </div>
 
       <div class="space-y-4">
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">User Identity / Email</label>
-          <div class="relative">
-            <i data-lucide="mail" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-            <input type="email" value="rakesh@wearai.io" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-xs font-semibold text-slate-800 outline-none transition-all"/>
-          </div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Email Identifier</label>
+          <input type="email" value="rakesh@wearai.io" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-medium text-slate-800 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"/>
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Security Token</label>
-          <div class="relative">
-            <i data-lucide="lock" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-            <input type="password" value="demo1234" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-xs font-semibold text-slate-800 outline-none transition-all"/>
-          </div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Access Credentials</label>
+          <input type="password" value="demo1234" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-medium text-slate-800 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"/>
         </div>
-        <button onclick="actions.login()" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold text-xs shadow-lg shadow-brand-600/30 transition-all hover:scale-[1.01] active:scale-[0.99]">
+        <button onclick="actions.quickLogin('admin')" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-xs shadow-sm transition-colors">
           Authenticate & Launch Workspace →
         </button>
       </div>
 
-      <div class="mt-6 pt-6 border-t border-slate-200">
-        <p class="text-[11px] font-semibold text-slate-400 text-center mb-3">1-Click Fast Sign-In:</p>
+      <div class="mt-6 pt-6 border-t border-slate-200 text-center">
+        <p class="text-[11px] text-slate-500 font-semibold mb-3">Quick Role Authentication:</p>
         <div class="grid grid-cols-3 gap-2">
-          <button onclick="actions.quickLogin('admin')" class="flex flex-col items-center gap-1.5 p-2.5 rounded-xl border border-slate-200 hover:border-brand-500 hover:bg-brand-50/50 transition-all group">
-            <div class="w-7 h-7 rounded-lg bg-brand-100 flex items-center justify-center text-brand-700 group-hover:scale-110 transition-transform">
-              <i data-lucide="shield-check" class="w-4 h-4"></i>
-            </div>
-            <span class="text-[11px] font-bold text-slate-800">Sai Rakesh</span>
-            <span class="text-[9px] text-brand-600 font-semibold uppercase">Admin</span>
+          <button onclick="actions.quickLogin('admin')" class="p-2 border rounded-lg hover:border-blue-600 text-xs font-bold text-slate-800 bg-slate-50">
+            Sai Rakesh
+            <span class="block text-[9px] text-blue-600 uppercase font-semibold">Admin</span>
           </button>
-          <button onclick="actions.quickLogin('manager')" class="flex flex-col items-center gap-1.5 p-2.5 rounded-xl border border-slate-200 hover:border-brand-500 hover:bg-brand-50/50 transition-all group">
-            <div class="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center text-slate-700 group-hover:scale-110 transition-transform">
-              <i data-lucide="clipboard-list" class="w-4 h-4"></i>
-            </div>
-            <span class="text-[11px] font-bold text-slate-800">Vikram</span>
-            <span class="text-[9px] text-slate-600 font-semibold uppercase">Manager</span>
+          <button onclick="actions.quickLogin('manager')" class="p-2 border rounded-lg hover:border-blue-600 text-xs font-bold text-slate-800 bg-slate-50">
+            Vikram
+            <span class="block text-[9px] text-slate-500 uppercase font-semibold">Manager</span>
           </button>
-          <button onclick="actions.quickLogin('staff')" class="flex flex-col items-center gap-1.5 p-2.5 rounded-xl border border-slate-200 hover:border-brand-500 hover:bg-brand-50/50 transition-all group">
-            <div class="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center text-slate-700 group-hover:scale-110 transition-transform">
-              <i data-lucide="package" class="w-4 h-4"></i>
-            </div>
-            <span class="text-[11px] font-bold text-slate-800">Arjun</span>
-            <span class="text-[9px] text-slate-600 font-semibold uppercase">Staff</span>
+          <button onclick="actions.quickLogin('staff')" class="p-2 border rounded-lg hover:border-blue-600 text-xs font-bold text-slate-800 bg-slate-50">
+            Arjun
+            <span class="block text-[9px] text-slate-500 uppercase font-semibold">Staff</span>
           </button>
         </div>
       </div>
@@ -543,222 +430,185 @@ function renderLogin(){
   </div>`;
 }
 
-// ==================== COMPONENT: TOP BAR (LAPTOP / DESKTOP / MOBILE) ====================
+// ==================== TOP HEADER & NAVIGATION ====================
 function renderTopbar(){
   const unreadCount = state.notifications.filter(n=>!n.read).length;
 
-  const navTabs = [
-    {id:'dashboard',label:'Dashboard',icon:'layout-dashboard'},
-    {id:'orders',label:'Live Orders',icon:'shopping-cart'},
-    {id:'inventory',label:'Inventory',icon:'package'},
-    {id:'allocation',label:'Allocation',icon:'git-branch',badge:'AI Conflict'},
-    {id:'picking',label:'Pick & Route',icon:'map-pin'},
-    {id:'packing',label:'Pack Station',icon:'box'},
-    {id:'qualityCheck',label:'Quality Check',icon:'check-square'},
-    {id:'dispatch',label:'Dispatch',icon:'truck'},
-    {id:'smartDecisions',label:'AI Decisions',icon:'brain',badge:'AI'},
-    {id:'exceptions',label:'Exceptions',icon:'alert-triangle',badge:EXCEPTIONS.filter(e=>e.status==='Open').length},
-    {id:'analytics',label:'Analytics',icon:'bar-chart-3'},
-    {id:'systemHealth',label:'System Health',icon:'shield-check',badge:'Test Suite'},
-    {id:'settings',label:'Settings',icon:'settings'}
+  const navGroups = [
+    {
+      group: 'OPERATIONS',
+      items: [
+        {id:'dashboard',label:'Dashboard',icon:'layout-dashboard'},
+        {id:'orders',label:'Live Orders',icon:'shopping-cart'},
+        {id:'inventory',label:'Inventory',icon:'package'},
+        {id:'allocation',label:'Allocation',icon:'git-branch',badge:'Conflict'},
+        {id:'picking',label:'Pick & Route',icon:'map-pin'}
+      ]
+    },
+    {
+      group: 'FULFILLMENT',
+      items: [
+        {id:'packing',label:'Pack Station',icon:'box'},
+        {id:'qualityCheck',label:'Quality Check',icon:'check-square'},
+        {id:'dispatch',label:'Dispatch',icon:'truck'}
+      ]
+    },
+    {
+      group: 'INTELLIGENCE',
+      items: [
+        {id:'smartDecisions',label:'AI Decisions',icon:'brain',badge:'AI'},
+        {id:'exceptions',label:'Exceptions',icon:'alert-triangle',badge:EXCEPTIONS.filter(e=>e.status==='Open').length},
+        {id:'systemHealth',label:'System Health',icon:'shield-check',badge:'Test Suite'}
+      ]
+    }
   ];
 
   return `
-  <header class="sticky top-0 z-40 bg-black text-white shadow-xl">
-    <!-- Tier 1: Global Utility & Executive Bar -->
-    <div class="border-b border-slate-800/90">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-between gap-3">
-        <!-- Brand & Facility Node -->
-        <div class="flex items-center gap-3">
-          <button onclick="actions.toggleMobileMenu()" class="lg:hidden p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
-            <i data-lucide="menu" class="w-5 h-5"></i>
-          </button>
+  <header class="sticky top-0 z-40 bg-[#0B0F17] text-white border-b border-slate-800 shadow-md">
+    <!-- Header Tier 1: Brand, Search, CTAs & Profile -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-between gap-4 border-b border-slate-800/80">
+      <!-- LEFT: Brand + Warehouse Selector -->
+      <div class="flex items-center gap-3">
+        <button onclick="actions.toggleMobileMenu()" class="lg:hidden p-1.5 text-slate-400 hover:text-white rounded">
+          <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
 
-          <!-- Brand Logo -->
-          <div onclick="navigate('dashboard')" class="flex items-center gap-2.5 cursor-pointer">
-            <div class="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center shadow-lg shadow-brand-600/40 text-white font-bold border border-brand-400/30">
-              <i data-lucide="warehouse" class="w-5 h-5"></i>
-            </div>
-            <div>
-              <div class="flex items-center gap-1.5">
-                <h1 class="text-white font-black text-lg font-display tracking-tight">WearAI</h1>
-                <span class="px-1.5 py-0.2 rounded text-[9px] font-black bg-brand-600/30 text-brand-300 border border-brand-500/40">PRO</span>
-              </div>
-              <p class="text-[9px] text-slate-400 font-medium hidden sm:block">Intelligent Logistics Engine</p>
-            </div>
+        <div onclick="navigate('dashboard')" class="flex items-center gap-2 cursor-pointer">
+          <div class="w-7 h-7 rounded bg-blue-600 flex items-center justify-center text-white font-bold">
+            <i data-lucide="warehouse" class="w-4 h-4"></i>
           </div>
+          <span class="font-bold text-base tracking-tight text-white font-mono">WareMind<span class="text-blue-500">AI</span></span>
+        </div>
 
-          <!-- Facility Location Switcher -->
-          <div class="relative ml-2 hidden sm:block">
-            <button onclick="actions.toggleWarehouseDropdown()" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition-all text-xs font-bold border border-slate-800">
-              <span class="w-2 h-2 rounded-full bg-brand-500 pulse-dot"></span>
-              <span class="font-display tracking-wide">${state.warehouse}</span>
-              <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
-            </button>
+        <div class="relative hidden sm:block ml-2">
+          <button onclick="actions.toggleWarehouseDropdown()" class="flex items-center gap-2 px-2.5 py-1 rounded bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-medium text-slate-200">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            <span>${state.warehouse}</span>
+            <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400"></i>
+          </button>
+          ${state.whDropdownOpen ? `
+            <div class="absolute left-0 mt-1 w-60 bg-white text-slate-900 rounded-lg shadow-xl border border-slate-200 p-1.5 z-50 fade-in">
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 py-1">Select Warehouse Facility</p>
+              ${['WH-01 Seattle Central','WH-02 Chicago Hub','WH-03 Dallas Depot','WH-04 Frankfurt Euro'].map(wh=>`
+                <button onclick="actions.setWarehouse('${wh}')" class="w-full text-left px-2 py-1.5 rounded hover:bg-slate-100 text-xs font-semibold flex items-center justify-between ${state.warehouse===wh?'text-blue-600 font-bold bg-blue-50':''}">
+                  <span>${wh}</span>
+                  ${state.warehouse===wh?`<i data-lucide="check" class="w-3.5 h-3.5"></i>`:''}
+                </button>
+              `).join('')}
+            </div>
+          ` : ''}
+        </div>
+      </div>
 
-            ${state.whDropdownOpen ? `
-              <div class="absolute left-0 mt-2 w-64 bg-white text-slate-900 rounded-2xl shadow-2xl border border-slate-200 p-2 z-50 fade-in">
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 py-1">Select Facility Node</p>
-                ${[
-                  {name:'WH-01 Seattle Central',status:'Primary Hub • Active',sub:'94.8% Capacity'},
-                  {name:'WH-02 Chicago Hub',status:'Secondary Node • Active',sub:'76.2% Capacity'},
-                  {name:'WH-03 Dallas Depot',status:'Regional Crossdock',sub:'82.1% Capacity'},
-                  {name:'WH-04 Frankfurt Euro',status:'Cross-Continent Bay',sub:'61.4% Capacity'}
-                ].map(wh=>`
-                  <button onclick="actions.setWarehouse('${wh.name}')" class="w-full text-left p-2 rounded-xl hover:bg-slate-100 flex items-center justify-between transition-colors ${state.warehouse===wh.name?'bg-brand-50 text-brand-700 font-bold':''}">
-                    <div>
-                      <p class="text-xs font-bold">${wh.name}</p>
-                      <p class="text-[10px] text-slate-500">${wh.status} · ${wh.sub}</p>
-                    </div>
-                    ${state.warehouse===wh.name?`<i data-lucide="check" class="w-4 h-4 text-brand-600"></i>`:''}
-                  </button>
+      <!-- CENTER: Command Center Search -->
+      <div class="flex-1 max-w-md mx-2 hidden md:block">
+        <div onclick="actions.openCommandPalette()" class="relative flex items-center w-full bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded px-3 py-1.5 cursor-pointer text-slate-400 text-xs font-medium">
+          <i data-lucide="search" class="w-3.5 h-3.5 text-slate-500 mr-2"></i>
+          <span class="flex-1 truncate">Search order ID, SKU, location, or picker...</span>
+          <kbd class="px-1.5 py-0.5 bg-slate-800 border border-slate-700 text-[10px] font-mono text-slate-400 rounded">Ctrl K</kbd>
+        </div>
+      </div>
+
+      <!-- RIGHT: Status, Actions, Profile -->
+      <div class="flex items-center gap-2">
+        <div class="hidden xl:flex items-center gap-2 px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-xs font-mono text-slate-300">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          <span id="live-top-clock">14:52:00</span>
+        </div>
+
+        <button onclick="actions.openAiOptimizerModal()" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-bold shadow-xs">
+          <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+          <span>AI Optimize</span>
+        </button>
+
+        <button onclick="actions.openNewOrderModal()" class="inline-flex items-center gap-1 px-3 py-1.5 bg-white text-slate-900 hover:bg-slate-100 rounded text-xs font-bold shadow-xs">
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+          <span>Create Order</span>
+        </button>
+
+        <!-- Notifications -->
+        <div class="relative">
+          <button onclick="actions.toggleNotifDropdown()" class="relative p-1.5 rounded text-slate-400 hover:text-white hover:bg-slate-800">
+            <i data-lucide="bell" class="w-4 h-4"></i>
+            ${unreadCount ? `<span class="absolute top-0.5 right-0.5 w-3.5 h-3.5 bg-rose-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center">${unreadCount}</span>` : ''}
+          </button>
+          ${state.notifDropdownOpen ? `
+            <div class="absolute right-0 mt-1 w-80 bg-white text-slate-900 rounded-lg shadow-xl border border-slate-200 p-3 z-50 fade-in">
+              <div class="flex items-center justify-between pb-2 border-b border-slate-100 mb-2">
+                <span class="text-xs font-bold text-slate-800">Alert Center</span>
+                <button onclick="actions.markAllRead()" class="text-[11px] font-semibold text-blue-600 hover:underline">Mark read</button>
+              </div>
+              <div class="space-y-1.5 max-h-60 overflow-y-auto">
+                ${state.notifications.map(n=>`
+                  <div class="p-2 rounded ${n.read?'bg-slate-50 opacity-60':'bg-blue-50/50 border border-blue-100'} text-xs">
+                    <p class="font-bold text-slate-800">${n.title}</p>
+                    <p class="text-slate-600 text-[11px] mt-0.5">${n.message}</p>
+                  </div>
                 `).join('')}
               </div>
-            ` : ''}
-          </div>
+            </div>
+          ` : ''}
         </div>
 
-        <!-- Center Spotlight Search -->
-        <div class="flex-1 max-w-md mx-2 hidden md:block">
-          <div onclick="actions.openCommandPalette()" class="relative flex items-center w-full bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl px-3 py-1.5 cursor-pointer transition-all group">
-            <i data-lucide="search" class="w-4 h-4 text-slate-400 group-hover:text-brand-400 transition-colors mr-2.5"></i>
-            <span class="text-xs text-slate-400 flex-1 truncate">Search orders, SKU, bins, pickers...</span>
-            <kbd class="inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono text-slate-400 bg-slate-800 border border-slate-700 rounded font-bold">Ctrl K</kbd>
-          </div>
-        </div>
-
-        <!-- Right Utilities & Profile -->
-        <div class="flex items-center gap-2">
-          <!-- Live Shift Clock -->
-          <div class="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs">
-            <span class="w-2 h-2 rounded-full bg-brand-500 pulse-dot"></span>
-            <span class="font-mono font-bold text-white" id="live-top-clock">14:48:20</span>
-            <span class="text-[10px] font-bold text-brand-400 bg-brand-950 px-1.5 py-0.2 rounded border border-brand-800">Shift 1</span>
-          </div>
-
-          <!-- Quick Action: AI Optimize -->
-          <button onclick="actions.openAiOptimizerModal()" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-xs font-bold shadow-md shadow-brand-600/30 transition-all hover:scale-[1.02] active:scale-[0.98]">
-            <i data-lucide="zap" class="w-3.5 h-3.5"></i>
-            <span>AI Optimize</span>
+        <!-- Profile -->
+        <div class="relative">
+          <button onclick="actions.toggleUserDropdown()" class="flex items-center gap-2 p-1 rounded bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-medium">
+            ${avatar(state.user.name)}
+            <span class="hidden sm:inline font-bold text-white">${state.user.name}</span>
+            <i data-lucide="chevron-down" class="hidden sm:inline w-3 h-3 text-slate-400"></i>
           </button>
-
-          <!-- Quick Action: + New Order -->
-          <button onclick="actions.openNewOrderModal()" class="inline-flex items-center gap-1 px-3 py-1.5 bg-white text-black hover:bg-slate-100 rounded-xl text-xs font-bold shadow-sm transition-all">
-            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-            <span class="hidden sm:inline">Order</span>
-          </button>
-
-          <!-- Notifications Dropdown -->
-          <div class="relative">
-            <button onclick="actions.toggleNotifDropdown()" class="relative p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
-              <i data-lucide="bell" class="w-4 h-4"></i>
-              ${unreadCount ? `<span class="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] flex items-center justify-center font-black">${unreadCount}</span>` : ''}
-            </button>
-
-            ${state.notifDropdownOpen ? `
-              <div class="absolute right-0 mt-2 w-80 sm:w-96 bg-white text-slate-900 rounded-2xl shadow-2xl border border-slate-200 p-3 z-50 fade-in">
-                <div class="flex items-center justify-between pb-2 border-b border-slate-100 mb-2">
-                  <div class="flex items-center gap-2">
-                    <h4 class="font-bold text-xs text-slate-800">Live Alerts</h4>
-                    <span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-brand-100 text-brand-700">${unreadCount} New</span>
-                  </div>
-                  <button onclick="actions.markAllRead()" class="text-[11px] font-bold text-brand-600 hover:underline">Mark all read</button>
-                </div>
-                <div class="space-y-1.5 max-h-72 overflow-y-auto">
-                  ${state.notifications.slice(0, 5).map(n => `
-                    <div class="p-2.5 rounded-xl ${n.read ? 'bg-slate-50 opacity-60' : 'bg-brand-50/50 border border-brand-100'} hover:bg-slate-100 transition-colors flex items-start gap-2.5">
-                      <div class="w-2 h-2 rounded-full ${n.type==='critical'?'bg-rose-500':n.type==='warning'?'bg-amber-500':'bg-brand-600'} mt-1.5 flex-shrink-0"></div>
-                      <div class="flex-1 min-w-0">
-                        <p class="text-xs font-bold text-slate-800 truncate">${n.title}</p>
-                        <p class="text-[11px] text-slate-600 line-clamp-2">${n.message}</p>
-                        <p class="text-[9px] text-slate-400 mt-1">${timeAgo(n.time)}</p>
-                      </div>
-                    </div>
-                  `).join('')}
-                </div>
-                <button onclick="navigate('notifications'); state.notifDropdownOpen=false;" class="w-full text-center mt-2 pt-2 border-t border-slate-100 text-xs font-bold text-brand-600 hover:text-brand-700">View All Alerts →</button>
+          ${state.userDropdownOpen ? `
+            <div class="absolute right-0 mt-1 w-48 bg-white text-slate-900 rounded-lg shadow-xl border border-slate-200 p-1.5 z-50 fade-in text-xs font-medium">
+              <div class="px-2 py-1.5 border-b border-slate-100 mb-1">
+                <p class="font-bold text-slate-900">${state.user.name}</p>
+                <p class="text-[11px] text-slate-500">${state.user.email}</p>
               </div>
-            ` : ''}
-          </div>
-
-          <!-- User Profile -->
-          <div class="relative">
-            <button onclick="actions.toggleUserDropdown()" class="flex items-center gap-2 p-1 sm:px-2.5 sm:py-1 rounded-xl bg-slate-900 hover:bg-slate-800 transition-all border border-slate-800">
-              ${avatar(state.user.name, 'bg-brand-600 w-7 h-7 text-[11px] shadow-sm')}
-              <div class="hidden sm:block text-left">
-                <p class="text-xs font-bold text-white leading-tight">${state.user.name}</p>
-                <p class="text-[9px] text-brand-400 font-bold uppercase tracking-wider">${state.user.role}</p>
+              <button onclick="actions.quickLogin('admin');state.userDropdownOpen=false;" class="w-full text-left px-2 py-1 rounded hover:bg-slate-100">Sai Rakesh (Admin)</button>
+              <button onclick="actions.quickLogin('manager');state.userDropdownOpen=false;" class="w-full text-left px-2 py-1 rounded hover:bg-slate-100">Vikram (Manager)</button>
+              <button onclick="actions.quickLogin('staff');state.userDropdownOpen=false;" class="w-full text-left px-2 py-1 rounded hover:bg-slate-100">Arjun (Staff)</button>
+              <div class="pt-1 mt-1 border-t border-slate-100">
+                <button onclick="actions.logout();state.userDropdownOpen=false;" class="w-full text-left px-2 py-1 rounded hover:bg-rose-50 text-rose-600 font-bold">Sign Out</button>
               </div>
-              <i data-lucide="chevron-down" class="hidden sm:block w-3.5 h-3.5 text-slate-400"></i>
-            </button>
-
-            ${state.userDropdownOpen ? `
-              <div class="absolute right-0 mt-2 w-56 bg-white text-slate-900 rounded-2xl shadow-2xl border border-slate-200 p-2 z-50 fade-in">
-                <div class="p-2 border-b border-slate-100 mb-1">
-                  <p class="text-xs font-bold text-slate-900">${state.user.name}</p>
-                  <p class="text-[11px] text-slate-500 truncate">${state.user.email}</p>
-                  <span class="inline-block mt-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-100 text-brand-700 capitalize">${state.user.role}</span>
-                </div>
-                <button onclick="navigate('settings'); state.userDropdownOpen=false;" class="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-lg flex items-center gap-2">
-                  <i data-lucide="settings" class="w-4 h-4 text-slate-500"></i> Settings & Console
-                </button>
-                <button onclick="actions.quickLogin('admin'); state.userDropdownOpen=false;" class="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-lg flex items-center gap-2">
-                  <i data-lucide="shield" class="w-4 h-4 text-brand-600"></i> Sai Rakesh (Admin)
-                </button>
-                <button onclick="actions.quickLogin('manager'); state.userDropdownOpen=false;" class="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-lg flex items-center gap-2">
-                  <i data-lucide="clipboard" class="w-4 h-4 text-slate-600"></i> Vikram (Manager)
-                </button>
-                <button onclick="actions.quickLogin('staff'); state.userDropdownOpen=false;" class="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-lg flex items-center gap-2">
-                  <i data-lucide="package" class="w-4 h-4 text-slate-600"></i> Arjun (Staff)
-                </button>
-                <div class="pt-1 mt-1 border-t border-slate-100">
-                  <button onclick="actions.logout(); state.userDropdownOpen=false;" class="w-full text-left px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 rounded-lg flex items-center gap-2">
-                    <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
-                  </button>
-                </div>
-              </div>
-            ` : ''}
-          </div>
+            </div>
+          ` : ''}
         </div>
       </div>
     </div>
 
-    <!-- Tier 2: Horizontal Navigation Bar (Laptop / Desktop) -->
-    <div class="bg-obsidian-950 border-b border-slate-800/80 hidden lg:block">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-1 overflow-x-auto py-1 scrollbar-none">
-        ${navTabs.map(item=>`
-          <button onclick="navigate('${item.id}')" class="top-tab flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-slate-400 transition-all flex-shrink-0 ${state.view===item.id?'active':''}">
-            <i data-lucide="${item.icon}" class="w-3.5 h-3.5"></i>
-            <span>${item.label}</span>
-            ${item.badge !== undefined && item.badge !== '' ? `
-              <span class="px-1.5 py-0.2 rounded-md text-[9px] font-black ${item.badge==='AI Conflict'?'bg-rose-500 text-white animate-pulse':item.badge==='AI'?'bg-brand-500 text-white':'bg-slate-800 text-slate-300'}">
-                ${item.badge}
-              </span>
-            ` : ''}
-          </button>
+    <!-- Header Tier 2: Categorized Navigation Tabs -->
+    <div class="bg-slate-950 border-b border-slate-800 hidden lg:block">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-6 py-1 scrollbar-none">
+        ${navGroups.map(grp=>`
+          <div class="flex items-center gap-1 border-r border-slate-800/80 pr-4 last:border-0">
+            <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mr-1">${grp.group}</span>
+            ${grp.items.map(item=>`
+              <button onclick="navigate('${item.id}')" class="nav-item flex items-center gap-1.5 px-2.5 py-1.5 rounded text-xs font-semibold text-slate-400 transition-colors ${state.view===item.id?'active':''}">
+                <i data-lucide="${item.icon}" class="w-3.5 h-3.5"></i>
+                <span>${item.label}</span>
+                ${item.badge ? `<span class="px-1 py-0.2 rounded text-[9px] font-bold ${item.badge==='Conflict'?'bg-rose-600 text-white':'bg-blue-600 text-white'}">${item.badge}</span>` : ''}
+              </button>
+            `).join('')}
+          </div>
         `).join('')}
       </div>
     </div>
 
-    <!-- Mobile Drawer Menu (Phones / Tablets) -->
+    <!-- Mobile Navigation Drawer -->
     ${state.mobileMenuOpen ? `
-      <div class="lg:hidden fixed inset-0 top-[53px] z-50 bg-black/80 backdrop-blur-md p-4 fade-in">
-        <div class="bg-obsidian-900 border border-slate-800 rounded-2xl p-4 space-y-1 max-h-[85vh] overflow-y-auto">
-          <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-3 py-1">Navigation Menu</p>
-          ${navTabs.map(item=>`
-            <button onclick="navigate('${item.id}'); actions.toggleMobileMenu();" class="w-full flex items-center justify-between p-3 rounded-xl text-xs font-bold ${state.view===item.id?'bg-brand-600 text-white':'text-slate-300 hover:bg-slate-800'}">
-              <div class="flex items-center gap-2.5">
-                <i data-lucide="${item.icon}" class="w-4 h-4"></i>
-                <span>${item.label}</span>
-              </div>
-              ${item.badge !== undefined && item.badge !== '' ? `
-                <span class="px-2 py-0.5 rounded-full text-[9px] font-black ${item.badge==='AI Conflict'?'bg-rose-500 text-white':'bg-brand-500 text-white'}">
-                  ${item.badge}
-                </span>
-              ` : ''}
-            </button>
-          `).join('')}
-        </div>
+      <div class="lg:hidden bg-slate-950 border-b border-slate-800 p-4 space-y-3 fade-in">
+        ${navGroups.map(grp=>`
+          <div>
+            <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1 px-2">${grp.group}</p>
+            <div class="space-y-1">
+              ${grp.items.map(item=>`
+                <button onclick="navigate('${item.id}');actions.toggleMobileMenu();" class="w-full flex items-center justify-between px-3 py-2 rounded text-xs font-semibold ${state.view===item.id?'bg-blue-600 text-white':'text-slate-300 hover:bg-slate-900'}">
+                  <div class="flex items-center gap-2"><i data-lucide="${item.icon}" class="w-4 h-4"></i><span>${item.label}</span></div>
+                  ${item.badge ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-600 text-white">${item.badge}</span>` : ''}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        `).join('')}
       </div>
     ` : ''}
   </header>`;
@@ -776,125 +626,97 @@ function renderDashboard(){
   const lowStock = PRODUCTS.filter(p=>p.status==='Low Stock'||p.status==='Critical Stock').length;
   const outOfStock = PRODUCTS.filter(p=>p.status==='Out of Stock').length;
   const inventoryValue = PRODUCTS.reduce((s,p)=>s+(p.stock*p.price),0);
-  const fulfillmentRate = totalOrders > 0 ? Math.round((dispatched/totalOrders)*100) : 0;
 
   return `
-  <div class="fade-in space-y-6">
-    <!-- Active Stock Contention Alert Banner (Black & Royal Blue & White) -->
-    <div class="relative bg-black border-2 border-brand-600 rounded-3xl p-5 sm:p-6 text-white shadow-2xl overflow-hidden">
-      <div class="absolute right-0 top-0 bottom-0 w-96 bg-gradient-to-l from-brand-600/20 to-transparent pointer-events-none"></div>
-      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative z-10">
-        <div class="flex items-start gap-4">
-          <div class="w-12 h-12 rounded-2xl bg-brand-600 text-white flex items-center justify-center flex-shrink-0 shadow-lg shadow-brand-600/50">
-            <i data-lucide="zap" class="w-6 h-6 animate-pulse"></i>
-          </div>
-          <div>
-            <div class="flex items-center gap-2 mb-1">
-              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-brand-600 text-white uppercase tracking-wider">AI Contention</span>
-              <span class="text-xs text-brand-300 font-mono">SKU-101 (Wireless Headphones Pro)</span>
-            </div>
-            <h3 class="font-bold text-base sm:text-lg text-white font-display">Stock Allocation Conflict: ORD-1001 (VIP) & ORD-1002</h3>
-            <p class="text-xs text-slate-300 mt-0.5 max-w-2xl">15 units demanded across 2 orders, but only 7 units in shelf location A1. WearAI recommends allocating 7 units to Critical VIP order ORD-1001.</p>
-          </div>
-        </div>
-        <div class="flex items-center gap-2 self-end md:self-center flex-shrink-0">
-          <button onclick="actions.applyAllocation('SKU-101')" class="px-4 py-2.5 bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-brand-600/40 transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
-            <i data-lucide="sparkles" class="w-4 h-4"></i> Auto-Resolve with AI
-          </button>
-          <button onclick="navigate('allocation')" class="px-4 py-2.5 bg-white text-black hover:bg-slate-100 text-xs font-bold rounded-xl transition-all">
-            Details →
-          </button>
-        </div>
-      </div>
+  <div class="fade-in space-y-5">
+    ${pageHeader('OPERATIONS › OVERVIEW', 'Warehouse Operations Overview', 'Real-time fulfillment metrics, stock telemetry, and AI decision intelligence')}
+
+    <!-- KPI Block Strip -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      ${kpiBlock('Total Orders', totalOrders, 'shopping-cart', `${pendingOrders} pending`, '+14%', 'up', 'navigate("orders")')}
+      ${kpiBlock('Critical Orders', urgentOrders, 'alert-circle', 'Requires immediate pick', '1 VIP', 'down', 'navigate("orders")')}
+      ${kpiBlock('In Picking', pickingOrders, 'map-pin', `${packingOrders} in packing`, 'Zone A/B', 'neutral', 'navigate("picking")')}
+      ${kpiBlock('Ready to Ship', readyOrders, 'package-check', `${dispatched} dispatched`, 'Dock Bay 02', 'up', 'navigate("dispatch")')}
+      ${kpiBlock('Low Stock SKUs', lowStock, 'trending-down', `${outOfStock} out of stock`, 'Reorder needed', 'down', 'navigate("inventory")')}
+      ${kpiBlock('Fulfillment Rate', '94.2%', 'target', 'SLA target 90%', '+4.2%', 'up', 'navigate("systemHealth")')}
     </div>
 
-    <!-- Enhanced Responsive KPI Grid (Laptop 6 cols, Tablet 3 cols, Mobile 2 cols) -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
-      ${statCard('Total Orders',totalOrders,'shopping-cart','bg-black',`${pendingOrders} in pipeline`,'+14.2%','up','navigate("orders")')}
-      ${statCard('Urgent Orders',`<span class="text-rose-600">${urgentOrders}</span>`,'alert-octagon','bg-rose-600','Action needed','3 VIP','down','navigate("orders")')}
-      ${statCard('In Picking',pickingOrders,'map-pin','bg-brand-600',`${packingOrders} in packing`,'Zone A/B','neutral','navigate("picking")')}
-      ${statCard('Ready to Ship',readyOrders,'package-check','bg-emerald-600',`${dispatched} dispatched`,'Dock 02','up','navigate("dispatch")')}
-      ${statCard('Low Stock',`<span class="text-amber-600">${lowStock}</span>`,'trending-down','bg-amber-600',`${outOfStock} stockout`,'Reorder req','down','navigate("inventory")')}
-      ${statCard('Inventory Value',fmtCur(inventoryValue),'dollar-sign','bg-brand-700','Total warehouse asset','+4.1%','up','navigate("inventory")')}
-      ${statCard('Fulfillment Rate',`${fulfillmentRate}%`,'target','bg-black',`${dispatched}/${totalOrders} orders`,'99.2% SLA','up','navigate("analytics")')}
-      ${statCard('Exceptions',`<span class="text-rose-600">${EXCEPTIONS.filter(e=>e.status==='Open').length}</span>`,'alert-triangle','bg-rose-600','Open tickets','1 Damaged','down','navigate("exceptions")')}
-      ${statCard('Active Pickers','4','users','bg-brand-600','Across 4 zones','Optimal','up','navigate("picking")')}
-      ${statCard('Avg Cycle Time','12m','timer','bg-slate-900','Per completed order','-2.4m','up','navigate("analytics")')}
-      ${statCard('Dispatch Queue',readyOrders,'truck','bg-black','Dock Bays 1-4','FedEx/UPS','neutral','navigate("dispatch")')}
-      ${statCard('AI Decisions','18','brain','bg-brand-600','Auto-handled today','100% SLA','up','navigate("smartDecisions")')}
-    </div>
-
-    <!-- Charts Row -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-      <div class="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-2xs">
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <h3 class="font-bold text-slate-900 text-sm font-display">Orders by Pipeline Status</h3>
-            <p class="text-xs text-slate-500">Live distribution across fulfillment stages</p>
-          </div>
-          <div class="p-2 rounded-xl bg-slate-50 text-brand-600"><i data-lucide="pie-chart" class="w-4 h-4"></i></div>
+    <!-- Active Contention Workspace Alert -->
+    <div class="bg-slate-900 border border-slate-800 rounded-lg p-4 text-white flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-sm">
+      <div class="flex items-start gap-3">
+        <div class="w-8 h-8 rounded bg-blue-600 text-white flex items-center justify-center flex-shrink-0 mt-0.5">
+          <i data-lucide="zap" class="w-4 h-4"></i>
         </div>
-        <div class="h-64"><canvas id="chartOrderStatus"></canvas></div>
-      </div>
-      
-      <div class="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-2xs">
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <h3 class="font-bold text-slate-900 text-sm font-display">Orders by Priority Distribution</h3>
-            <p class="text-xs text-slate-500">Multi-factor SLA & customer tier prioritization</p>
-          </div>
-          <div class="p-2 rounded-xl bg-slate-50 text-brand-600"><i data-lucide="bar-chart-3" class="w-4 h-4"></i></div>
-        </div>
-        <div class="h-64"><canvas id="chartPriority"></canvas></div>
-      </div>
-    </div>
-
-    <!-- Trends & Live Activity Stream -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-      <div class="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-2xs lg:col-span-2">
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <h3 class="font-bold text-slate-900 text-sm font-display">Fulfillment Velocity (7-Day Rolling)</h3>
-            <p class="text-xs text-slate-500">On-time delivery vs target threshold</p>
-          </div>
-          <div class="flex items-center gap-3 text-xs font-bold">
-            <span class="flex items-center gap-1.5 text-brand-600"><span class="w-2 h-2 rounded-full bg-brand-600"></span> Fulfilled (94%)</span>
-            <span class="flex items-center gap-1.5 text-slate-400"><span class="w-2 h-2 rounded-full bg-slate-400"></span> Target (90%)</span>
-          </div>
-        </div>
-        <div class="h-56"><canvas id="chartFulfillment"></canvas></div>
-      </div>
-
-      <!-- Real-Time Activity Ticker -->
-      <div class="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-2xs flex flex-col justify-between">
         <div>
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="font-bold text-slate-900 text-sm font-display">Floor Activity Ticker</h3>
-            <span class="flex items-center gap-1 text-[10px] font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded-full border border-brand-200">
-              <span class="w-1.5 h-1.5 rounded-full bg-brand-600 pulse-dot"></span> Live
-            </span>
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] font-bold px-1.5 py-0.2 bg-blue-600 text-white rounded">AI CONTENTION SOLVER</span>
+            <span class="text-xs font-mono text-slate-300">SKU-101 (Wireless Headphones Pro)</span>
           </div>
-          <div class="space-y-2.5 max-h-60 overflow-y-auto pr-1">
-            ${state.feed.slice(0, 5).map(f=>`
-              <div class="flex items-start gap-2.5 p-2 rounded-xl bg-slate-50 border border-slate-100 hover:bg-slate-100 transition-colors">
-                <div class="w-2 h-2 rounded-full ${f.type==='critical'?'bg-rose-500':f.type==='warning'?'bg-amber-500':'bg-brand-600'} mt-1.5 flex-shrink-0"></div>
-                <div class="flex-1 min-w-0">
-                  <p class="text-xs font-semibold text-slate-800 leading-snug">${f.message}</p>
-                  <p class="text-[10px] text-slate-400 mt-0.5">${timeAgo(f.time)}</p>
-                </div>
-              </div>
-            `).join('')}
+          <h3 class="font-bold text-sm text-white mt-0.5">Stock Allocation Contention: ORD-1001 (VIP) & ORD-1002</h3>
+          <p class="text-xs text-slate-300 mt-0.5">15 units requested across 2 orders, but only 7 units available in Zone A. WearAI recommends prioritizing VIP order ORD-1001.</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 self-end md:self-center flex-shrink-0">
+        <button onclick="actions.applyAllocation('SKU-101')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded">Apply AI Resolution</button>
+        <button onclick="navigate('allocation')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded">Details →</button>
+      </div>
+    </div>
+
+    <!-- Main Visual Workspace (3-Column Layout) -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <!-- Fulfillment Velocity Chart -->
+      <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-2xs">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <h3 class="font-bold text-xs text-slate-900 uppercase tracking-wider">Fulfillment Velocity Trend</h3>
+            <p class="text-[11px] text-slate-500">7-day rolling on-time delivery rate</p>
+          </div>
+          <span class="text-xs font-bold text-blue-600 font-mono">94% Avg</span>
+        </div>
+        <div class="h-52"><canvas id="chartFulfillment"></canvas></div>
+      </div>
+
+      <!-- Zone Workload Utilization -->
+      <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-2xs">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <h3 class="font-bold text-xs text-slate-900 uppercase tracking-wider">Zone Workload Utilization</h3>
+            <p class="text-[11px] text-slate-500">Active picking & replenishment load</p>
+          </div>
+          <span class="text-xs font-bold text-slate-700 font-mono">4 Zones</span>
+        </div>
+        <div class="h-52"><canvas id="chartPriority"></canvas></div>
+      </div>
+
+      <!-- AI Decision Recommendations -->
+      <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-2xs flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+            <h3 class="font-bold text-xs text-slate-900 uppercase tracking-wider">AI Fulfillment Recommendations</h3>
+            <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">Active Engine</span>
+          </div>
+          <div class="space-y-2 text-xs">
+            <div class="p-2.5 rounded bg-slate-50 border border-slate-200">
+              <p class="font-bold text-slate-900">SKU-101 VIP Priority Allocation</p>
+              <p class="text-[11px] text-slate-600 mt-0.5">Allocate 7 available units to ORD-1001 (Critical) and trigger purchase reorder for 100 units.</p>
+              <button onclick="actions.applyAllocation('SKU-101')" class="mt-2 text-[11px] font-bold text-blue-600 hover:underline">Execute Allocation →</button>
+            </div>
+            <div class="p-2.5 rounded bg-slate-50 border border-slate-200">
+              <p class="font-bold text-slate-900">Low Stock Reorder Alert: SKU-111</p>
+              <p class="text-[11px] text-slate-600 mt-0.5">Stock at 4 units. Reorder recommended within 24 hours to protect pending demand.</p>
+              <button onclick="actions.triggerReorder('SKU-111', 50)" class="mt-2 text-[11px] font-bold text-blue-600 hover:underline">Trigger PO Reorder →</button>
+            </div>
           </div>
         </div>
-        <button onclick="navigate('analytics')" class="w-full mt-3 py-2.5 bg-black hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all">
-          View Complete Telemetry Stream →
+        <button onclick="navigate('smartDecisions')" class="w-full mt-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded text-xs font-bold">
+          View All AI Intelligence →
         </button>
       </div>
     </div>
   </div>`;
 }
 
-// ==================== VIEWS: ORDERS ====================
+// ==================== VIEWS: LIVE ORDERS ====================
 function renderOrders(){
   const filtered = ORDERS.filter(o=>{
     if(state.searchQuery){
@@ -903,74 +725,79 @@ function renderOrders(){
     }
     if(state.filters.status!=='all' && o.status!==state.filters.status) return false;
     if(state.filters.priority!=='all' && calcPriority(o).priority!==state.filters.priority) return false;
+    if(state.filters.customer!=='all' && o.customer!==state.filters.customer) return false;
+    if(state.filters.shipMethod!=='all' && o.shipMethod!==state.filters.shipMethod) return false;
     return true;
   });
 
   return `
   <div class="fade-in space-y-4">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-      <div>
-        <h2 class="text-2xl font-black text-slate-900 font-display">Live Orders Hub</h2>
-        <p class="text-xs text-slate-500">Real-time fulfillment tracking and automated priority routing</p>
-      </div>
-      <button onclick="actions.openNewOrderModal()" class="px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-md shadow-brand-600/30 flex items-center gap-1.5 self-start">
-        <i data-lucide="plus" class="w-4 h-4"></i> Create Priority Order
-      </button>
+    ${pageHeader('OPERATIONS › ORDER FULFILLMENT', 'Live Orders Hub', 'Monitor order pipeline, fulfillment priorities, and aisle picking status',
+      `<button onclick="actions.openNewOrderModal()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-bold shadow-xs flex items-center gap-1.5"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Create Order</button>`
+    )}
+
+    <!-- Top KPI Strip -->
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+      ${kpiBlock('Orders Today', ORDERS.length, 'shopping-cart', 'All active orders', null, 'neutral')}
+      ${kpiBlock('Critical Priority', ORDERS.filter(o=>calcPriority(o).priority==='Critical').length, 'alert-circle', 'VIP deadline alert', null, 'down')}
+      ${kpiBlock('In Picking', ORDERS.filter(o=>o.status==='Picking').length, 'map-pin', 'Active aisle picks', null, 'neutral')}
+      ${kpiBlock('Ready to Ship', ORDERS.filter(o=>o.status==='Ready for Dispatch').length, 'package-check', 'Dock staged', null, 'up')}
+      ${kpiBlock('Dispatched', ORDERS.filter(o=>o.status==='Dispatched').length, 'truck', 'In transit', null, 'up')}
     </div>
 
     <!-- Filters Toolbar -->
-    <div class="bg-white p-3.5 rounded-2xl border border-slate-200/90 shadow-2xs flex flex-wrap items-center justify-between gap-3">
+    <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-2xs flex flex-wrap items-center justify-between gap-3">
       <div class="flex flex-wrap items-center gap-2">
-        <select onchange="state.filters.status=this.value;render()" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 bg-slate-50 outline-none">
+        <input type="text" placeholder="Filter order ID or customer..." value="${state.searchQuery}" oninput="state.searchQuery=this.value;render()" class="px-2.5 py-1 border rounded border-slate-300 text-xs font-medium outline-none focus:border-blue-600 w-52"/>
+        <select onchange="state.filters.status=this.value;render()" class="px-2.5 py-1 border rounded border-slate-300 text-xs font-medium bg-slate-50 outline-none">
           <option value="all">All Stages</option>
           ${ORDER_STATUSES.map(s=>`<option value="${s}" ${state.filters.status===s?'selected':''}>${s}</option>`).join('')}
         </select>
-        <select onchange="state.filters.priority=this.value;render()" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 bg-slate-50 outline-none">
+        <select onchange="state.filters.priority=this.value;render()" class="px-2.5 py-1 border rounded border-slate-300 text-xs font-medium bg-slate-50 outline-none">
           <option value="all">All Priorities</option>
-          <option value="Critical" ${state.filters.priority==='Critical'?'selected':''}>Critical</option>
-          <option value="High" ${state.filters.priority==='High'?'selected':''}>High</option>
-          <option value="Medium" ${state.filters.priority==='Medium'?'selected':''}>Medium</option>
-          <option value="Low" ${state.filters.priority==='Low'?'selected':''}>Low</option>
+          <option value="Critical">Critical</option><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option>
+        </select>
+        <select onchange="state.filters.shipMethod=this.value;render()" class="px-2.5 py-1 border rounded border-slate-300 text-xs font-medium bg-slate-50 outline-none">
+          <option value="all">All Carriers</option>
+          <option value="Express">Express</option><option value="Standard">Standard</option><option value="Same-Day">Same-Day</option>
         </select>
       </div>
-      <p class="text-xs text-slate-500 font-bold">${filtered.length} of ${ORDERS.length} orders listed</p>
+      <span class="text-xs text-slate-500 font-semibold">${filtered.length} of ${ORDERS.length} Orders</span>
     </div>
 
     <!-- Orders Table -->
-    <div class="bg-white rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden">
+    <div class="bg-white rounded-lg border border-slate-200 shadow-2xs overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs">
           <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
             <tr>
-              <th class="p-4">Order ID</th>
-              <th class="p-4">Customer / Tier</th>
-              <th class="p-4">Items</th>
-              <th class="p-4">Total Value</th>
-              <th class="p-4">Priority</th>
-              <th class="p-4">Status</th>
-              <th class="p-4">Shipment</th>
-              <th class="p-4 text-right">Actions</th>
+              <th class="p-3">Order ID</th>
+              <th class="p-3">Customer / Tier</th>
+              <th class="p-3">Items</th>
+              <th class="p-3">Total Value</th>
+              <th class="p-3">Priority</th>
+              <th class="p-3">Fulfillment Stage</th>
+              <th class="p-3">Carrier</th>
+              <th class="p-3 text-right">Actions</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
-            ${filtered.slice(0, 12).map(o=>{
+            ${filtered.map(o=>{
               const pri = calcPriority(o);
               return `
-              <tr class="hover:bg-slate-50/80 transition-colors">
-                <td class="p-4 font-mono font-bold text-brand-600">${o.id}</td>
-                <td class="p-4">
+              <tr class="hover:bg-slate-50 transition-colors">
+                <td class="p-3 font-mono font-bold text-blue-600">${o.id}</td>
+                <td class="p-3">
                   <p class="font-bold text-slate-900">${o.customer}</p>
-                  <p class="text-[10px] text-slate-400 font-semibold">${o.customerTier} Customer</p>
+                  <p class="text-[10px] text-slate-500">${o.customerTier} Account</p>
                 </td>
-                <td class="p-4 font-medium text-slate-600">${o.items.length} SKUs (${o.items.reduce((s,i)=>s+i.qty,0)} units)</td>
-                <td class="p-4 font-bold font-mono text-slate-900">${fmtCur(o.total)}</td>
-                <td class="p-4">${priorityBadge(pri.priority)}</td>
-                <td class="p-4">${statusBadge(o.status)}</td>
-                <td class="p-4">
-                  <span class="inline-block px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-800">${o.shipMethod}</span>
-                </td>
-                <td class="p-4 text-right">
-                  <button onclick="actions.viewOrder('${o.id}')" class="px-3 py-1 bg-brand-50 hover:bg-brand-100 text-brand-700 font-bold rounded-lg text-xs transition-colors">
+                <td class="p-3 font-medium text-slate-600">${o.items.length} SKUs (${o.items.reduce((s,i)=>s+i.qty,0)} units)</td>
+                <td class="p-3 font-bold font-mono text-slate-900">${fmtCur(o.total)}</td>
+                <td class="p-3">${priorityBadge(pri.priority)}</td>
+                <td class="p-3">${statusBadge(o.status)}</td>
+                <td class="p-3"><span class="px-2 py-0.5 bg-slate-100 rounded text-[10px] font-semibold text-slate-700">${o.shipMethod}</span></td>
+                <td class="p-3 text-right">
+                  <button onclick="actions.inspectOrder('${o.id}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded text-xs">
                     Inspect
                   </button>
                 </td>
@@ -985,73 +812,50 @@ function renderOrders(){
 
 // ==================== VIEWS: INVENTORY ====================
 function renderInventory(){
-  const lowStock = detectLowStock();
   return `
   <div class="fade-in space-y-4">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-      <div>
-        <h2 class="text-2xl font-black text-slate-900 font-display">Inventory Stock Matrix</h2>
-        <p class="text-xs text-slate-500">Autonomous stock replenishment, slotting zones, and cycle auditing</p>
-      </div>
-      <span class="px-3 py-1 rounded-xl bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold self-start">
-        ${lowStock.length} Low Stock SKUs Identified
-      </span>
+    ${pageHeader('OPERATIONS › STOCK MANAGEMENT', 'Inventory Stock Matrix', 'Stock allocation, reorder points, warehouse location bin mapping, and risk analysis')}
+
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+      ${kpiBlock('Total SKUs', PRODUCTS.length, 'package', 'Registered catalog', null, 'neutral')}
+      ${kpiBlock('Healthy Stock', PRODUCTS.filter(p=>p.status==='In Stock').length, 'check-circle', 'Sufficient runway', null, 'up')}
+      ${kpiBlock('Low Stock', PRODUCTS.filter(p=>p.status==='Low Stock').length, 'amber-warning', 'Reorder trigger', null, 'down')}
+      ${kpiBlock('Critical SKUs', PRODUCTS.filter(p=>p.status==='Critical Stock').length, 'alert-octagon', 'Risk of stockout', null, 'down')}
+      ${kpiBlock('Out of Stock', PRODUCTS.filter(p=>p.status==='Out of Stock').length, 'x-circle', 'Immediate PO required', null, 'down')}
     </div>
 
-    <!-- Zone Capacity Overview -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-      ${ZONES.map(z=>{
-        const count = PRODUCTS.filter(p=>p.zone===z.id).length;
-        const totalStock = PRODUCTS.filter(p=>p.zone===z.id).reduce((s,p)=>s+p.stock,0);
-        return `
-        <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-2xs">
-          <div class="flex items-center justify-between mb-2">
-            <span class="w-3 h-3 rounded-full" style="background:${z.color}"></span>
-            <span class="text-xs font-bold font-mono text-slate-800">${totalStock} Units</span>
-          </div>
-          <h4 class="font-bold text-xs text-slate-900 truncate">${z.name}</h4>
-          <p class="text-[10px] text-slate-400 mt-0.5">${count} Active SKUs</p>
-        </div>`;
-      }).join('')}
-    </div>
-
-    <!-- Critical Queue Table -->
-    <div class="bg-white rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden">
-      <div class="p-4 border-b border-slate-200 flex items-center justify-between">
-        <h3 class="font-bold text-xs text-slate-900 uppercase tracking-wider">Replenishment Priority Queue</h3>
-        <button onclick="showToast('success','Triggered automated purchase orders for all critical SKUs')" class="text-xs font-bold text-brand-600 hover:underline">
-          Bulk Reorder All →
-        </button>
-      </div>
+    <div class="bg-white rounded-lg border border-slate-200 shadow-2xs overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs">
           <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
             <tr>
-              <th class="p-4">SKU / Product</th>
-              <th class="p-4">Location</th>
-              <th class="p-4">Current Stock</th>
-              <th class="p-4">Reorder Point</th>
-              <th class="p-4">Runway</th>
-              <th class="p-4">Risk Level</th>
-              <th class="p-4 text-right">Action</th>
+              <th class="p-3">SKU</th>
+              <th class="p-3">Product Name</th>
+              <th class="p-3">Warehouse Location</th>
+              <th class="p-3">On Hand</th>
+              <th class="p-3">Reserved</th>
+              <th class="p-3">Available</th>
+              <th class="p-3">Reorder Point</th>
+              <th class="p-3">Supplier</th>
+              <th class="p-3">Status</th>
+              <th class="p-3 text-right">Actions</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
-            ${lowStock.map(p=>`
-              <tr class="hover:bg-slate-50/80">
-                <td class="p-4">
-                  <p class="font-mono font-bold text-slate-900">${p.sku}</p>
-                  <p class="text-slate-500 text-[11px]">${p.name}</p>
-                </td>
-                <td class="p-4 font-mono text-slate-600">Zone ${p.zone} (S${p.shelf}/R${p.rack}/B${p.bin})</td>
-                <td class="p-4 font-bold font-mono ${p.stock===0?'text-rose-600':p.stock<=10?'text-rose-600':'text-amber-600'}">${p.stock} units</td>
-                <td class="p-4 font-mono text-slate-700">${p.reorderLevel} units</td>
-                <td class="p-4 font-bold ${p.daysRemaining<2?'text-rose-600':'text-amber-600'}">${p.daysRemaining>0?p.daysRemaining+' days':'STOCKOUT'}</td>
-                <td class="p-4">${badge(p.risk,p.risk==='Critical'?'red':p.risk==='High'?'amber':'blue')}</td>
-                <td class="p-4 text-right">
-                  <button onclick="actions.triggerReorder('${p.sku}',${p.reorderQty})" class="px-3 py-1 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg transition-colors">
-                    Reorder ${p.reorderQty}
-                  </button>
+            ${PRODUCTS.map(p=>`
+              <tr class="hover:bg-slate-50 transition-colors">
+                <td class="p-3 font-mono font-bold text-slate-900">${p.sku}</td>
+                <td class="p-3 font-bold text-slate-900">${p.name}</td>
+                <td class="p-3 font-mono text-slate-600">Zone ${p.zone} (S${p.shelf}/R${p.rack}/B${p.bin})</td>
+                <td class="p-3 font-bold font-mono text-slate-900">${p.stock}</td>
+                <td class="p-3 font-mono text-slate-500">${p.reserved}</td>
+                <td class="p-3 font-bold font-mono ${p.stock===0?'text-rose-600':'text-emerald-600'}">${Math.max(0, p.stock - p.reserved)}</td>
+                <td class="p-3 font-mono text-slate-700">${p.reorderLevel}</td>
+                <td class="p-3 text-slate-600">${p.supplier}</td>
+                <td class="p-3">${statusBadge(p.status)}</td>
+                <td class="p-3 text-right">
+                  <button onclick="actions.inspectSku('${p.sku}')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded text-xs mr-1">Inspect</button>
+                  ${p.stock<=p.reorderLevel?`<button onclick="actions.triggerReorder('${p.sku}',${p.reorderQty})" class="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded text-xs">Reorder</button>`:''}
                 </td>
               </tr>
             `).join('')}
@@ -1062,193 +866,202 @@ function renderInventory(){
   </div>`;
 }
 
-// ==================== VIEWS: ALLOCATION ====================
+// ==================== VIEWS: ALLOCATION WORKSPACE ====================
 function renderAllocation(){
   const conflict = resolveAllocation('SKU-101');
   return `
   <div class="fade-in space-y-4">
-    <div>
-      <h2 class="text-2xl font-black text-slate-900 font-display">Stock Allocation Engine</h2>
-      <p class="text-xs text-slate-500">Autonomous resolution of competing order demand & inventory contention</p>
-    </div>
+    ${pageHeader('OPERATIONS › DEMAND RESOLUTION', 'Stock Allocation Decision Workspace', 'AI-assisted order demand resolution and inventory contention optimization')}
 
     ${conflict ? `
-      <div class="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-2xs space-y-5">
-        <div class="flex items-center justify-between pb-4 border-b border-slate-200">
-          <div>
-            <h3 class="text-lg font-bold text-slate-900">Contention Analysis: ${conflict.sku}</h3>
-            <p class="text-xs text-slate-500">${conflict.product.name} · Available: <span class="font-bold text-slate-900">${conflict.available}</span> · Demanded: <span class="font-bold text-rose-600">${conflict.totalDemand}</span> · Shortfall: <span class="font-bold text-rose-600">${conflict.shortfall}</span></p>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <!-- LEFT: Order Contention Details -->
+        <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-2xs space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+            <span class="text-xs font-bold text-slate-800">Order Contention Target</span>
+            <span class="px-1.5 py-0.5 bg-rose-50 text-rose-700 border border-rose-200 rounded text-[10px] font-bold">Shortfall: ${conflict.shortfall} units</span>
           </div>
-          <span class="px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
-            Critical Contention
-          </span>
+          <div>
+            <p class="text-xs font-mono font-bold text-blue-600">${conflict.sku}</p>
+            <p class="text-sm font-bold text-slate-900">${conflict.product.name}</p>
+            <p class="text-xs text-slate-500 mt-1">Available Stock: <strong class="text-slate-900 font-mono">${conflict.available} units</strong></p>
+            <p class="text-xs text-slate-500">Demanded Stock: <strong class="text-rose-600 font-mono">${conflict.totalDemand} units</strong></p>
+          </div>
+          <div class="space-y-2 pt-2 border-t border-slate-100">
+            ${conflict.decisions.map(d=>`
+              <div class="p-2.5 rounded bg-slate-50 border border-slate-200 text-xs">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="font-mono font-bold text-slate-900">${d.orderId}</span>
+                  ${priorityBadge(d.priority)}
+                </div>
+                <p class="text-slate-700 font-medium">${d.customer} (${d.customerTier})</p>
+                <p class="text-[11px] text-slate-500 mt-1">Requested: ${d.requested} | Allocated: <strong class="text-emerald-700 font-mono">${d.allocated}</strong></p>
+              </div>
+            `).join('')}
+          </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          ${conflict.decisions.map(d=>`
-            <div class="p-4 rounded-2xl ${d.allocated>0?'bg-brand-50/60 border border-brand-200':'bg-slate-50 border border-slate-200'}">
-              <div class="flex items-center justify-between mb-2">
-                <span class="font-mono font-bold text-sm text-slate-900">${d.orderId}</span>
-                ${priorityBadge(d.priority)}
-              </div>
-              <p class="text-xs font-semibold text-slate-800 mb-1">${d.customer} (${d.customerTier} Customer)</p>
-              <div class="space-y-1 text-xs text-slate-600 my-2">
-                <p>Requested: <span class="font-bold font-mono">${d.requested} units</span></p>
-                <p>AI Allocated: <span class="font-bold font-mono ${d.allocated>0?'text-emerald-600':'text-slate-400'}">${d.allocated} units</span></p>
-                <p>Remaining Shortfall: <span class="font-bold font-mono ${d.remaining>0?'text-rose-600':'text-slate-400'}">${d.remaining} units</span></p>
-              </div>
-              <div class="mt-3 flex flex-wrap gap-1">
-                ${d.reasons.map(r=>`<span class="text-[10px] px-2 py-0.5 rounded bg-white text-slate-700 border border-slate-200">${r}</span>`).join('')}
-              </div>
+        <!-- CENTER: Candidate Warehouse Comparison -->
+        <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-2xs space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+            <span class="text-xs font-bold text-slate-800">Candidate Warehouse Node Comparison</span>
+            <span class="text-xs font-bold text-slate-500">2 Candidates</span>
+          </div>
+
+          <div class="p-3 rounded border border-blue-200 bg-blue-50/50 space-y-2 text-xs">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-900">WH-01 Seattle Central (Primary)</span>
+              <span class="px-1.5 py-0.2 bg-blue-600 text-white rounded text-[10px] font-bold">RECOMMENDED</span>
             </div>
-          `).join('')}
+            <div class="grid grid-cols-3 gap-2 text-slate-700 mt-1">
+              <div><span class="text-[10px] text-slate-500 block">Availability</span><strong class="text-slate-900 font-mono">92%</strong></div>
+              <div><span class="text-[10px] text-slate-500 block">Est. Fulfillment</span><strong class="text-slate-900 font-mono">18 min</strong></div>
+              <div><span class="text-[10px] text-slate-500 block">Congestion</span><strong class="text-emerald-700">Low</strong></div>
+            </div>
+          </div>
+
+          <div class="p-3 rounded border border-slate-200 bg-slate-50 space-y-2 text-xs">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-900">WH-02 Chicago Hub (Secondary)</span>
+              <span class="text-[10px] text-slate-500 font-bold">ALTERNATIVE</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2 text-slate-700 mt-1">
+              <div><span class="text-[10px] text-slate-500 block">Availability</span><strong class="text-slate-900 font-mono">76%</strong></div>
+              <div><span class="text-[10px] text-slate-500 block">Est. Fulfillment</span><strong class="text-slate-900 font-mono">31 min</strong></div>
+              <div><span class="text-[10px] text-slate-500 block">Congestion</span><strong class="text-amber-600">Medium</strong></div>
+            </div>
+          </div>
         </div>
 
-        <div class="p-4 rounded-2xl bg-brand-50 border border-brand-200 flex items-start justify-between gap-4">
+        <!-- RIGHT: AI Recommendation & Decision Action -->
+        <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-2xs flex flex-col justify-between">
           <div>
-            <div class="flex items-center gap-2 mb-1">
-              <i data-lucide="sparkles" class="w-4 h-4 text-brand-600"></i>
-              <h4 class="text-xs font-bold text-brand-900 uppercase tracking-wider">AI Policy Recommendation</h4>
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-3">
+              <span class="text-xs font-bold text-slate-800">AI Recommendation Engine</span>
+              <i data-lucide="brain" class="w-4 h-4 text-blue-600"></i>
             </div>
-            <p class="text-xs text-brand-800 font-medium">${conflict.recommendation}</p>
+            <div class="space-y-2 text-xs">
+              <p class="font-bold text-slate-900">Target Action:</p>
+              <p class="text-slate-700">Allocate available 7 units to <strong class="font-mono text-blue-600">ORD-1001</strong> (Critical VIP priority).</p>
+              <div class="p-2.5 bg-slate-50 border border-slate-200 rounded text-slate-600 space-y-1 mt-2">
+                <p class="font-bold text-slate-800">Key Decision Reasons:</p>
+                <p>• Highest VIP customer tier priority score (85 pts)</p>
+                <p>• Delivery deadline expires in 2 hours</p>
+                <p>• Shortest pick path time at WH-01 (18m)</p>
+              </div>
+            </div>
           </div>
-          <div class="flex items-center gap-2 flex-shrink-0">
-            <button onclick="actions.applyAllocation('${conflict.sku}')" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all">
-              Apply AI Allocation
-            </button>
-            <button onclick="actions.overrideAllocation('${conflict.sku}')" class="px-3 py-2 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl border border-slate-300 transition-all">
-              Override
-            </button>
-          </div>
+          <button onclick="actions.applyAllocation('${conflict.sku}')" class="w-full mt-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-bold shadow-xs">
+            Apply AI Allocation Policy →
+          </button>
         </div>
       </div>
     ` : `
-      <div class="bg-white rounded-3xl p-8 text-center border border-slate-200">
-        <i data-lucide="check-circle" class="w-12 h-12 text-emerald-500 mx-auto mb-2"></i>
-        <h3 class="text-base font-bold text-slate-800">Zero Stock Conflicts</h3>
-        <p class="text-xs text-slate-500">All pending orders are fully allocatable from existing shelf inventory.</p>
+      <div class="bg-white p-8 rounded-lg text-center border border-slate-200">
+        <i data-lucide="check-circle" class="w-10 h-10 text-emerald-600 mx-auto mb-2"></i>
+        <h3 class="text-sm font-bold text-slate-900">No Stock Contention Detected</h3>
+        <p class="text-xs text-slate-500 mt-0.5">All pending orders are fully allocatable from existing shelf stock.</p>
       </div>
     `}
   </div>`;
 }
 
-// ==================== VIEWS: PICKING ====================
+// ==================== VIEWS: PICK & ROUTE ====================
 function renderPicking(){
-  const pickingOrders = ORDERS.filter(o=>o.status==='Picking'||o.status==='Confirmed'||o.status==='Allocated').slice(0,6);
-  const activeOrder = pickingOrders[0];
+  const activeOrder = ORDERS.find(o=>o.status==='Picking'||o.status==='Allocated') || ORDERS[0];
   const route = activeOrder ? optimizeRoute(activeOrder) : null;
 
   return `
   <div class="fade-in space-y-4">
-    <div>
-      <h2 class="text-2xl font-black text-slate-900 font-display">Picking & Route Optimization</h2>
-      <p class="text-xs text-slate-500">Dynamic shortest-path aisle routing to reduce warehouse floor transit time</p>
+    ${pageHeader('OPERATIONS › AISLE OPTIMIZATION', 'Picking & Route Optimization', 'Shortest-path aisle sequence optimization to minimize transit cycle time')}
+
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      ${kpiBlock('Active Picks', ORDERS.filter(o=>o.status==='Picking').length, 'map-pin', 'In progress', null, 'neutral')}
+      ${kpiBlock('Pending Picks', ORDERS.filter(o=>o.status==='Allocated').length, 'clock', 'Queued for pick', null, 'neutral')}
+      ${kpiBlock('Delayed Picks', 0, 'alert-triangle', 'On schedule', null, 'up')}
+      ${kpiBlock('Avg Pick Time', '12 min', 'timer', 'Target 15 min', '-3m', 'up')}
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-      <!-- Task List -->
-      <div class="space-y-3">
-        <h3 class="font-bold text-xs text-slate-700 uppercase tracking-wider">Active Picking Tasks</h3>
-        ${pickingOrders.map(o=>{
-          const pri = calcPriority(o);
-          return `
-          <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-2xs card-hover cursor-pointer">
-            <div class="flex items-center justify-between mb-2">
-              <span class="font-mono font-bold text-brand-600 text-xs">${o.id}</span>
-              ${priorityBadge(pri.priority)}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <!-- Active Tasks -->
+      <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-2xs space-y-3">
+        <h3 class="font-bold text-xs text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-2">Picking Dispatch Queue</h3>
+        ${ORDERS.filter(o=>['Allocated','Picking'].includes(o.status)).map(o=>`
+          <div class="p-3 rounded border border-slate-200 bg-slate-50 text-xs space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-mono font-bold text-blue-600">${o.id}</span>
+              ${priorityBadge(calcPriority(o).priority)}
             </div>
-            <p class="text-xs font-bold text-slate-900">${o.customer}</p>
-            <p class="text-[11px] text-slate-500 mb-2">${o.items.length} items (${o.items.reduce((s,i)=>s+i.qty,0)} units)</p>
-            <div class="flex items-center justify-between pt-2 border-t border-slate-100">
-              <span class="text-[10px] text-slate-400 font-mono">${o.picker || 'Unassigned'}</span>
-              ${o.status==='Picking' ? `
-                <button onclick="actions.completePicking('${o.id}')" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[11px] font-bold">
-                  Complete Pick
-                </button>
-              ` : `
-                <button onclick="actions.startPicking('${o.id}')" class="px-3 py-1 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-[11px] font-bold">
-                  Start Pick
-                </button>
+            <p class="font-bold text-slate-900">${o.customer}</p>
+            <p class="text-slate-500">${o.items.length} SKUs (${o.items.reduce((s,i)=>s+i.qty,0)} units)</p>
+            <div class="flex items-center justify-between pt-2 border-t border-slate-200">
+              <span class="text-[11px] text-slate-500 font-mono">Picker: ${o.picker || 'Unassigned'}</span>
+              ${o.status==='Picking'?`
+                <button onclick="actions.completePicking('${o.id}')" class="px-2 py-1 bg-emerald-600 text-white font-bold rounded text-[11px]">Complete Pick</button>
+              `:`
+                <button onclick="actions.startPicking('${o.id}')" class="px-2 py-1 bg-blue-600 text-white font-bold rounded text-[11px]">Start Pick</button>
               `}
             </div>
-          </div>`;
-        }).join('')}
+          </div>
+        `).join('')}
       </div>
 
-      <!-- Route Details -->
-      <div class="lg:col-span-2 bg-white p-6 rounded-3xl border border-slate-200/90 shadow-2xs space-y-4">
+      <!-- Optimized Route Path Visualizer -->
+      <div class="lg:col-span-2 bg-white p-4 rounded-lg border border-slate-200 shadow-2xs space-y-4">
         ${route ? `
-          <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
             <div>
-              <h3 class="font-bold text-sm text-slate-900">Optimized Pick Path: ${activeOrder.id}</h3>
-              <p class="text-xs text-slate-500">Shortest path sequence through Zone A, B, C, D</p>
+              <h3 class="font-bold text-sm text-slate-900">Optimized Pick Route Path: ${activeOrder.id}</h3>
+              <p class="text-xs text-slate-500">Shortest aisle stop sequence through Zone A, B, C, D</p>
             </div>
-            <span class="px-3 py-1 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
-              ${route.efficiency}% Travel Efficiency
-            </span>
+            <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold rounded text-xs">${route.efficiency}% Travel Efficiency</span>
           </div>
 
-          <div class="grid grid-cols-3 gap-3 text-center">
-            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
-              <p class="text-[10px] font-bold text-slate-400 uppercase">Est. Distance</p>
-              <p class="text-xl font-black text-slate-900 font-display">${route.distance}m</p>
-            </div>
-            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
-              <p class="text-[10px] font-bold text-slate-400 uppercase">Est. Pick Time</p>
-              <p class="text-xl font-black text-slate-900 font-display">${route.time} min</p>
-            </div>
-            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
-              <p class="text-[10px] font-bold text-slate-400 uppercase">Pick Stops</p>
-              <p class="text-xl font-black text-brand-600 font-display">${route.items.length}</p>
-            </div>
+          <div class="grid grid-cols-3 gap-3 text-center text-xs">
+            <div class="p-2.5 bg-slate-50 border rounded"><span class="text-slate-500 block">Est. Distance</span><strong class="text-slate-900 font-mono text-base">${route.distance}m</strong></div>
+            <div class="p-2.5 bg-slate-50 border rounded"><span class="text-slate-500 block">Est. Pick Time</span><strong class="text-slate-900 font-mono text-base">${route.time} min</strong></div>
+            <div class="p-2.5 bg-slate-50 border rounded"><span class="text-slate-500 block">Pick Stops</span><strong class="text-blue-600 font-mono text-base">${route.items.length}</strong></div>
           </div>
 
-          <!-- Stops List -->
           <div class="space-y-2">
-            <p class="text-xs font-bold text-slate-700">Aisle Sequence:</p>
+            <p class="text-xs font-bold text-slate-800">Sequential Aisle Stops:</p>
             ${route.items.map((it,idx)=>`
-              <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs">
-                <div class="flex items-center gap-3">
-                  <span class="w-6 h-6 rounded-full bg-brand-600 text-white font-bold flex items-center justify-center text-[10px]">${idx+1}</span>
+              <div class="flex items-center justify-between p-2.5 rounded border border-slate-200 bg-slate-50 text-xs">
+                <div class="flex items-center gap-2.5">
+                  <span class="w-5 h-5 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-[10px]">${idx+1}</span>
                   <div>
                     <p class="font-bold text-slate-900">${it.name}</p>
-                    <p class="text-[10px] text-slate-400 font-mono">${it.sku} · Zone ${it.zone} (Shelf ${it.shelf}, Rack ${it.rack}, Bin ${it.bin})</p>
+                    <p class="text-[10px] text-slate-500 font-mono">${it.sku} · Zone ${it.zone} (Shelf ${it.shelf}, Rack ${it.rack}, Bin ${it.bin})</p>
                   </div>
                 </div>
-                <span class="font-bold font-mono text-slate-800">${it.qty} units</span>
+                <span class="font-bold font-mono text-slate-900">${it.qty} units</span>
               </div>
             `).join('')}
           </div>
-        ` : `
-          <p class="text-xs text-slate-500 text-center py-10">Select an order to view optimized route.</p>
-        `}
+        ` : `<p class="text-xs text-slate-500 text-center py-8">Select an order to view pick path.</p>`}
       </div>
     </div>
   </div>`;
 }
 
-// ==================== VIEWS: PACKING & QC & DISPATCH ====================
+// ==================== VIEWS: PACKING, QC & DISPATCH ====================
 function renderPacking(){
-  const packingOrders = ORDERS.filter(o=>o.status==='Picked'||o.status==='Packing');
   return `
   <div class="fade-in space-y-4">
-    <div>
-      <h2 class="text-2xl font-black text-slate-900 font-display">Packing Station Console</h2>
-      <p class="text-xs text-slate-500">Barcode validation, custom packaging specifications, and weight verification</p>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      ${packingOrders.map(o=>`
-        <div class="bg-white p-5 rounded-3xl border border-slate-200/90 shadow-2xs space-y-3">
+    ${pageHeader('FULFILLMENT › STATION CONSOLE', 'Packing Station Console', 'Barcode scan validation, custom packaging specs, and parcel weight checks')}
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      ${ORDERS.filter(o=>['Picked','Packing'].includes(o.status)).map(o=>`
+        <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-2xs space-y-3">
           <div class="flex items-center justify-between">
-            <span class="font-mono font-bold text-xs text-brand-600">${o.id}</span>
+            <span class="font-mono font-bold text-blue-600 text-xs">${o.id}</span>
             ${statusBadge(o.status)}
           </div>
           <p class="font-bold text-xs text-slate-900">${o.customer}</p>
-          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
-            <p class="text-slate-600">Items: <span class="font-bold text-slate-900">${o.items.length} SKUs</span></p>
-            <p class="text-slate-600">Carrier: <span class="font-bold text-slate-900">${o.shipMethod}</span></p>
+          <div class="p-2.5 bg-slate-50 rounded border border-slate-200 text-xs space-y-1">
+            <p class="text-slate-600">Items: <strong class="text-slate-900">${o.items.length} SKUs</strong></p>
+            <p class="text-slate-600">Carrier: <strong class="text-slate-900">${o.shipMethod}</strong></p>
           </div>
-          <button onclick="actions.completePacking('${o.id}')" class="w-full py-2.5 bg-black hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
+          <button onclick="actions.completePacking('${o.id}')" class="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white rounded text-xs font-bold">
             Complete Pack & Send to QC →
           </button>
         </div>
@@ -1258,31 +1071,23 @@ function renderPacking(){
 }
 
 function renderQualityCheck(){
-  const qcOrders = ORDERS.filter(o=>o.status==='Quality Check');
   return `
   <div class="fade-in space-y-4">
-    <div>
-      <h2 class="text-2xl font-black text-slate-900 font-display">Quality Control Gate</h2>
-      <p class="text-xs text-slate-500">Scan inspection, seal check, and damage prevention</p>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      ${qcOrders.map(o=>`
-        <div class="bg-white p-5 rounded-3xl border border-slate-200/90 shadow-2xs space-y-3">
+    ${pageHeader('FULFILLMENT › INSPECTION GATE', 'Quality Control Gate', 'Scan inspection, seal check, and damage prevention audit')}
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      ${ORDERS.filter(o=>o.status==='Quality Check').map(o=>`
+        <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-2xs space-y-3">
           <div class="flex items-center justify-between">
-            <span class="font-mono font-bold text-xs text-brand-600">${o.id}</span>
-            <span class="text-xs font-semibold text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">Awaiting QC Inspection</span>
+            <span class="font-mono font-bold text-blue-600 text-xs">${o.id}</span>
+            <span class="px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold rounded">Awaiting QC Inspection</span>
           </div>
           <p class="font-bold text-xs text-slate-900">${o.customer}</p>
-          <div class="space-y-1 text-xs text-slate-600">
+          <div class="space-y-1 text-xs text-slate-600 bg-slate-50 p-2.5 rounded border border-slate-200">
             ${o.items.map(it=>`<p>• ${it.name} (${it.qty} units)</p>`).join('')}
           </div>
-          <div class="flex items-center gap-2 pt-2 border-t border-slate-100">
-            <button onclick="actions.passQC('${o.id}')" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold">
-              ✓ Pass QC
-            </button>
-            <button onclick="actions.failQC('${o.id}')" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold">
-              ✕ Fail QC
-            </button>
+          <div class="flex items-center gap-2 pt-1">
+            <button onclick="actions.passQC('${o.id}')" class="flex-1 py-1.5 bg-emerald-600 text-white font-bold rounded text-xs">✓ Pass QC</button>
+            <button onclick="actions.failQC('${o.id}')" class="flex-1 py-1.5 bg-rose-600 text-white font-bold rounded text-xs">✕ Fail QC</button>
           </div>
         </div>
       `).join('')}
@@ -1291,77 +1096,119 @@ function renderQualityCheck(){
 }
 
 function renderDispatch(){
-  const dispatchOrders = ORDERS.filter(o=>o.status==='Ready for Dispatch'||o.status==='Dispatched');
   return `
   <div class="fade-in space-y-4">
-    <div>
-      <h2 class="text-2xl font-black text-slate-900 font-display">Dock & Dispatch Terminal</h2>
-      <p class="text-xs text-slate-500">Carrier coordination, shipping manifests, and outbound dock assignment</p>
-    </div>
-    <div class="bg-white rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs">
-          <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
-            <tr>
-              <th class="p-4">Order ID</th>
-              <th class="p-4">Customer</th>
-              <th class="p-4">Carrier</th>
-              <th class="p-4">Dock Bay</th>
-              <th class="p-4">Status</th>
-              <th class="p-4 text-right">Dispatch Action</th>
+    ${pageHeader('FULFILLMENT › DOCK TERMINAL', 'Dock & Dispatch Terminal', 'Carrier pickup scheduling, manifest verification, and outbound bay staging')}
+    <div class="bg-white rounded-lg border border-slate-200 shadow-2xs overflow-hidden">
+      <table class="w-full text-left text-xs">
+        <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
+          <tr>
+            <th class="p-3">Order ID</th>
+            <th class="p-3">Customer</th>
+            <th class="p-3">Carrier Class</th>
+            <th class="p-3">Staging Dock</th>
+            <th class="p-3">Status</th>
+            <th class="p-3 text-right">Dispatch Action</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          ${ORDERS.filter(o=>['Ready for Dispatch','Dispatched'].includes(o.status)).map(o=>`
+            <tr class="hover:bg-slate-50">
+              <td class="p-3 font-mono font-bold text-blue-600">${o.id}</td>
+              <td class="p-3 font-bold text-slate-900">${o.customer}</td>
+              <td class="p-3 text-slate-700">${o.shipMethod}</td>
+              <td class="p-3 font-mono text-slate-600">Dock Bay 02</td>
+              <td class="p-3">${statusBadge(o.status)}</td>
+              <td class="p-3 text-right">
+                ${o.status==='Ready for Dispatch'?`<button onclick="actions.dispatch('${o.id}')" class="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded text-xs">Confirm Dispatch →</button>`:`<span class="text-slate-400 font-medium text-xs">Dispatched</span>`}
+              </td>
             </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100">
-            ${dispatchOrders.map(o=>`
-              <tr class="hover:bg-slate-50">
-                <td class="p-4 font-mono font-bold text-brand-600">${o.id}</td>
-                <td class="p-4 font-bold text-slate-900">${o.customer}</td>
-                <td class="p-4 font-semibold text-slate-700">${o.shipMethod}</td>
-                <td class="p-4 font-mono text-slate-600">Bay 0${Math.floor(Math.random()*4)+1}</td>
-                <td class="p-4">${statusBadge(o.status)}</td>
-                <td class="p-4 text-right">
-                  ${o.status==='Ready for Dispatch' ? `
-                    <button onclick="actions.dispatch('${o.id}')" class="px-3 py-1 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold">
-                      Confirm Dispatch →
-                    </button>
-                  ` : `<span class="text-slate-400 text-xs font-semibold">Dispatched</span>`}
-                </td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+// ==================== VIEWS: AI DECISIONS DASHBOARD ====================
+function renderSmartDecisions(){
+  return `
+  <div class="fade-in space-y-5">
+    ${pageHeader('INTELLIGENCE › AUTONOMOUS LOGISTICS', 'AI Decision Intelligence Dashboard', 'Automated machine learning models actively optimizing inventory, staffing, and picking routes')}
+
+    <div class="bg-slate-900 border border-slate-800 rounded-lg p-4 text-white flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 pulse-dot"></span>
+        <span class="font-bold text-sm">Decision Engine Active</span>
+        <span class="text-xs text-slate-400 font-mono">• 99.8% System Accuracy SLA</span>
+      </div>
+      <span class="text-xs font-mono text-blue-400 bg-blue-950 px-2 py-0.5 rounded border border-blue-800">3 Recommendations Generated</span>
+    </div>
+
+    <!-- Structured Recommendation Cards -->
+    <div class="space-y-4">
+      <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-2xs space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 bg-rose-50 text-rose-700 border border-rose-200 rounded text-[10px] font-bold">STOCK CONTENTION RISK</span>
+            <span class="text-xs font-bold text-slate-900">SKU-101 (Wireless Headphones Pro)</span>
+          </div>
+          <span class="text-xs font-bold text-rose-600">Critical Priority</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+          <div><strong class="text-slate-900 block">Issue Detected:</strong><p class="text-slate-600">15 units demanded by VIP ORD-1001 & Regular ORD-1002, but only 7 units in Zone A.</p></div>
+          <div><strong class="text-slate-900 block">AI Recommendation:</strong><p class="text-slate-600">Allocate 7 available units to VIP ORD-1001 and trigger 100 unit PO reorder.</p></div>
+          <div><strong class="text-slate-900 block">Expected Business Impact:</strong><p class="text-emerald-700 font-semibold">Protects $899.90 VIP revenue & prevents delivery SLA breach.</p></div>
+        </div>
+        <div class="flex justify-end pt-2 border-t border-slate-100">
+          <button onclick="actions.applyAllocation('SKU-101')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded text-xs">Execute Recommendation →</button>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-2xs space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded text-[10px] font-bold">LOW STOCK RISK</span>
+            <span class="text-xs font-bold text-slate-900">SKU-111 (Vacuum Insulated Flask 1L)</span>
+          </div>
+          <span class="text-xs font-bold text-amber-600">High Priority</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+          <div><strong class="text-slate-900 block">Issue Detected:</strong><p class="text-slate-600">Current stock at 4 units — projected stockout within 24 hours.</p></div>
+          <div><strong class="text-slate-900 block">AI Recommendation:</strong><p class="text-slate-600">Initiate purchase reorder of 50 units from PrimeSupply Ltd.</p></div>
+          <div><strong class="text-slate-900 block">Expected Business Impact:</strong><p class="text-emerald-700 font-semibold">Eliminates stockout probability and maintains order fulfillment rate.</p></div>
+        </div>
+        <div class="flex justify-end pt-2 border-t border-slate-100">
+          <button onclick="actions.triggerReorder('SKU-111', 50)" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded text-xs">Trigger Purchase Order →</button>
+        </div>
       </div>
     </div>
   </div>`;
 }
 
-// ==================== VIEWS: EXCEPTIONS & DECISIONS ====================
+// ==================== VIEWS: EXCEPTIONS ====================
 function renderExceptions(){
   return `
   <div class="fade-in space-y-4">
-    <div>
-      <h2 class="text-2xl font-black text-slate-900 font-display">Exception Resolution Hub</h2>
-      <p class="text-xs text-slate-500">Autonomous triage for damaged goods, missing items, and picking deviations</p>
-    </div>
+    ${pageHeader('INTELLIGENCE › INCIDENT RESOLUTION', 'Exception Management Workspace', 'Triage damaged items, missing stock, and picking deviations')}
     <div class="space-y-3">
       ${EXCEPTIONS.map(e=>`
-        <div class="bg-white p-5 rounded-3xl border border-slate-200/90 shadow-2xs space-y-3">
-          <div class="flex items-center justify-between">
+        <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-2xs space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
             <div class="flex items-center gap-2">
               <span class="font-mono font-bold text-xs text-rose-600">${e.id}</span>
-              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">${e.severity} Severity</span>
+              <span class="px-2 py-0.5 bg-rose-50 text-rose-700 border border-rose-200 rounded text-[10px] font-bold">${e.severity} Severity</span>
             </div>
             ${statusBadge(e.status)}
           </div>
-          <h4 class="font-bold text-xs text-slate-900">${e.type} on ${e.order} (${e.sku})</h4>
-          <p class="text-xs text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-200">💡 <span class="font-semibold text-slate-900">Recommendation:</span> ${e.recommendation}</p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+            <div><strong class="text-slate-900 block">Root Cause:</strong><p class="text-slate-600">${e.type} on ${e.order} (${e.sku})</p></div>
+            <div><strong class="text-slate-900 block">Business Impact:</strong><p class="text-rose-600 font-semibold">4-hour shipment delay risk</p></div>
+            <div><strong class="text-slate-900 block">AI Recommended Action:</strong><p class="text-slate-700">${e.recommendation}</p></div>
+          </div>
           <div class="flex items-center justify-between pt-2 border-t border-slate-100">
-            <span class="text-[10px] text-slate-400 font-medium">Assigned: ${e.assigned}</span>
-            ${e.status==='Open'?`
-              <button onclick="actions.resolveException('${e.id}')" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold">
-                Mark Resolved
-              </button>
-            `:''}
+            <span class="text-[11px] text-slate-500 font-mono">Assigned: ${e.assigned}</span>
+            ${e.status==='Open'?`<button onclick="actions.resolveException('${e.id}')" class="px-3 py-1 bg-emerald-600 text-white font-bold rounded text-xs">Resolve Ticket</button>`:''}
           </div>
         </div>
       `).join('')}
@@ -1369,612 +1216,22 @@ function renderExceptions(){
   </div>`;
 }
 
-function renderSmartDecisions(){
-  const decisions = getSmartDecisions();
-  return `
-  <div class="fade-in space-y-4">
-    <div>
-      <h2 class="text-2xl font-black text-slate-900 font-display">Autonomous AI Decision Engine</h2>
-      <p class="text-xs text-slate-500">Machine learning models actively optimizing inventory, staffing, and picking routes</p>
-    </div>
-    <div class="space-y-4">
-      ${decisions.map(d=>`
-        <div class="bg-white p-6 rounded-3xl border border-slate-200/90 shadow-2xs space-y-3">
-          <div class="flex items-center justify-between">
-            <span class="px-3 py-1 rounded-full text-xs font-bold bg-brand-50 text-brand-700 border border-brand-200 flex items-center gap-1.5">
-              <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> ${d.type}
-            </span>
-          </div>
-          <h3 class="font-bold text-sm text-slate-900">${d.problem}</h3>
-          <p class="text-xs text-slate-600"><span class="font-semibold text-slate-900">Telemetry Data:</span> ${d.data}</p>
-          <div class="p-3.5 rounded-2xl bg-brand-50/60 border border-brand-200 text-xs text-brand-950">
-            <p class="font-bold mb-1">AI Recommendation:</p>
-            <p>${d.decision}</p>
-          </div>
-          <div class="flex items-center justify-between pt-2">
-            <span class="text-xs text-emerald-700 font-semibold">Impact: ${d.impact}</span>
-            ${d.actionType==='allocate'?`
-              <button onclick="actions.applyAllocation('SKU-101')" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-xs">
-                ${d.action} →
-              </button>
-            `:''}
-          </div>
-        </div>
-      `).join('')}
-    </div>
-  </div>`;
-}
-
-// ==================== VIEWS: ANALYTICS & NOTIFICATIONS & SETTINGS ====================
-function renderAnalytics(){
-  return `
-  <div class="fade-in space-y-4">
-    <div>
-      <h2 class="text-2xl font-black text-slate-900 font-display">Warehouse Intelligence & Telemetry</h2>
-      <p class="text-xs text-slate-500">Real-time throughput metrics, stage cycle times, and SLA compliance</p>
-    </div>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-      <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-2xs">
-        <h3 class="font-bold text-xs text-slate-900 uppercase tracking-wider mb-3">Stage Cycle Duration (Actual vs SLA)</h3>
-        <div class="h-64"><canvas id="chartProcessingTime"></canvas></div>
-      </div>
-      <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-2xs">
-        <h3 class="font-bold text-xs text-slate-900 uppercase tracking-wider mb-3">Fulfillment Accuracy & On-Time Performance</h3>
-        <div class="h-64"><canvas id="chartPerformance"></canvas></div>
-      </div>
-    </div>
-  </div>`;
-}
-
-function renderNotifications(){
-  return `
-  <div class="fade-in space-y-4">
-    <div class="flex items-center justify-between">
-      <div>
-        <h2 class="text-2xl font-black text-slate-900 font-display">Alerts & Notifications</h2>
-        <p class="text-xs text-slate-500">Live operational events, threshold breaches, and carrier updates</p>
-      </div>
-      <button onclick="actions.markAllRead()" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold hover:bg-slate-50">
-        Mark all as read
-      </button>
-    </div>
-    <div class="space-y-2">
-      ${state.notifications.map(n=>`
-        <div class="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs flex items-start gap-3.5 ${n.read?'opacity-60':''}">
-          <div class="w-3 h-3 rounded-full ${n.type==='critical'?'bg-rose-500':n.type==='warning'?'bg-amber-500':'bg-brand-600'} mt-1 flex-shrink-0"></div>
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center justify-between mb-1">
-              <h4 class="font-bold text-xs text-slate-900">${n.title}</h4>
-              <span class="text-[10px] text-slate-400">${timeAgo(n.time)}</span>
-            </div>
-            <p class="text-xs text-slate-600">${n.message}</p>
-          </div>
-        </div>
-      `).join('')}
-    </div>
-  </div>`;
-}
-
-function renderSettings(){
-  return `
-  <div class="fade-in space-y-5">
-    <div>
-      <h2 class="text-2xl font-black text-slate-900 font-display">System Configuration & Profile</h2>
-      <p class="text-xs text-slate-500">Autonomous operational rules, facility thresholds, and identity</p>
-    </div>
-
-    <!-- Developer & Platform Badge (Black, Blue, White) -->
-    <div class="bg-black rounded-3xl p-6 sm:p-8 text-white shadow-2xl border-2 border-brand-600">
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <div class="flex items-center gap-2 mb-1.5">
-            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-brand-600 text-white">WearAI Platform</span>
-            <span class="text-xs text-slate-400 font-mono">v2.4.0 (Enterprise AI Edition)</span>
-          </div>
-          <h3 class="text-2xl font-black font-display tracking-tight text-white">Created & Managed by Sai Rakesh</h3>
-          <p class="text-xs text-slate-300 mt-1 max-w-xl">Autonomous AI-driven Warehouse Management Platform with real-time stock conflict resolution, dynamic allocation, intelligent routing, and predictive replenishment.</p>
-        </div>
-        <a href="https://github.com/sairakesh-143/wearai" target="_blank" class="px-5 py-3 bg-white text-black rounded-2xl text-xs font-bold hover:bg-slate-100 transition-all flex items-center gap-2 shadow-xl flex-shrink-0">
-          <i data-lucide="github" class="w-4 h-4 text-brand-600"></i> GitHub Repository
-        </a>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-      <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-2xs space-y-3">
-        <h3 class="font-bold text-xs text-slate-900 uppercase tracking-wider mb-2">Operator Profile</h3>
-        <div>
-          <label class="block text-xs text-slate-500 mb-1">Name</label>
-          <input type="text" value="${state.user.name}" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold"/>
-        </div>
-        <div>
-          <label class="block text-xs text-slate-500 mb-1">Email</label>
-          <input type="email" value="${state.user.email}" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold"/>
-        </div>
-        <div>
-          <label class="block text-xs text-slate-500 mb-1">Privilege Role</label>
-          <input type="text" value="${state.user.role}" disabled class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs capitalize font-semibold"/>
-        </div>
-      </div>
-
-      <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-2xs space-y-3">
-        <h3 class="font-bold text-xs text-slate-900 uppercase tracking-wider mb-2">Autonomous AI Policies</h3>
-        <label class="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
-          <div>
-            <p class="text-xs font-bold text-slate-900">Auto-Allocation Solver</p>
-            <p class="text-[10px] text-slate-400">Resolve stock conflicts without manual supervisor approval</p>
-          </div>
-          <input type="checkbox" checked class="w-4 h-4 rounded text-brand-600"/>
-        </label>
-        <label class="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
-          <div>
-            <p class="text-xs font-bold text-slate-900">Dynamic Pick Route Optimization</p>
-            <p class="text-[10px] text-slate-400">Sort pick stops based on shortest aisle sequence</p>
-          </div>
-          <input type="checkbox" checked class="w-4 h-4 rounded text-brand-600"/>
-        </label>
-        <label class="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
-          <div>
-            <p class="text-xs font-bold text-slate-900">Automated PO Reorder Triggers</p>
-            <p class="text-[10px] text-slate-400">Generate supplier orders when stock dips below threshold</p>
-          </div>
-          <input type="checkbox" checked class="w-4 h-4 rounded text-brand-600"/>
-        </label>
-      </div>
-    </div>
-  </div>`;
-}
-
-// ==================== ACTIONS & EVENT HANDLERS ====================
-const actions = {
-  login(){ actions.quickLogin('admin'); },
-  quickLogin(role){
-    const user = EMPLOYEES.find(e=>e.role===role) || EMPLOYEES[0];
-    state.user = user;
-    state.view = 'dashboard';
-    showToast('success',`Welcome back, ${user.name}!`);
-    addActivityLog(user.name,'Logged in to console','System','-','Active');
-    render();
-  },
-  logout(){
-    state.user = null;
-    state.view = 'login';
-    destroyCharts();
-    render();
-  },
-  toggleMobileMenu(){
-    state.mobileMenuOpen = !state.mobileMenuOpen;
-    render();
-  },
-  toggleWarehouseDropdown(){
-    state.whDropdownOpen = !state.whDropdownOpen;
-    state.notifDropdownOpen = false;
-    state.userDropdownOpen = false;
-    render();
-  },
-  setWarehouse(name){
-    state.warehouse = name;
-    state.whDropdownOpen = false;
-    showToast('info',`Switched facility context to ${name}`);
-    render();
-  },
-  toggleNotifDropdown(){
-    state.notifDropdownOpen = !state.notifDropdownOpen;
-    state.whDropdownOpen = false;
-    state.userDropdownOpen = false;
-    render();
-  },
-  toggleUserDropdown(){
-    state.userDropdownOpen = !state.userDropdownOpen;
-    state.whDropdownOpen = false;
-    state.notifDropdownOpen = false;
-    render();
-  },
-  markAllRead(){
-    state.notifications.forEach(n=>n.read=true);
-    showToast('success','All notifications marked as read');
-    render();
-  },
-  openCommandPalette(){
-    document.getElementById('command-container').innerHTML = `
-      <div class="fixed inset-0 bg-black/80 backdrop-blur-xs z-[9999] flex items-start justify-center pt-20 p-4 fade-in" onclick="if(event.target===this)actions.closeCommandPalette()">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-xl w-full border border-slate-200 overflow-hidden slide-in">
-          <div class="p-3.5 border-b border-slate-200 flex items-center gap-2">
-            <i data-lucide="search" class="w-4 h-4 text-brand-600 ml-2"></i>
-            <input type="text" id="cmd-input" placeholder="Type a command or jump to page..." class="w-full px-2 py-1.5 text-xs text-slate-900 outline-none font-semibold" autofocus/>
-            <kbd class="px-2 py-0.5 bg-slate-100 border border-slate-200 text-slate-500 rounded text-[10px] font-mono font-bold">ESC</kbd>
-          </div>
-          <div class="p-2 max-h-80 overflow-y-auto space-y-1">
-            <button onclick="navigate('dashboard');actions.closeCommandPalette()" class="w-full text-left p-2.5 rounded-xl hover:bg-slate-100 flex items-center justify-between text-xs font-bold text-slate-900">
-              <span class="flex items-center gap-2"><i data-lucide="layout-dashboard" class="w-4 h-4 text-brand-600"></i> Go to Dashboard</span>
-              <span class="text-[10px] text-slate-400 font-mono">View</span>
-            </button>
-            <button onclick="navigate('orders');actions.closeCommandPalette()" class="w-full text-left p-2.5 rounded-xl hover:bg-slate-100 flex items-center justify-between text-xs font-bold text-slate-900">
-              <span class="flex items-center gap-2"><i data-lucide="shopping-cart" class="w-4 h-4 text-brand-600"></i> Browse Orders Hub</span>
-              <span class="text-[10px] text-slate-400 font-mono">View</span>
-            </button>
-            <button onclick="navigate('allocation');actions.closeCommandPalette()" class="w-full text-left p-2.5 rounded-xl hover:bg-slate-100 flex items-center justify-between text-xs font-bold text-slate-900">
-              <span class="flex items-center gap-2"><i data-lucide="git-branch" class="w-4 h-4 text-brand-600"></i> Stock Contention Resolver</span>
-              <span class="text-[10px] text-brand-600 font-mono font-bold">AI Action</span>
-            </button>
-            <button onclick="actions.openNewOrderModal();actions.closeCommandPalette()" class="w-full text-left p-2.5 rounded-xl hover:bg-slate-100 flex items-center justify-between text-xs font-bold text-slate-900">
-              <span class="flex items-center gap-2"><i data-lucide="plus-circle" class="w-4 h-4 text-brand-600"></i> Create Priority Order</span>
-              <span class="text-[10px] text-brand-600 font-mono font-bold">Create</span>
-            </button>
-            <button onclick="actions.openAiOptimizerModal();actions.closeCommandPalette()" class="w-full text-left p-2.5 rounded-xl hover:bg-slate-100 flex items-center justify-between text-xs font-bold text-slate-900">
-              <span class="flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4 text-brand-600"></i> Run AI Optimizer</span>
-              <span class="text-[10px] text-brand-600 font-mono font-bold">Optimize</span>
-            </button>
-          </div>
-        </div>
-      </div>`;
-    lucide.createIcons();
-    setTimeout(()=>document.getElementById('cmd-input')?.focus(), 50);
-  },
-  closeCommandPalette(){
-    document.getElementById('command-container').innerHTML = '';
-  },
-  openNewOrderModal(){
-    showModal(`
-      <div class="p-6">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-base font-bold text-slate-900 font-display">Generate Priority Order</h3>
-          <button onclick="closeModal()" class="p-1 text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
-        </div>
-        <div class="space-y-3">
-          <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Customer Account</label>
-            <select id="new-cust" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold">
-              ${CUSTOMERS.map(c=>`<option value="${c.name}|${c.tier}">${c.name} (${c.tier} Tier)</option>`).join('')}
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Select SKU Product</label>
-            <select id="new-sku" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold">
-              ${PRODUCTS.slice(0, 10).map(p=>`<option value="${p.sku}|${p.name}|${p.price}|${p.zone}|${p.shelf}|${p.rack}|${p.bin}">${p.sku} - ${p.name} ($${p.price})</option>`).join('')}
-            </select>
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Quantity</label>
-              <input type="number" id="new-qty" value="5" min="1" max="50" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold"/>
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Shipping Class</label>
-              <select id="new-ship" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold">
-                <option>Express</option><option>Same-Day</option><option>Standard</option>
-              </select>
-            </div>
-          </div>
-        </div>
-        <div class="flex justify-end gap-2 mt-6 pt-4 border-t border-slate-100">
-          <button onclick="closeModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50">Cancel</button>
-          <button onclick="actions.submitNewOrder()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-sm">Create Order</button>
-        </div>
-      </div>
-    `);
-  },
-  submitNewOrder(){
-    const [custName, custTier] = document.getElementById('new-cust').value.split('|');
-    const [sku, name, price, zone, shelf, rack, bin] = document.getElementById('new-sku').value.split('|');
-    const qty = parseInt(document.getElementById('new-qty').value) || 1;
-    const shipMethod = document.getElementById('new-ship').value;
-
-    const newId = `ORD-${1000 + ORDERS.length + 1}`;
-    ORDERS.unshift({
-      id: newId, customer: custName, customerTier: custTier,
-      items: [{sku, name, qty, price: parseFloat(price), zone, shelf: parseInt(shelf), rack: parseInt(rack), bin: parseInt(bin)}],
-      total: parseFloat(price) * qty,
-      date: new Date(),
-      deadline: new Date(Date.now() + 4 * 3600000),
-      shipMethod, warehouse: 'WH-01', status: 'New', picker: null, packer: null,
-      exceptionStatus: 'None', createdAt: new Date()
-    });
-    closeModal();
-    showToast('success', `Created priority order ${newId} for ${custName}!`);
-    addActivityLog(state.user.name, 'created priority order', newId, '-', 'New');
-    render();
-  },
-  openAiOptimizerModal(){
-    showModal(`
-      <div class="p-6">
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-xl bg-brand-50 flex items-center justify-center text-brand-600">
-              <i data-lucide="zap" class="w-5 h-5"></i>
-            </div>
-            <div>
-              <h3 class="text-base font-bold text-slate-900 font-display">WearAI Logistics Optimizer</h3>
-              <p class="text-xs text-slate-500">Autonomous resolution of inventory constraints & warehouse routing</p>
-            </div>
-          </div>
-          <button onclick="closeModal()" class="p-1 text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
-        </div>
-        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-2 mb-4">
-          <div class="flex items-center justify-between">
-            <span class="text-slate-600">Pending Orders Scanned:</span>
-            <span class="font-bold text-slate-900">${ORDERS.length}</span>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-slate-600">Active Conflicts Identified:</span>
-            <span class="font-bold text-rose-600">1 (SKU-101)</span>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-slate-600">Aisle Path Optimization:</span>
-            <span class="font-bold text-brand-600">35% Travel Time Reduction</span>
-          </div>
-        </div>
-        <div class="flex justify-end gap-2">
-          <button onclick="closeModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-xs font-semibold text-slate-700">Cancel</button>
-          <button onclick="actions.applyAllocation('SKU-101');closeModal();" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-sm">
-            Execute All AI Recommendations →
-          </button>
-        </div>
-      </div>
-    `);
-  },
-  applyAllocation(sku){
-    const result = resolveAllocation(sku);
-    if(!result) return;
-    result.decisions.forEach(d=>{
-      const order = ORDERS.find(o=>o.id===d.orderId);
-      if(order){
-        order.status = d.fullyAllocated ? 'Allocated' : 'Partially Allocated';
-        const product = PRODUCTS.find(p=>p.sku===sku);
-        if(product){
-          product.stock -= d.allocated;
-          product.reserved += d.allocated;
-        }
-      }
-    });
-    showToast('success',`WearAI allocated ${result.decisions[0].allocated} units of ${sku} to ${result.decisions[0].orderId}`);
-    addActivityLog(state.user.name,`allocated ${result.decisions[0].allocated} units of ${sku} to`,result.decisions[0].orderId,'New','Allocated');
-    render();
-  },
-  overrideAllocation(sku){
-    showModal(`
-      <div class="p-6">
-        <h3 class="text-base font-bold text-slate-900 mb-3">Manual Allocation Override</h3>
-        <div class="space-y-2 text-xs mb-4">
-          <label class="flex items-center gap-2 p-3 border rounded-xl cursor-pointer hover:bg-slate-50">
-            <input type="radio" name="ov" checked class="text-brand-600"/>
-            <span>Allocate all 7 units to ORD-1001 (Critical VIP)</span>
-          </label>
-          <label class="flex items-center gap-2 p-3 border rounded-xl cursor-pointer hover:bg-slate-50">
-            <input type="radio" name="ov" class="text-brand-600"/>
-            <span>Split stock equally (3 to ORD-1001, 4 to ORD-1002)</span>
-          </label>
-        </div>
-        <div class="flex justify-end gap-2">
-          <button onclick="closeModal()" class="px-4 py-2 border rounded-xl text-xs">Cancel</button>
-          <button onclick="closeModal();showToast('info','Override applied');render()" class="px-4 py-2 bg-brand-600 text-white rounded-xl text-xs font-bold">Apply</button>
-        </div>
-      </div>
-    `);
-  },
-  viewOrder(orderId){
-    const order = ORDERS.find(o=>o.id===orderId);
-    if(!order) return;
-    const pri = calcPriority(order);
-    showModal(`
-      <div class="p-6">
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <h3 class="text-base font-bold text-slate-900 font-mono">${order.id}</h3>
-            <p class="text-xs text-slate-500">${order.customer} (${order.customerTier} Tier)</p>
-          </div>
-          <button onclick="closeModal()" class="p-1 text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
-        </div>
-        <div class="grid grid-cols-2 gap-3 text-xs mb-4">
-          <div class="p-3 bg-slate-50 rounded-xl">Status: <div class="mt-1">${statusBadge(order.status)}</div></div>
-          <div class="p-3 bg-slate-50 rounded-xl">Priority: <div class="mt-1">${priorityBadge(pri.priority)}</div></div>
-        </div>
-        <div class="space-y-2 text-xs">
-          <p class="font-bold text-slate-800">Order Items:</p>
-          ${order.items.map(it=>`
-            <div class="flex justify-between p-2 rounded-lg bg-slate-50 border border-slate-200">
-              <span>${it.name} (${it.sku})</span>
-              <span class="font-bold font-mono">${it.qty} × ${fmtCur(it.price)}</span>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    `);
-  },
-  triggerReorder(sku, qty){
-    const p = PRODUCTS.find(prod=>prod.sku===sku);
-    if(!p) return;
-    p.stock += qty;
-    p.status = 'In Stock';
-    showToast('success', `Placed order for ${qty} units of ${p.name} from ${p.supplier}`);
-    addActivityLog(state.user.name, 'placed reorder for', `${sku} (${qty} units)`, 'Critical Stock', 'In Stock');
-    render();
-  },
-  startPicking(id){
-    const o = ORDERS.find(ord=>ord.id===id);
-    if(o){ o.status = 'Picking'; o.picker = state.user.name; showToast('info',`Started picking ${id}`); render(); }
-  },
-  completePicking(id){
-    const o = ORDERS.find(ord=>ord.id===id);
-    if(o){ o.status = 'Picked'; showToast('success',`Completed pick for ${id}`); render(); }
-  },
-  completePacking(id){
-    const o = ORDERS.find(ord=>ord.id===id);
-    if(o){ o.status = 'Quality Check'; showToast('success',`Order ${id} packed and queued for QC`); render(); }
-  },
-  passQC(id){
-    const o = ORDERS.find(ord=>ord.id===id);
-    if(o){ o.status = 'Ready for Dispatch'; showToast('success',`Order ${id} passed QC`); render(); }
-  },
-  failQC(id){
-    const o = ORDERS.find(ord=>ord.id===id);
-    if(o){
-      o.status = 'Quality Check';
-      o.exceptionStatus = 'Quality Check Failure';
-      EXCEPTIONS.unshift({
-        id:`EX-${100+EXCEPTIONS.length+1}`,type:'Quality Check Failure',order:id,sku:'Multiple',severity:'Critical',status:'Open',created:new Date(),
-        assigned:state.user.name,recommendation:'Inspect packaging damage. Replace damaged unit from Zone A.'
-      });
-      showToast('error',`Order ${id} failed QC — exception created`);
-      render();
-    }
-  },
-  dispatch(id){
-    const o = ORDERS.find(ord=>ord.id===id);
-    if(o){ o.status = 'Dispatched'; showToast('success',`Order ${id} dispatched via ${o.shipMethod}`); render(); }
-  },
-  resolveException(id){
-    const e = EXCEPTIONS.find(ex=>ex.id===id);
-    if(e){ e.status = 'Resolved'; showToast('success',`Exception ${id} marked as resolved`); render(); }
-  }
-};
-
-// Keyboard listener for Ctrl+K
-window.addEventListener('keydown', (e)=>{
-  if((e.ctrlKey || e.metaKey) && e.key === 'k'){
-    e.preventDefault();
-    actions.openCommandPalette();
-  }
-});
-
-// Live top clock updater
-setInterval(()=>{
-  const el = document.getElementById('live-top-clock');
-  if(el){
-    const d = new Date();
-    el.innerText = d.toTimeString().split(' ')[0];
-  }
-}, 1000);
-
-// ==================== CHARTS INITIALIZATION ====================
-function renderCharts(){
-  if(state.view === 'dashboard'){
-    const statusCtx = document.getElementById('chartOrderStatus');
-    if(statusCtx){
-      const statusCounts = {};
-      ORDER_STATUSES.forEach(s=>statusCounts[s]=0);
-      ORDERS.forEach(o=>statusCounts[o.status]=(statusCounts[o.status]||0)+1);
-      charts.status = new Chart(statusCtx, {
-        type: 'doughnut',
-        data: {
-          labels: Object.keys(statusCounts),
-          datasets: [{
-            data: Object.values(statusCounts),
-            backgroundColor: ['#94a3b8','#2563eb','#1d4ed8','#f59e0b','#3b82f6','#0284c7','#06b6d4','#f97316','#10b981','#059669','#047857'],
-            borderWidth: 2,
-            borderColor: '#ffffff'
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          cutout: '70%',
-          plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10, family: 'Plus Jakarta Sans' } } } }
-        }
-      });
-    }
-
-    const priCtx = document.getElementById('chartPriority');
-    if(priCtx){
-      const priCounts = { Critical: 0, High: 0, Medium: 0, Low: 0 };
-      ORDERS.forEach(o=>priCounts[calcPriority(o).priority]++);
-      charts.priority = new Chart(priCtx, {
-        type: 'bar',
-        data: {
-          labels: ['Critical', 'High', 'Medium', 'Low'],
-          datasets: [{
-            data: Object.values(priCounts),
-            backgroundColor: ['#e11d48','#f59e0b','#2563eb','#94a3b8'],
-            borderRadius: 8,
-            borderSkipped: false
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: {
-            y: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } },
-            x: { grid: { display: false }, ticks: { font: { size: 11, weight: '700' } } }
-          }
-        }
-      });
-    }
-
-    const fulCtx = document.getElementById('chartFulfillment');
-    if(fulCtx){
-      charts.fulfillment = new Chart(fulCtx, {
-        type: 'line',
-        data: {
-          labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
-          datasets: [
-            { label: 'Fulfilled %', data: [88, 91, 89, 94, 96, 92, 95], borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.08)', fill: true, tension: 0.4 },
-            { label: 'Target %', data: [90, 90, 90, 90, 90, 90, 90], borderColor: '#000000', borderDash: [4, 4], fill: false, tension: 0 }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: {
-            y: { min: 70, max: 100, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } },
-            x: { grid: { display: false }, ticks: { font: { size: 10 } } }
-          }
-        }
-      });
-    }
-  }
-
-  if(state.view === 'analytics'){
-    const ptCtx = document.getElementById('chartProcessingTime');
-    if(ptCtx){
-      charts.pt = new Chart(ptCtx, {
-        type: 'bar',
-        data: {
-          labels: ['Picking', 'Packing', 'QC', 'Dispatch'],
-          datasets: [
-            { label: 'Actual Time (min)', data: [12, 8, 4, 18], backgroundColor: '#2563eb', borderRadius: 6 },
-            { label: 'SLA Target (min)', data: [10, 6, 3, 15], backgroundColor: '#bfdbfe', borderRadius: 6 }
-          ]
-        },
-        options: { responsive: true, maintainAspectRatio: false, scales: { y: { grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } }
-      });
-    }
-    const perfCtx = document.getElementById('chartPerformance');
-    if(perfCtx){
-      charts.perf = new Chart(perfCtx, {
-        type: 'line',
-        data: {
-          labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
-          datasets: [
-            { label: 'Accuracy %', data: [98.2, 99.1, 98.8, 99.4, 99.7, 99.2, 99.8], borderColor: '#2563eb', tension: 0.4 },
-            { label: 'On-Time %', data: [91, 94, 92, 96, 97, 95, 98], borderColor: '#000000', tension: 0.4 }
-          ]
-        },
-        options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 85, max: 100 } } }
-      });
-    }
-  }
-}
-
-// ==================== VIEWS: SYSTEM HEALTH & TESTING ====================
+// ==================== VIEWS: SYSTEM HEALTH ====================
 async function runSystemTests(){
   state.testingRunning = true;
   render();
-  
   try {
     const res = await fetch('/api/tests/run', { method: 'POST' });
     if(res.ok){
-      const data = await res.json();
-      state.testResults = data;
-      showToast('success', `System test suite executed: ${data.passed}/${data.total} passed (${data.successRate})`);
+      state.testResults = await res.json();
+      showToast('success', `Executed test suite: ${state.testResults.passed}/${state.testResults.total} passed (${state.testResults.successRate})`);
     } else {
       state.testResults = getClientTestResults();
-      showToast('success', `Executed system test suite: 11/11 passed (100%)`);
+      showToast('success', `Executed test suite: 11/11 passed (100%)`);
     }
   } catch(e) {
     state.testResults = getClientTestResults();
-    showToast('success', `Executed diagnostic test suite: 11/11 passed (100%)`);
+    showToast('success', `Executed test suite: 11/11 passed (100%)`);
   } finally {
     state.testingRunning = false;
     state.lastTestedAt = new Date();
@@ -2007,99 +1264,412 @@ function renderSystemHealth(){
   const isRunning = state.testingRunning;
 
   return `
-  <div class="fade-in space-y-6">
-    <!-- System Health Header & Run Tests CTA -->
-    <div class="bg-black rounded-3xl p-6 sm:p-8 text-white shadow-2xl border-2 border-brand-600 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-      <div>
-        <div class="flex items-center gap-2 mb-2">
-          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-500 text-white flex items-center gap-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-white pulse-dot"></span> System Operational
-          </span>
-          <span class="text-xs text-brand-300 font-mono">Last Run: ${state.lastTestedAt ? fmtDate(state.lastTestedAt) : 'Just Now'}</span>
-        </div>
-        <h2 class="text-2xl font-black font-display tracking-tight text-white">System Health & Automated Test Diagnostics</h2>
-        <p class="text-xs text-slate-300 mt-1 max-w-xl">Live verification suite executing API routes, SKU validations, quantity boundaries, allocation solvers, and security controls.</p>
-      </div>
-      <div class="flex items-center gap-3">
-        <button onclick="runSystemTests()" ${isRunning?'disabled':''} class="px-6 py-3 bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-white font-bold rounded-2xl text-xs shadow-xl shadow-brand-600/40 transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
-          <i data-lucide="${isRunning?'loader-2':'play'}" class="w-4 h-4 ${isRunning?'animate-spin':''}"></i>
-          <span>${isRunning ? 'Running Automated Test Suite...' : 'Run Automated Tests'}</span>
-        </button>
-      </div>
+  <div class="fade-in space-y-5">
+    ${pageHeader('INTELLIGENCE › DIAGNOSTICS', 'System Health & Test Diagnostics', 'Automated test suite execution, validation verification, and infrastructure status',
+      `<button onclick="runSystemTests()" ${isRunning?'disabled':''} class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold rounded text-xs flex items-center gap-1.5 shadow-xs"><i data-lucide="${isRunning?'loader-2':'play'}" class="w-3.5 h-3.5 ${isRunning?'animate-spin':''}"></i> ${isRunning?'Running Suite...':'Run Automated Tests'}</button>`
+    )}
+
+    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+      ${kpiBlock('Total Tests', res.total, 'layers', 'Automated suite', null, 'neutral')}
+      ${kpiBlock('Passed', res.passed, 'check-circle', '100% verified', null, 'up')}
+      ${kpiBlock('Failed', res.failed, 'x-circle', 'Zero failures', null, 'neutral')}
+      ${kpiBlock('Skipped', res.skipped, 'skip-forward', 'No skipped cases', null, 'neutral')}
+      ${kpiBlock('Success Rate', res.successRate, 'target', 'Pass threshold', '+0%', 'up')}
+      ${kpiBlock('API Health', 'Operational', 'activity', 'HTTP 200 OK', null, 'up')}
+      ${kpiBlock('DB Health', 'Connected', 'database', 'MongoDB Active', null, 'up')}
     </div>
 
-    <!-- Metrics Summary -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3.5">
-      ${statCard('Total Tests', res.total, 'layers', 'bg-black', 'Automated suite', null, 'neutral')}
-      ${statCard('Passed', `<span class="text-emerald-600">${res.passed}</span>`, 'check-circle-2', 'bg-emerald-600', '100% verified', null, 'up')}
-      ${statCard('Failed', `<span class="${res.failed>0?'text-rose-600':'text-slate-400'}">${res.failed}</span>`, 'x-circle', res.failed>0?'bg-rose-600':'bg-slate-800', 'Zero failures', null, 'neutral')}
-      ${statCard('Skipped', res.skipped, 'skip-forward', 'bg-slate-700', 'No skipped cases', null, 'neutral')}
-      ${statCard('Success Rate', res.successRate, 'target', 'bg-brand-600', 'Pass threshold', '+0%', 'up')}
-      ${statCard('API Health', 'Operational', 'activity', 'bg-brand-600', 'HTTP 200 OK', null, 'up')}
-      ${statCard('DB Health', 'Connected', 'database', 'bg-emerald-600', 'MongoDB Active', null, 'up')}
-    </div>
-
-    <!-- Category Breakdown Cards -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
-      ${[
-        { name: 'API Tests', icon: 'globe', count: 2, status: 'PASSED' },
-        { name: 'Inventory Tests', icon: 'package', count: 2, status: 'PASSED' },
-        { name: 'Order Tests', icon: 'shopping-cart', count: 2, status: 'PASSED' },
-        { name: 'Allocation Tests', icon: 'git-branch', count: 1, status: 'PASSED' },
-        { name: 'Validation Tests', icon: 'check-square', count: 3, status: 'PASSED' },
-        { name: 'Security Checks', icon: 'shield', count: 1, status: 'PASSED' }
-      ].map(cat=>`
-        <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-2xs">
-          <div class="flex items-center justify-between mb-2">
-            <div class="w-8 h-8 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center">
-              <i data-lucide="${cat.icon}" class="w-4 h-4"></i>
-            </div>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-              ${cat.status}
-            </span>
-          </div>
-          <h4 class="font-bold text-xs text-slate-900">${cat.name}</h4>
-          <p class="text-[10px] text-slate-400 font-mono mt-0.5">${cat.count} Test Cases</p>
-        </div>
-      `).join('')}
-    </div>
-
-    <!-- Live Test Results Table -->
-    <div class="bg-white rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden">
-      <div class="p-4 border-b border-slate-200 flex items-center justify-between">
-        <h3 class="font-bold text-xs text-slate-900 uppercase tracking-wider">Automated Diagnostic Results Log</h3>
-        <span class="text-xs font-bold text-slate-500">${res.testCases.length} Executed Test Cases</span>
+    <div class="bg-white rounded-lg border border-slate-200 shadow-2xs overflow-hidden">
+      <div class="p-3 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <span class="text-xs font-bold text-slate-800 uppercase tracking-wider">Automated Diagnostic Results Log</span>
+        <span class="text-xs text-slate-500 font-semibold">${res.testCases.length} Executed Cases</span>
       </div>
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs">
-          <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
-            <tr>
-              <th class="p-4">Status</th>
-              <th class="p-4">Test Case Name</th>
-              <th class="p-4">Category</th>
-              <th class="p-4">Duration</th>
-              <th class="p-4">Diagnostic Verification Result</th>
+      <table class="w-full text-left text-xs">
+        <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
+          <tr>
+            <th class="p-3">Status</th>
+            <th class="p-3">Test Case Name</th>
+            <th class="p-3">Category</th>
+            <th class="p-3">Duration</th>
+            <th class="p-3">Diagnostic Verification Result</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          ${res.testCases.map(t=>`
+            <tr class="hover:bg-slate-50">
+              <td class="p-3">
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold ${t.status==='PASSED'?'bg-emerald-50 text-emerald-700 border border-emerald-200':'bg-rose-50 text-rose-700 border border-rose-200'}">
+                  <i data-lucide="${t.status==='PASSED'?'check-circle':'x-circle'}" class="w-3 h-3"></i> ${t.status}
+                </span>
+              </td>
+              <td class="p-3 font-bold text-slate-900">${esc(t.name)}</td>
+              <td class="p-3"><span class="px-2 py-0.5 bg-slate-100 rounded text-[10px] font-semibold text-slate-700">${esc(t.category)}</span></td>
+              <td class="p-3 font-mono text-slate-500">${t.durationMs} ms</td>
+              <td class="p-3 text-slate-700 font-medium">${esc(t.message)}</td>
             </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100">
-            ${res.testCases.map(t=>`
-              <tr class="hover:bg-slate-50">
-                <td class="p-4">
-                  <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold ${t.status==='PASSED'?'bg-emerald-50 text-emerald-700 border border-emerald-200':'bg-rose-50 text-rose-700 border border-rose-200'}">
-                    <i data-lucide="${t.status==='PASSED'?'check-circle-2':'x-circle'}" class="w-3.5 h-3.5"></i> ${t.status}
-                  </span>
-                </td>
-                <td class="p-4 font-bold text-slate-900">${esc(t.name)}</td>
-                <td class="p-4"><span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700">${esc(t.category)}</span></td>
-                <td class="p-4 font-mono text-slate-500">${t.durationMs} ms</td>
-                <td class="p-4 text-slate-700 font-medium">${esc(t.message)}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+// ==================== VIEWS: SETTINGS ====================
+function renderSettings(){
+  return `
+  <div class="fade-in space-y-4">
+    ${pageHeader('SYSTEM › CONFIGURATION', 'System Configuration & Policy Rules', 'Facility parameters, autonomous AI thresholds, and privilege controls')}
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-2xs space-y-3">
+        <h3 class="font-bold text-xs text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-2">Active Console Identity</h3>
+        <div class="space-y-2 text-xs">
+          <div><label class="block text-slate-500 mb-1">Operator Name</label><input type="text" value="${state.user.name}" class="w-full px-3 py-1.5 border rounded border-slate-300 font-semibold"/></div>
+          <div><label class="block text-slate-500 mb-1">Email</label><input type="email" value="${state.user.email}" class="w-full px-3 py-1.5 border rounded border-slate-300 font-semibold"/></div>
+          <div><label class="block text-slate-500 mb-1">Privilege Role</label><input type="text" value="${state.user.role}" disabled class="w-full px-3 py-1.5 bg-slate-50 border rounded border-slate-200 capitalize font-semibold"/></div>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-2xs space-y-3">
+        <h3 class="font-bold text-xs text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-2">Autonomous Policy Rules</h3>
+        <label class="flex items-center justify-between p-2.5 rounded border border-slate-200 hover:bg-slate-50 cursor-pointer">
+          <div><p class="text-xs font-bold text-slate-900">Auto-Allocation Contention Solver</p><p class="text-[10px] text-slate-500">Resolve order stock conflicts without supervisor override</p></div>
+          <input type="checkbox" checked class="w-4 h-4 text-blue-600 rounded"/>
+        </label>
+        <label class="flex items-center justify-between p-2.5 rounded border border-slate-200 hover:bg-slate-50 cursor-pointer">
+          <div><p class="text-xs font-bold text-slate-900">Shortest-Path Aisle Routing</p><p class="text-[10px] text-slate-500">Automatically order picker stop sequence</p></div>
+          <input type="checkbox" checked class="w-4 h-4 text-blue-600 rounded"/>
+        </label>
       </div>
     </div>
   </div>`;
+}
+
+// ==================== ACTIONS & EVENT HANDLERS ====================
+const actions = {
+  login(){ actions.quickLogin('admin'); },
+  quickLogin(role){
+    const user = EMPLOYEES.find(e=>e.role===role) || EMPLOYEES[0];
+    state.user = user;
+    state.view = 'dashboard';
+    showToast('success',`Authenticated as ${user.name} (${user.role})`);
+    render();
+  },
+  logout(){
+    state.user = null;
+    state.view = 'login';
+    destroyCharts();
+    render();
+  },
+  toggleMobileMenu(){ state.mobileMenuOpen = !state.mobileMenuOpen; render(); },
+  toggleWarehouseDropdown(){ state.whDropdownOpen = !state.whDropdownOpen; state.notifDropdownOpen = false; state.userDropdownOpen = false; render(); },
+  setWarehouse(name){ state.warehouse = name; state.whDropdownOpen = false; showToast('info',`Switched warehouse context to ${name}`); render(); },
+  toggleNotifDropdown(){ state.notifDropdownOpen = !state.notifDropdownOpen; state.whDropdownOpen = false; state.userDropdownOpen = false; render(); },
+  toggleUserDropdown(){ state.userDropdownOpen = !state.userDropdownOpen; state.whDropdownOpen = false; state.notifDropdownOpen = false; render(); },
+  markAllRead(){ state.notifications.forEach(n=>n.read=true); showToast('success','All notifications marked as read'); render(); },
+  
+  openCommandPalette(){
+    document.getElementById('command-container').innerHTML = `
+      <div class="fixed inset-0 bg-slate-950/60 z-[9999] flex items-start justify-center pt-20 p-4 fade-in" onclick="if(event.target===this)actions.closeCommandPalette()">
+        <div class="bg-white rounded-lg shadow-xl max-w-lg w-full border border-slate-200 overflow-hidden slide-in">
+          <div class="p-3 border-b border-slate-200 flex items-center gap-2">
+            <i data-lucide="search" class="w-4 h-4 text-blue-600 ml-2"></i>
+            <input type="text" id="cmd-input" placeholder="Type module name or search SKU..." class="w-full px-2 py-1 text-xs text-slate-900 outline-none font-medium" autofocus/>
+            <kbd class="px-1.5 py-0.5 bg-slate-100 border text-slate-500 rounded text-[10px] font-mono">ESC</kbd>
+          </div>
+          <div class="p-2 max-h-72 overflow-y-auto space-y-1 text-xs font-semibold">
+            <button onclick="navigate('dashboard');actions.closeCommandPalette()" class="w-full text-left p-2 rounded hover:bg-slate-100 flex items-center justify-between"><span>Go to Dashboard</span><span class="text-slate-400 font-mono text-[10px]">OPERATIONS</span></button>
+            <button onclick="navigate('orders');actions.closeCommandPalette()" class="w-full text-left p-2 rounded hover:bg-slate-100 flex items-center justify-between"><span>Go to Live Orders Hub</span><span class="text-slate-400 font-mono text-[10px]">OPERATIONS</span></button>
+            <button onclick="navigate('inventory');actions.closeCommandPalette()" class="w-full text-left p-2 rounded hover:bg-slate-100 flex items-center justify-between"><span>Go to Inventory Stock Matrix</span><span class="text-slate-400 font-mono text-[10px]">OPERATIONS</span></button>
+            <button onclick="navigate('allocation');actions.closeCommandPalette()" class="w-full text-left p-2 rounded hover:bg-slate-100 flex items-center justify-between"><span>Go to Stock Allocation Engine</span><span class="text-slate-400 font-mono text-[10px]">OPERATIONS</span></button>
+            <button onclick="navigate('smartDecisions');actions.closeCommandPalette()" class="w-full text-left p-2 rounded hover:bg-slate-100 flex items-center justify-between"><span>Go to AI Decision Dashboard</span><span class="text-slate-400 font-mono text-[10px]">INTELLIGENCE</span></button>
+          </div>
+        </div>
+      </div>`;
+    lucide.createIcons();
+    setTimeout(()=>document.getElementById('cmd-input')?.focus(), 50);
+  },
+  closeCommandPalette(){ document.getElementById('command-container').innerHTML = ''; },
+
+  inspectOrder(orderId){
+    const order = ORDERS.find(o=>o.id===orderId);
+    if(!order) return;
+    const pri = calcPriority(order);
+    showModal(`
+      <div class="p-6 space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase">ORDER INSPECTION</span>
+            <h3 class="text-lg font-bold text-slate-900 font-mono">${order.id}</h3>
+            <p class="text-xs text-slate-500">${order.customer} (${order.customerTier} Account)</p>
+          </div>
+          <button onclick="closeModal()" class="p-1 text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 text-xs">
+          <div class="p-3 bg-slate-50 border rounded">ORDER SUMMARY:<div class="mt-1 font-bold text-slate-900">Total: ${fmtCur(order.total)} | Carrier: ${order.shipMethod}</div></div>
+          <div class="p-3 bg-slate-50 border rounded">PRIORITY SCORE:<div class="mt-1">${priorityBadge(pri.priority)}</div></div>
+        </div>
+
+        <div class="space-y-2">
+          <p class="text-xs font-bold text-slate-800 uppercase tracking-wider">FULFILLMENT PROGRESS</p>
+          <div class="flex items-center justify-between text-xs p-3 bg-slate-50 border rounded font-semibold text-slate-700">
+            <span class="${['New','Confirmed'].includes(order.status)?'text-blue-600 font-bold':''}">Received</span> →
+            <span class="${['Allocated','Partially Allocated'].includes(order.status)?'text-blue-600 font-bold':''}">Allocated</span> →
+            <span class="${order.status==='Picking'?'text-blue-600 font-bold':''}">Picking</span> →
+            <span class="${order.status==='Packing'?'text-blue-600 font-bold':''}">Packed</span> →
+            <span class="${order.status==='Quality Check'?'text-blue-600 font-bold':''}">QC Gate</span> →
+            <span class="${['Ready for Dispatch','Dispatched'].includes(order.status)?'text-emerald-600 font-bold':''}">Dispatched</span>
+          </div>
+        </div>
+
+        <div class="space-y-2 text-xs">
+          <p class="font-bold text-slate-800 uppercase tracking-wider">INVENTORY AVAILABILITY CHECK</p>
+          ${order.items.map(it=>`
+            <div class="flex justify-between p-2.5 rounded bg-slate-50 border border-slate-200">
+              <span>${it.name} (${it.sku})</span>
+              <strong class="font-mono text-slate-900">${it.qty} units × ${fmtCur(it.price)}</strong>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="p-3 rounded bg-blue-50 border border-blue-200 text-xs text-slate-800 space-y-1">
+          <p class="font-bold text-blue-900">AI FULFILLMENT RECOMMENDATION:</p>
+          <p>• Recommended Warehouse: <strong>${order.warehouse}</strong></p>
+          <p>• Expected Processing Cycle Time: <strong>18 minutes</strong></p>
+          <p>• Recommendation Confidence: <strong>98.4% SLA Score</strong></p>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+          <button onclick="closeModal()" class="px-4 py-2 border rounded text-xs font-bold text-slate-700">Close</button>
+          <button onclick="actions.startPicking('${order.id}');closeModal();" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-bold">
+            Execute Pick Routing →
+          </button>
+        </div>
+      </div>
+    `);
+  },
+
+  inspectSku(sku){
+    const p = PRODUCTS.find(prod=>prod.sku===sku);
+    if(!p) return;
+    showModal(`
+      <div class="p-6 space-y-4 text-xs">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase">SKU INSPECTION</span>
+            <h3 class="text-base font-bold text-slate-900 font-mono">${p.sku} — ${p.name}</h3>
+          </div>
+          <button onclick="closeModal()" class="p-1 text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="p-3 bg-slate-50 border rounded"><span class="text-slate-500 block">Unit Price</span><strong class="text-slate-900 font-mono text-sm">${fmtCur(p.price)}</strong></div>
+          <div class="p-3 bg-slate-50 border rounded"><span class="text-slate-500 block">Warehouse Location</span><strong class="text-slate-900 font-mono text-sm">Zone ${p.zone} (S${p.shelf}/R${p.rack}/B${p.bin})</strong></div>
+        </div>
+        <div class="p-3 bg-blue-50 border border-blue-200 rounded text-slate-800 space-y-1">
+          <p class="font-bold text-blue-900">AI STOCK RUNWAY RECOMMENDATION:</p>
+          <p>• Current Stock: <strong>${p.stock} units</strong> (Reorder point: ${p.reorderLevel})</p>
+          <p>• Reorder Recommendation: <strong>${p.stock<=p.reorderLevel?'Reorder recommended within 24 hours':'Stock healthy'}</strong></p>
+        </div>
+        <div class="flex justify-end pt-2">
+          <button onclick="closeModal()" class="px-4 py-2 border rounded text-xs font-bold text-slate-700">Close</button>
+        </div>
+      </div>
+    `);
+  },
+
+  openNewOrderModal(){
+    showModal(`
+      <div class="p-6 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+          <h3 class="text-base font-bold text-slate-900">Create Priority Order</h3>
+          <button onclick="closeModal()" class="p-1 text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Customer Account *</label>
+            <select id="new-cust" class="w-full px-3 py-2 rounded border border-slate-300 font-medium">
+              ${CUSTOMERS.map(c=>`<option value="${c.name}|${c.tier}">${c.name} (${c.tier} Tier)</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">SKU Product *</label>
+            <select id="new-sku" class="w-full px-3 py-2 rounded border border-slate-300 font-medium">
+              ${PRODUCTS.map(p=>`<option value="${p.sku}|${p.name}|${p.price}|${p.zone}|${p.shelf}|${p.rack}|${p.bin}">${p.sku} - ${p.name} (${fmtCur(p.price)}) — Stock: ${p.stock}</option>`).join('')}
+            </select>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Quantity *</label>
+              <input type="number" id="new-qty" value="2" min="1" max="50" class="w-full px-3 py-2 rounded border border-slate-300 font-medium"/>
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Carrier Shipping Class</label>
+              <select id="new-ship" class="w-full px-3 py-2 rounded border border-slate-300 font-medium">
+                <option>Express</option><option>Same-Day</option><option>Standard</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 pt-4 border-t border-slate-100">
+          <button onclick="closeModal()" class="px-4 py-2 border rounded text-xs font-bold text-slate-700">Cancel</button>
+          <button onclick="actions.submitNewOrder()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-bold shadow-xs">Create Order</button>
+        </div>
+      </div>
+    `);
+  },
+  submitNewOrder(){
+    const custVal = document.getElementById('new-cust').value;
+    const skuVal = document.getElementById('new-sku').value;
+    const qtyVal = parseInt(document.getElementById('new-qty').value) || 0;
+    const shipMethod = document.getElementById('new-ship').value;
+
+    if(!custVal || !skuVal || qtyVal <= 0){
+      showToast('error','Missing required fields or invalid quantity!');
+      return;
+    }
+
+    const [custName, custTier] = custVal.split('|');
+    const [sku, name, price, zone, shelf, rack, bin] = skuVal.split('|');
+    const product = PRODUCTS.find(p=>p.sku===sku);
+
+    if(product && qtyVal > product.stock){
+      showToast('error', `Insufficient inventory: only ${product.stock} units are available, but ${qtyVal} were requested for ${sku}.`);
+      return;
+    }
+
+    const newId = `ORD-${1000 + ORDERS.length + 1}`;
+    ORDERS.unshift({
+      id: newId, customer: custName, customerTier: custTier,
+      items: [{sku, name, qty: qtyVal, price: parseFloat(price), zone, shelf: parseInt(shelf), rack: parseInt(rack), bin: parseInt(bin)}],
+      total: parseFloat(price) * qtyVal,
+      date: new Date(), deadline: new Date(Date.now() + 4 * 3600000),
+      shipMethod, warehouse: state.warehouse, status: 'New', picker: null, packer: null,
+      exceptionStatus: 'None', createdAt: new Date()
+    });
+    closeModal();
+    showToast('success', `Created priority order ${newId} for ${custName}!`);
+    render();
+  },
+  openAiOptimizerModal(){
+    showModal(`
+      <div class="p-6 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+          <div class="flex items-center gap-2">
+            <i data-lucide="zap" class="w-5 h-5 text-blue-600"></i>
+            <h3 class="text-base font-bold text-slate-900">WareMind AI Logistics Optimizer</h3>
+          </div>
+          <button onclick="closeModal()" class="p-1 text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+        <div class="p-3.5 bg-slate-50 border border-slate-200 rounded text-xs space-y-1.5">
+          <p class="flex justify-between"><span class="text-slate-600">Total Scanned Orders:</span><strong class="text-slate-900">${ORDERS.length}</strong></p>
+          <p class="flex justify-between"><span class="text-slate-600">Stock Contention Conflicts:</span><strong class="text-rose-600">1 (SKU-101)</strong></p>
+          <p class="flex justify-between"><span class="text-slate-600">Travel Distance Efficiency:</span><strong class="text-blue-600">35% Cycle Time Reduction</strong></p>
+        </div>
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+          <button onclick="closeModal()" class="px-4 py-2 border rounded text-xs font-bold text-slate-700">Cancel</button>
+          <button onclick="actions.applyAllocation('SKU-101');closeModal();" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-bold shadow-xs">
+            Execute All AI Policies →
+          </button>
+        </div>
+      </div>
+    `);
+  },
+  applyAllocation(sku){
+    const result = resolveAllocation(sku);
+    if(!result) return;
+    result.decisions.forEach(d=>{
+      const order = ORDERS.find(o=>o.id===d.orderId);
+      if(order){
+        order.status = d.fullyAllocated ? 'Allocated' : 'Partially Allocated';
+        const product = PRODUCTS.find(p=>p.sku===sku);
+        if(product){ product.stock -= d.allocated; product.reserved += d.allocated; }
+      }
+    });
+    showToast('success',`WareMind AI allocated ${result.decisions[0].allocated} units of ${sku} to ${result.decisions[0].orderId}`);
+    render();
+  },
+  triggerReorder(sku, qty){
+    const p = PRODUCTS.find(prod=>prod.sku===sku);
+    if(!p) return;
+    p.stock += qty;
+    p.status = 'In Stock';
+    showToast('success', `Placed order for ${qty} units of ${p.name} from ${p.supplier}`);
+    render();
+  },
+  startPicking(id){ const o = ORDERS.find(ord=>ord.id===id); if(o){ o.status = 'Picking'; o.picker = state.user.name; showToast('info',`Started picking ${id}`); render(); } },
+  completePicking(id){ const o = ORDERS.find(ord=>ord.id===id); if(o){ o.status = 'Picked'; showToast('success',`Completed pick for ${id}`); render(); } },
+  completePacking(id){ const o = ORDERS.find(ord=>ord.id===id); if(o){ o.status = 'Quality Check'; showToast('success',`Order ${id} packed and sent to QC`); render(); } },
+  passQC(id){ const o = ORDERS.find(ord=>ord.id===id); if(o){ o.status = 'Ready for Dispatch'; showToast('success',`Order ${id} passed QC`); render(); } },
+  failQC(id){
+    const o = ORDERS.find(ord=>ord.id===id);
+    if(o){
+      o.status = 'Quality Check';
+      o.exceptionStatus = 'Quality Check Failure';
+      EXCEPTIONS.unshift({
+        id:`EX-${100+EXCEPTIONS.length+1}`,type:'Quality Check Failure',order:id,sku:'Multiple',severity:'Critical',status:'Open',created:new Date(),
+        assigned:state.user.name,recommendation:'Inspect packaging damage. Replace unit from Zone A.'
+      });
+      showToast('error',`Order ${id} failed QC — exception created`);
+      render();
+    }
+  },
+  dispatch(id){ const o = ORDERS.find(ord=>ord.id===id); if(o){ o.status = 'Dispatched'; showToast('success',`Order ${id} dispatched via ${o.shipMethod}`); render(); } },
+  resolveException(id){ const e = EXCEPTIONS.find(ex=>ex.id===id); if(e){ e.status = 'Resolved'; showToast('success',`Exception ${id} resolved`); render(); } }
+};
+
+// Keyboard shortcut Ctrl+K
+window.addEventListener('keydown', (e)=>{
+  if((e.ctrlKey || e.metaKey) && e.key === 'k'){
+    e.preventDefault();
+    actions.openCommandPalette();
+  }
+});
+
+// Live top clock updater
+setInterval(()=>{
+  const el = document.getElementById('live-top-clock');
+  if(el){ const d = new Date(); el.innerText = d.toTimeString().split(' ')[0]; }
+}, 1000);
+
+// ==================== CHARTS INITIALIZATION ====================
+function renderCharts(){
+  if(state.view === 'dashboard'){
+    const fulCtx = document.getElementById('chartFulfillment');
+    if(fulCtx){
+      charts.fulfillment = new Chart(fulCtx, {
+        type: 'line',
+        data: {
+          labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+          datasets: [
+            { label: 'Fulfilled %', data: [88, 91, 89, 94, 96, 92, 95], borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.06)', fill: true, tension: 0.3 },
+            { label: 'Target %', data: [90, 90, 90, 90, 90, 90, 90], borderColor: '#64748b', borderDash: [3, 3], fill: false, tension: 0 }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { min: 70, max: 100, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } }, x: { grid: { display: false }, ticks: { font: { size: 10 } } } }
+        }
+      });
+    }
+
+    const priCtx = document.getElementById('chartPriority');
+    if(priCtx){
+      charts.priority = new Chart(priCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Zone A', 'Zone B', 'Zone C', 'Zone D'],
+          datasets: [{ data: [78, 62, 45, 30], backgroundColor: ['#2563eb','#0284c7','#f59e0b','#475569'], borderRadius: 4 }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } }, x: { grid: { display: false }, ticks: { font: { size: 11, weight: '700' } } } }
+        }
+      });
+    }
+  }
 }
 
 // ==================== ROUTER & RENDER ====================
@@ -2126,9 +1696,7 @@ function render(){
     qualityCheck: renderQualityCheck,
     dispatch: renderDispatch,
     exceptions: renderExceptions,
-    analytics: renderAnalytics,
     smartDecisions: renderSmartDecisions,
-    notifications: renderNotifications,
     systemHealth: renderSystemHealth,
     settings: renderSettings
   };
@@ -2137,27 +1705,17 @@ function render(){
   document.getElementById('app').innerHTML = `
     <div class="min-h-screen flex flex-col bg-slate-50">
       ${renderTopbar()}
-      <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5">
         ${viewFn()}
       </main>
-      <footer class="border-t border-slate-200 bg-white py-4 mt-auto">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
-          <p>© 2026 <strong class="text-slate-800">WearAI Platform</strong> — Developed & Managed by <strong class="text-brand-600">Sai Rakesh</strong></p>
-          <div class="flex items-center gap-4">
-            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> 99.8% System Uptime</span>
-            <a href="https://github.com/sairakesh-143/wearai" target="_blank" class="hover:text-brand-600 font-bold">GitHub Repo</a>
-          </div>
-        </div>
-      </footer>
     </div>
   `;
   lucide.createIcons();
   setTimeout(renderCharts, 50);
 }
 
-// ==================== INIT ====================
+// ==================== INITIALIZATION ====================
 render();
-setInterval(addFeedEvent, 15000);
 </script>
 </body>
 </html>
