@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartWMS — Intelligent Warehouse Operations Platform</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        brand: { 50:'#eef2ff',100:'#e0e7ff',200:'#c7d2fe',300:'#a5b4fc',400:'#818cf8',500:'#6366f1',600:'#4f46e5',700:'#4338ca',800:'#3730a3',900:'#312e81' }
+      },
+      fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+    }
+  }
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{font-family:'Inter',system-ui,sans-serif}
+  body{background:#f1f5f9}
+  ::-webkit-scrollbar{width:7px;height:7px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}
+  ::-webkit-scrollbar-thumb:hover{background:#94a3b8}
+  .sidebar-scroll::-webkit-scrollbar-thumb{background:#475569;border-radius:4px}
+  .fade-in{animation:fadeIn .3s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .slide-in{animation:slideIn .25s ease}
+  @keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+  .pulse-dot{animation:pulseDot 2s infinite}
+  @keyframes pulseDot{0%,100%{opacity:1}50%{opacity:.4}}
+  .card-hover{transition:all .2s ease}
+  .card-hover:hover{transform:translateY(-2px);box-shadow:0 8px 25px -5px rgba(0,0,0,.1)}
+  .toast-enter{animation:toastEnter .3s ease}
+  @keyframes toastEnter{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+  .skel{background:linear-gradient(90deg,#e2e8f0 25%,#f1f5f9 50%,#e2e8f0 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+  @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+  .nav-item.active{background:linear-gradient(90deg,rgba(99,102,241,.2),transparent);border-left:3px solid #818cf8;color:#fff}
+  .route-line{stroke-dasharray:5;animation:dash 1s linear infinite}
+  @keyframes dash{to{stroke-dashoffset:-10}}
+</style>
+</head>
+<body class="h-full">
+<div id="app"></div>
+<div id="toast-container" class="fixed top-4 right-4 z-[9999] space-y-2"></div></output>
