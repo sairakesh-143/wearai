@@ -103,66 +103,31 @@ const ZONES = [
 const SUPPLIERS = ['TechSource Inc','GlobalGoods Co','PrimeSupply Ltd','FastChain Trading','Metro Distributors','Excel Logistics'];
 const CARRIERS = ['FedEx Express','UPS Priority','DHL Worldwide','BlueDart Air','Shadowfax Quick'];
 
-const PRODUCT_DEFS = [
-  ['Wireless Headphones Pro','Electronics',89.99,'A',1,5,3],['Bluetooth Soundbar 360','Electronics',59.99,'A',1,7,2],
-  ['USB-C Braided Cable 6ft','Electronics',12.99,'A',2,3,1],['Laptop Stand Ergonomic','Electronics',45.00,'A',2,8,4],
-  ['Precision Wireless Mouse','Electronics',29.99,'A',3,2,5],['RGB Mechanical Keyboard','Electronics',129.99,'A',3,6,2],
-  ['4K Ultra HD Webcam','Electronics',79.99,'A',3,9,1],['Power Bank 25000mAh','Electronics',49.99,'A',4,4,3],
-  ['HDMI 2.1 Ultra High Speed','Electronics',18.99,'A',4,1,6],['Powered USB-C Hub 8-Port','Electronics',34.99,'A',4,5,4],
-  ['Dual Monitor Desk Mount','Electronics',89.00,'A',5,2,7],['Padded Laptop Sleeve 16"','Electronics',24.99,'A',5,7,1],
-  ['Active Noise Earbuds Pro','Electronics',149.99,'A',6,3,5],['Aluminum Tablet Stand','Electronics',35.00,'A',6,8,2],
-  ['Dimmable Smart Desk Lamp','Electronics',39.99,'A',7,1,4],['Cable Management Raceway','Electronics',14.99,'A',7,4,8],
-  ['Surge Protector 12-Outlet','Electronics',27.99,'A',8,2,6],['Tempered Screen Shield','Electronics',9.99,'A',8,5,3],
-  ['65W GaN Fast Charger','Electronics',22.99,'A',9,1,2],['Portable NVMe SSD 2TB','Electronics',119.99,'A',9,3,7],
-  ['Executive Notebook A5','Office Supplies',8.99,'B',1,2,1],['Gel Pen Smooth Set 12pc','Office Supplies',11.99,'B',1,5,3],
-  ['Heavy-Duty Metal Stapler','Office Supplies',16.99,'B',2,8,4],['Desktop Tape Dispenser','Office Supplies',7.49,'B',2,3,6],
-  ['Super Sticky Notes Pack','Office Supplies',6.99,'B',3,1,2],['Dry Erase Markers 12pc','Office Supplies',13.99,'B',3,7,5],
-  ['Archival File Storage Box','Office Supplies',4.99,'B',4,2,8],['Assorted Steel Binder Clips','Office Supplies',5.49,'B',4,6,1],
-  ['Scientific Graphing Tool','Office Supplies',24.99,'B',5,3,4],['Panoramic Desk Calendar 2026','Office Supplies',9.99,'B',5,8,7],
-  ['Pastel Chisel Highlighters','Office Supplies',4.49,'B',6,1,3],['Ruled Index Cards 200ct','Office Supplies',3.49,'B',6,5,8],
-  ['Smart LED Bulb E27 12W','Home & Living',6.99,'C',1,2,4],['Plush Linen Pillow Cover','Home & Living',19.99,'C',1,5,7],
-  ['Modern Minimalist Frame 8x10','Home & Living',14.99,'C',2,8,2],['Silent Quartz Wall Clock','Home & Living',26.99,'C',2,3,5],
-  ['Ceramic Geometric Planter','Home & Living',22.00,'C',3,1,8],['Egyptian Cotton Towel Set','Home & Living',34.99,'C',3,6,3],
-  ['Vacuum Insulated Flask 1L','Home & Living',18.99,'C',4,4,1],['Artisan Ceramic Mug Set','Home & Living',7.99,'C',4,9,6],
-  ['Brushless Impact Drill 20V','Tools',89.99,'D',1,2,3],['Magnetic Precision Driver Set','Tools',24.99,'D',1,5,7],
-  ['Wide Jaw Adjustable Wrench','Tools',14.99,'D',2,8,2],['Auto-Lock Measuring Tape 30ft','Tools',9.99,'D',2,3,5],
-  ['Modular Tool Box Organizer','Tools',39.99,'D',3,1,8],['Shockproof Claw Hammer','Tools',16.99,'D',3,6,4],
-  ['Heavy-Duty Plier Set 5pc','Tools',29.99,'D',4,2,1],['Magnetic Digital Laser Level','Tools',19.99,'D',4,7,6],
-  ['Auto-Retract Utility Knife','Tools',8.49,'D',5,3,4],['Anti-Fog Safety Glasses','Tools',5.99,'D',5,8,2]
+const PRODUCTS = [
+  { id: 1, sku: 'SKU-101', name: 'Wireless Headphones Pro', category: 'Electronics', price: 89.99, zone: 'A', shelf: 1, rack: 5, bin: 3, stock: 7, reserved: 7, reorderLevel: 25, reorderQty: 100, dailyDemand: 8, supplier: 'TechSource Inc', status: 'Critical Stock' },
+  { id: 2, sku: 'SKU-102', name: 'Ergonomic Laptop Stand', category: 'Electronics', price: 45.00, zone: 'A', shelf: 2, rack: 8, bin: 4, stock: 45, reserved: 0, reorderLevel: 15, reorderQty: 50, dailyDemand: 5, supplier: 'TechSource Inc', status: 'In Stock' },
+  { id: 3, sku: 'SKU-103', name: 'Precision Wireless Mouse', category: 'Electronics', price: 29.99, zone: 'A', shelf: 3, rack: 2, bin: 5, stock: 82, reserved: 0, reorderLevel: 20, reorderQty: 80, dailyDemand: 6, supplier: 'GlobalGoods Co', status: 'In Stock' },
+  { id: 4, sku: 'SKU-104', name: 'RGB Mechanical Keyboard', category: 'Electronics', price: 129.99, zone: 'A', shelf: 3, rack: 6, bin: 2, stock: 12, reserved: 0, reorderLevel: 15, reorderQty: 40, dailyDemand: 4, supplier: 'TechSource Inc', status: 'Low Stock' },
+  { id: 5, sku: 'SKU-105', name: '4K Ultra HD Webcam', category: 'Electronics', price: 79.99, zone: 'A', shelf: 3, rack: 9, bin: 1, stock: 28, reserved: 0, reorderLevel: 10, reorderQty: 30, dailyDemand: 3, supplier: 'PrimeSupply Ltd', status: 'In Stock' },
+  { id: 6, sku: 'SKU-106', name: 'Executive Notebook A5', category: 'Office Supplies', price: 8.99, zone: 'B', shelf: 1, rack: 2, bin: 1, stock: 140, reserved: 0, reorderLevel: 30, reorderQty: 150, dailyDemand: 12, supplier: 'FastChain Trading', status: 'In Stock' },
+  { id: 7, sku: 'SKU-107', name: 'Smooth Gel Pen Set (12pc)', category: 'Office Supplies', price: 11.99, zone: 'B', shelf: 1, rack: 5, bin: 3, stock: 210, reserved: 0, reorderLevel: 40, reorderQty: 200, dailyDemand: 18, supplier: 'FastChain Trading', status: 'In Stock' },
+  { id: 8, sku: 'SKU-108', name: 'Heavy-Duty Metal Stapler', category: 'Office Supplies', price: 16.99, zone: 'B', shelf: 2, rack: 8, bin: 4, stock: 35, reserved: 0, reorderLevel: 15, reorderQty: 50, dailyDemand: 4, supplier: 'Metro Distributors', status: 'In Stock' },
+  { id: 9, sku: 'SKU-109', name: 'Smart LED Bulb E27 12W', category: 'Home & Living', price: 6.99, zone: 'C', shelf: 1, rack: 2, bin: 4, stock: 175, reserved: 0, reorderLevel: 50, reorderQty: 200, dailyDemand: 15, supplier: 'GlobalGoods Co', status: 'In Stock' },
+  { id: 10, sku: 'SKU-110', name: 'Plush Linen Pillow Cover', category: 'Home & Living', price: 19.99, zone: 'C', shelf: 1, rack: 5, bin: 7, stock: 64, reserved: 0, reorderLevel: 20, reorderQty: 60, dailyDemand: 5, supplier: 'Excel Logistics', status: 'In Stock' },
+  { id: 11, sku: 'SKU-111', name: 'Vacuum Insulated Flask 1L', category: 'Home & Living', price: 18.99, zone: 'C', shelf: 4, rack: 4, bin: 1, stock: 4, reserved: 0, reorderLevel: 15, reorderQty: 50, dailyDemand: 3, supplier: 'PrimeSupply Ltd', status: 'Critical Stock' },
+  { id: 12, sku: 'SKU-112', name: 'Brushless Impact Drill 20V', category: 'Tools', price: 89.99, zone: 'D', shelf: 1, rack: 2, bin: 3, stock: 18, reserved: 0, reorderLevel: 10, reorderQty: 30, dailyDemand: 2, supplier: 'TechSource Inc', status: 'In Stock' },
+  { id: 13, sku: 'SKU-113', name: 'Magnetic Precision Driver Set', category: 'Tools', price: 24.99, zone: 'D', shelf: 1, rack: 5, bin: 7, stock: 52, reserved: 0, reorderLevel: 15, reorderQty: 40, dailyDemand: 3, supplier: 'Metro Distributors', status: 'In Stock' },
+  { id: 14, sku: 'SKU-114', name: 'Auto-Lock Measuring Tape 30ft', category: 'Tools', price: 9.99, zone: 'D', shelf: 2, rack: 3, bin: 5, stock: 0, reserved: 0, reorderLevel: 20, reorderQty: 80, dailyDemand: 6, supplier: 'Metro Distributors', status: 'Out of Stock' },
+  { id: 15, sku: 'SKU-115', name: 'Modular Tool Box Organizer', category: 'Tools', price: 39.99, zone: 'D', shelf: 3, rack: 1, bin: 8, stock: 26, reserved: 0, reorderLevel: 10, reorderQty: 30, dailyDemand: 2, supplier: 'Excel Logistics', status: 'In Stock' }
 ];
-
-const PRODUCTS = PRODUCT_DEFS.map((p,i)=>{
-  const sku = `SKU-${String(101+i).padStart(3,'0')}`;
-  const stockLevels = i===0 ? 7 : Math.random()>0.85 ? 0 : Math.floor(Math.random()*180)+8;
-  const reorderLevel = 25;
-  const reorderQty = 100;
-  let status = 'In Stock';
-  if(stockLevels===0) status='Out of Stock';
-  else if(stockLevels<=10) status='Critical Stock';
-  else if(stockLevels<=reorderLevel) status='Low Stock';
-  return {
-    id: i+1, sku, name: p[0], category: p[1], price: p[2],
-    zone: p[3], shelf: p[4], rack: p[5], bin: p[6],
-    stock: stockLevels, reserved: i===0?7:0, reorderLevel, reorderQty,
-    dailyDemand: Math.floor(Math.random()*12)+3, supplier: SUPPLIERS[i%SUPPLIERS.length],
-    status, lastAudited: new Date(Date.now() - Math.floor(Math.random()*72)*3600000)
-  };
-});
-
-PRODUCTS[0].stock = 7;
-PRODUCTS[0].status = 'Critical Stock';
 
 const CUSTOMERS = [
   {name:'TechCorp Industries',tier:'VIP',email:'procurement@techcorp.com'},
   {name:'RetailCo Stores',tier:'Regular',email:'orders@retailco.com'},
   {name:'PrimeMart Chain',tier:'VIP',email:'supply@primemart.com'},
   {name:'CityTech Solutions',tier:'Premium',email:'buy@citytech.io'},
-  {name:'GlobalTrade Inc',tier:'Regular',email:'purchase@globaltrade.com'},
   {name:'NextGen Retail',tier:'Premium',email:'ops@nextgen.com'},
-  {name:'MetroElectronics',tier:'VIP',email:'orders@metroe.com'},
-  {name:'QuickShip Commerce',tier:'Regular',email:'buy@quickship.com'},
-  {name:'ValueBuy Group',tier:'Premium',email:'procurement@valuebuy.com'},
-  {name:'ApexTraders',tier:'Regular',email:'sales@apextraders.com'}
+  {name:'MetroElectronics',tier:'VIP',email:'orders@metroe.com'}
 ];
 
 const EMPLOYEES = [
@@ -171,60 +136,65 @@ const EMPLOYEES = [
   {id:3,name:'Arjun Mehta',role:'staff',email:'arjun@wearai.io',avatar:'AM',zone:'A'},
   {id:4,name:'Priya Nair',role:'staff',email:'priya@wearai.io',avatar:'PN',zone:'B'},
   {id:5,name:'Rohan Das',role:'staff',email:'rohan@wearai.io',avatar:'RD',zone:'C'},
-  {id:6,name:'Sneha Reddy',role:'staff',email:'sneha@wearai.io',avatar:'SR',zone:'D'},
-  {id:7,name:'Karthik Iyer',role:'staff',email:'karthik@wearai.io',avatar:'KI',zone:'A'},
-  {id:8,name:'Divya Joshi',role:'staff',email:'divya@wearai.io',avatar:'DJ',zone:'B'}
+  {id:6,name:'Sneha Reddy',role:'staff',email:'sneha@wearai.io',avatar:'SR',zone:'D'}
 ];
 
 const SHIP_METHODS = ['Express','Standard','Same-Day','Economy'];
 const ORDER_STATUSES = ['New','Confirmed','Allocated','Partially Allocated','Picking','Picked','Packing','Quality Check','Ready for Dispatch','Dispatched','Delivered'];
 
-function genOrders(){
-  const orders = [];
-  orders.push({
-    id:'ORD-1001', customer:'TechCorp Industries', customerTier:'VIP',
-    items:[{sku:'SKU-101',name:'Wireless Headphones Pro',qty:10,price:89.99,zone:'A',shelf:1,rack:5,bin:3}],
-    total:899.90, date:new Date(Date.now()-3*3600000), deadline:new Date(Date.now()+2*3600000),
-    shipMethod:'Express', warehouse:'WH-01', status:'New', picker:null, packer:null,
-    exceptionStatus:'None', createdAt:new Date(Date.now()-3*3600000)
-  });
-  orders.push({
-    id:'ORD-1002', customer:'RetailCo Stores', customerTier:'Regular',
-    items:[{sku:'SKU-101',name:'Wireless Headphones Pro',qty:5,price:89.99,zone:'A',shelf:1,rack:5,bin:3}],
-    total:449.95, date:new Date(Date.now()-5*3600000), deadline:new Date(Date.now()+5*24*3600000),
-    shipMethod:'Standard', warehouse:'WH-01', status:'New', picker:null, packer:null,
-    exceptionStatus:'None', createdAt:new Date(Date.now()-5*3600000)
-  });
-
-  for(let i=3;i<=32;i++){
-    const cust = CUSTOMERS[Math.floor(Math.random()*CUSTOMERS.length)];
-    const itemCount = Math.floor(Math.random()*3)+1;
-    const items = [];
-    for(let j=0;j<itemCount;j++){
-      const p = PRODUCTS[Math.floor(Math.random()*PRODUCTS.length)];
-      const qty = Math.floor(Math.random()*6)+1;
-      items.push({sku:p.sku,name:p.name,qty,price:p.price,zone:p.zone,shelf:p.shelf,rack:p.rack,bin:p.bin});
-    }
-    const total = items.reduce((s,it)=>s+it.qty*it.price,0);
-    const statusIdx = Math.floor(Math.random()*ORDER_STATUSES.length);
-    const status = ORDER_STATUSES[statusIdx];
-    const deadline = new Date(Date.now()+(Math.floor(Math.random()*6)-1)*24*3600000);
-    const date = new Date(Date.now()-Math.floor(Math.random()*48)*3600000);
-    const picker = statusIdx>=4 && statusIdx<=6 ? EMPLOYEES[2+Math.floor(Math.random()*4)].name : null;
-    const packer = statusIdx>=6 && statusIdx<=8 ? EMPLOYEES[2+Math.floor(Math.random()*4)].name : null;
-    const hasException = Math.random()>0.82;
-    const excType = hasException ? ['Missing Item','Damaged Item','Insufficient Stock','Delayed Picking','Quality Check Failure'][Math.floor(Math.random()*5)] : 'None';
-    orders.push({
-      id:`ORD-${1000+i}`, customer:cust.name, customerTier:cust.tier, items, total,
-      date, deadline, shipMethod:SHIP_METHODS[Math.floor(Math.random()*SHIP_METHODS.length)],
-      warehouse:`WH-0${Math.floor(Math.random()*3)+1}`, status, picker, packer,
-      exceptionStatus:excType, createdAt:date
-    });
+const ORDERS = [
+  {
+    id: 'ORD-1001', customer: 'TechCorp Industries', customerTier: 'VIP',
+    items: [{ sku: 'SKU-101', name: 'Wireless Headphones Pro', qty: 10, price: 89.99, zone: 'A', shelf: 1, rack: 5, bin: 3 }],
+    total: 899.90, date: new Date(Date.now() - 3*3600000), deadline: new Date(Date.now() + 2*3600000),
+    shipMethod: 'Express', warehouse: 'WH-01', status: 'New', picker: null, packer: null,
+    exceptionStatus: 'None', createdAt: new Date(Date.now() - 3*3600000)
+  },
+  {
+    id: 'ORD-1002', customer: 'RetailCo Stores', customerTier: 'Regular',
+    items: [{ sku: 'SKU-101', name: 'Wireless Headphones Pro', qty: 5, price: 89.99, zone: 'A', shelf: 1, rack: 5, bin: 3 }],
+    total: 449.95, date: new Date(Date.now() - 5*3600000), deadline: new Date(Date.now() + 5*24*3600000),
+    shipMethod: 'Standard', warehouse: 'WH-01', status: 'New', picker: null, packer: null,
+    exceptionStatus: 'None', createdAt: new Date(Date.now() - 5*3600000)
+  },
+  {
+    id: 'ORD-1003', customer: 'PrimeMart Chain', customerTier: 'VIP',
+    items: [
+      { sku: 'SKU-104', name: 'RGB Mechanical Keyboard', qty: 2, price: 129.99, zone: 'A', shelf: 3, rack: 6, bin: 2 },
+      { sku: 'SKU-105', name: '4K Ultra HD Webcam', qty: 1, price: 79.99, zone: 'A', shelf: 3, rack: 9, bin: 1 }
+    ],
+    total: 339.97, date: new Date(Date.now() - 6*3600000), deadline: new Date(Date.now() + 24*3600000),
+    shipMethod: 'Express', warehouse: 'WH-01', status: 'Allocated', picker: null, packer: null,
+    exceptionStatus: 'None', createdAt: new Date(Date.now() - 6*3600000)
+  },
+  {
+    id: 'ORD-1004', customer: 'CityTech Solutions', customerTier: 'Premium',
+    items: [
+      { sku: 'SKU-102', name: 'Ergonomic Laptop Stand', qty: 4, price: 45.00, zone: 'A', shelf: 2, rack: 8, bin: 4 },
+      { sku: 'SKU-103', name: 'Precision Wireless Mouse', qty: 2, price: 29.99, zone: 'A', shelf: 3, rack: 2, bin: 5 }
+    ],
+    total: 239.98, date: new Date(Date.now() - 8*3600000), deadline: new Date(Date.now() + 18*3600000),
+    shipMethod: 'Same-Day', warehouse: 'WH-01', status: 'Picking', picker: 'Arjun Mehta', packer: null,
+    exceptionStatus: 'None', createdAt: new Date(Date.now() - 8*3600000)
+  },
+  {
+    id: 'ORD-1005', customer: 'NextGen Retail', customerTier: 'Premium',
+    items: [
+      { sku: 'SKU-106', name: 'Executive Notebook A5', qty: 10, price: 8.99, zone: 'B', shelf: 1, rack: 2, bin: 1 },
+      { sku: 'SKU-107', name: 'Smooth Gel Pen Set (12pc)', qty: 5, price: 11.99, zone: 'B', shelf: 1, rack: 5, bin: 3 }
+    ],
+    total: 149.85, date: new Date(Date.now() - 12*3600000), deadline: new Date(Date.now() + 48*3600000),
+    shipMethod: 'Standard', warehouse: 'WH-01', status: 'Ready for Dispatch', picker: 'Priya Nair', packer: 'Priya Nair',
+    exceptionStatus: 'None', createdAt: new Date(Date.now() - 12*3600000)
+  },
+  {
+    id: 'ORD-1006', customer: 'MetroElectronics', customerTier: 'VIP',
+    items: [{ sku: 'SKU-112', name: 'Brushless Impact Drill 20V', qty: 3, price: 89.99, zone: 'D', shelf: 1, rack: 2, bin: 3 }],
+    total: 269.97, date: new Date(Date.now() - 14*3600000), deadline: new Date(Date.now() + 12*3600000),
+    shipMethod: 'Express', warehouse: 'WH-01', status: 'Dispatched', picker: 'Arjun Mehta', packer: 'Vikram Patel',
+    exceptionStatus: 'None', createdAt: new Date(Date.now() - 14*3600000)
   }
-  return orders;
-}
-
-const ORDERS = genOrders();
+];
 
 const EXCEPTIONS = [
   {id:'EX-101',type:'Insufficient Stock',order:'ORD-1001',sku:'SKU-101',severity:'Critical',status:'Open',created:new Date(Date.now()-30*60000),assigned:'Vikram Patel',recommendation:'Allocate available 7 units to ORD-1001 (Critical priority). Reserve remaining 3 units. Generate reorder for 100 units.'},

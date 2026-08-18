@@ -236,76 +236,78 @@ def seed_database():
     users_col.insert_many(users_data)
 
     # Products
-    categories = ['Electronics','Office Supplies','Home & Living','Tools']
-    zones = ['A','B','C','D']
-    suppliers = ['TechSource Inc','GlobalGoods Co','PrimeSupply Ltd']
-    
-    products_data = []
-    for i in range(50):
-        sku = f"SKU-{101+i}"
-        stock = 7 if i == 2 else random.choice([0, 5, 12, 15, 50, 100, 150])
-        reorder_level = 25
-        status = "In Stock"
-        if stock == 0: status = "Out of Stock"
-        elif stock <= 10: status = "Critical Stock"
-        elif stock <= reorder_level: status = "Low Stock"
-        
-        products_data.append({
-            "id": i+1, "sku": sku, "name": f"Product {i+1}",
-            "category": categories[i % 4], "price": round(random.uniform(10, 150), 2),
-            "zone": zones[i % 4], "shelf": random.randint(1,9), "rack": random.randint(1,9), "bin": random.randint(1,8),
-            "stock": stock, "reserved": 0, "reorderLevel": reorder_level, "reorderQty": 100,
-            "dailyDemand": random.randint(2, 15), "supplier": suppliers[i % 3], "status": status
-        })
+    products_data = [
+        {"id": 1, "sku": "SKU-101", "name": "Wireless Headphones Pro", "category": "Electronics", "price": 89.99, "zone": "A", "shelf": 1, "rack": 5, "bin": 3, "stock": 7, "reserved": 7, "reorderLevel": 25, "reorderQty": 100, "dailyDemand": 8, "supplier": "TechSource Inc", "status": "Critical Stock"},
+        {"id": 2, "sku": "SKU-102", "name": "Ergonomic Laptop Stand", "category": "Electronics", "price": 45.00, "zone": "A", "shelf": 2, "rack": 8, "bin": 4, "stock": 45, "reserved": 0, "reorderLevel": 15, "reorderQty": 50, "dailyDemand": 5, "supplier": "TechSource Inc", "status": "In Stock"},
+        {"id": 3, "sku": "SKU-103", "name": "Precision Wireless Mouse", "category": "Electronics", "price": 29.99, "zone": "A", "shelf": 3, "rack": 2, "bin": 5, "stock": 82, "reserved": 0, "reorderLevel": 20, "reorderQty": 80, "dailyDemand": 6, "supplier": "GlobalGoods Co", "status": "In Stock"},
+        {"id": 4, "sku": "SKU-104", "name": "RGB Mechanical Keyboard", "category": "Electronics", "price": 129.99, "zone": "A", "shelf": 3, "rack": 6, "bin": 2, "stock": 12, "reserved": 0, "reorderLevel": 15, "reorderQty": 40, "dailyDemand": 4, "supplier": "TechSource Inc", "status": "Low Stock"},
+        {"id": 5, "sku": "SKU-105", "name": "4K Ultra HD Webcam", "category": "Electronics", "price": 79.99, "zone": "A", "shelf": 3, "rack": 9, "bin": 1, "stock": 28, "reserved": 0, "reorderLevel": 10, "reorderQty": 30, "dailyDemand": 3, "supplier": "PrimeSupply Ltd", "status": "In Stock"},
+        {"id": 6, "sku": "SKU-106", "name": "Executive Notebook A5", "category": "Office Supplies", "price": 8.99, "zone": "B", "shelf": 1, "rack": 2, "bin": 1, "stock": 140, "reserved": 0, "reorderLevel": 30, "reorderQty": 150, "dailyDemand": 12, "supplier": "FastChain Trading", "status": "In Stock"},
+        {"id": 7, "sku": "SKU-107", "name": "Smooth Gel Pen Set (12pc)", "category": "Office Supplies", "price": 11.99, "zone": "B", "shelf": 1, "rack": 5, "bin": 3, "stock": 210, "reserved": 0, "reorderLevel": 40, "reorderQty": 200, "dailyDemand": 18, "supplier": "FastChain Trading", "status": "In Stock"},
+        {"id": 8, "sku": "SKU-108", "name": "Heavy-Duty Metal Stapler", "category": "Office Supplies", "price": 16.99, "zone": "B", "shelf": 2, "rack": 8, "bin": 4, "stock": 35, "reserved": 0, "reorderLevel": 15, "reorderQty": 50, "dailyDemand": 4, "supplier": "Metro Distributors", "status": "In Stock"},
+        {"id": 9, "sku": "SKU-109", "name": "Smart LED Bulb E27 12W", "category": "Home & Living", "price": 6.99, "zone": "C", "shelf": 1, "rack": 2, "bin": 4, "stock": 175, "reserved": 0, "reorderLevel": 50, "reorderQty": 200, "dailyDemand": 15, "supplier": "GlobalGoods Co", "status": "In Stock"},
+        {"id": 10, "sku": "SKU-110", "name": "Plush Linen Pillow Cover", "category": "Home & Living", "price": 19.99, "zone": "C", "shelf": 1, "rack": 5, "bin": 7, "stock": 64, "reserved": 0, "reorderLevel": 20, "reorderQty": 60, "dailyDemand": 5, "supplier": "Excel Logistics", "status": "In Stock"},
+        {"id": 11, "sku": "SKU-111", "name": "Vacuum Insulated Flask 1L", "category": "Home & Living", "price": 18.99, "zone": "C", "shelf": 4, "rack": 4, "bin": 1, "stock": 4, "reserved": 0, "reorderLevel": 15, "reorderQty": 50, "dailyDemand": 3, "supplier": "PrimeSupply Ltd", "status": "Critical Stock"},
+        {"id": 12, "sku": "SKU-112", "name": "Brushless Impact Drill 20V", "category": "Tools", "price": 89.99, "zone": "D", "shelf": 1, "rack": 2, "bin": 3, "stock": 18, "reserved": 0, "reorderLevel": 10, "reorderQty": 30, "dailyDemand": 2, "supplier": "TechSource Inc", "status": "In Stock"},
+        {"id": 13, "sku": "SKU-113", "name": "Magnetic Precision Driver Set", "category": "Tools", "price": 24.99, "zone": "D", "shelf": 1, "rack": 5, "bin": 7, "stock": 52, "reserved": 0, "reorderLevel": 15, "reorderQty": 40, "dailyDemand": 3, "supplier": "Metro Distributors", "status": "In Stock"},
+        {"id": 14, "sku": "SKU-114", "name": "Auto-Lock Measuring Tape 30ft", "category": "Tools", "price": 9.99, "zone": "D", "shelf": 2, "rack": 3, "bin": 5, "stock": 0, "reserved": 0, "reorderLevel": 20, "reorderQty": 80, "dailyDemand": 6, "supplier": "Metro Distributors", "status": "Out of Stock"},
+        {"id": 15, "sku": "SKU-115", "name": "Modular Tool Box Organizer", "category": "Tools", "price": 39.99, "zone": "D", "shelf": 3, "rack": 1, "bin": 8, "stock": 26, "reserved": 0, "reorderLevel": 10, "reorderQty": 30, "dailyDemand": 2, "supplier": "Excel Logistics", "status": "In Stock"}
+    ]
     products_col.insert_many(products_data)
 
     # Orders
-    customers = [
-        {"name":"TechCorp Industries","tier":"VIP"},{"name":"RetailCo Stores","tier":"Regular"},
-        {"name":"PrimeMart Chain","tier":"VIP"},{"name":"CityTech Solutions","tier":"Premium"}
+    orders_data = [
+        {
+            "id": "ORD-1001", "customer": "TechCorp Industries", "customerTier": "VIP",
+            "items": [{"sku": "SKU-101", "name": "Wireless Headphones Pro", "qty": 10, "price": 89.99, "zone": "A", "shelf": 1, "rack": 5, "bin": 3}],
+            "total": 899.90, "date": datetime.utcnow()-timedelta(hours=3), "deadline": datetime.utcnow()+timedelta(hours=2),
+            "shipMethod": "Express", "warehouse": "WH-01", "status": "New", "picker": None, "packer": None, "exceptionStatus": "None"
+        },
+        {
+            "id": "ORD-1002", "customer": "RetailCo Stores", "customerTier": "Regular",
+            "items": [{"sku": "SKU-101", "name": "Wireless Headphones Pro", "qty": 5, "price": 89.99, "zone": "A", "shelf": 1, "rack": 5, "bin": 3}],
+            "total": 449.95, "date": datetime.utcnow()-timedelta(hours=5), "deadline": datetime.utcnow()+timedelta(days=5),
+            "shipMethod": "Standard", "warehouse": "WH-01", "status": "New", "picker": None, "packer": None, "exceptionStatus": "None"
+        },
+        {
+            "id": "ORD-1003", "customer": "PrimeMart Chain", "customerTier": "VIP",
+            "items": [
+                {"sku": "SKU-104", "name": "RGB Mechanical Keyboard", "qty": 2, "price": 129.99, "zone": "A", "shelf": 3, "rack": 6, "bin": 2},
+                {"sku": "SKU-105", "name": "4K Ultra HD Webcam", "qty": 1, "price": 79.99, "zone": "A", "shelf": 3, "rack": 9, "bin": 1}
+            ],
+            "total": 339.97, "date": datetime.utcnow()-timedelta(hours=6), "deadline": datetime.utcnow()+timedelta(days=1),
+            "shipMethod": "Express", "warehouse": "WH-01", "status": "Allocated", "picker": None, "packer": None, "exceptionStatus": "None"
+        },
+        {
+            "id": "ORD-1004", "customer": "CityTech Solutions", "customerTier": "Premium",
+            "items": [
+                {"sku": "SKU-102", "name": "Ergonomic Laptop Stand", "qty": 4, "price": 45.00, "zone": "A", "shelf": 2, "rack": 8, "bin": 4},
+                {"sku": "SKU-103", "name": "Precision Wireless Mouse", "qty": 2, "price": 29.99, "zone": "A", "shelf": 3, "rack": 2, "bin": 5}
+            ],
+            "total": 239.98, "date": datetime.utcnow()-timedelta(hours=8), "deadline": datetime.utcnow()+timedelta(hours=18),
+            "shipMethod": "Same-Day", "warehouse": "WH-01", "status": "Picking", "picker": "Arjun Mehta", "packer": None, "exceptionStatus": "None"
+        },
+        {
+            "id": "ORD-1005", "customer": "NextGen Retail", "customerTier": "Premium",
+            "items": [
+                {"sku": "SKU-106", "name": "Executive Notebook A5", "qty": 10, "price": 8.99, "zone": "B", "shelf": 1, "rack": 2, "bin": 1},
+                {"sku": "SKU-107", "name": "Smooth Gel Pen Set (12pc)", "qty": 5, "price": 11.99, "zone": "B", "shelf": 1, "rack": 5, "bin": 3}
+            ],
+            "total": 149.85, "date": datetime.utcnow()-timedelta(hours=12), "deadline": datetime.utcnow()+timedelta(days=2),
+            "shipMethod": "Standard", "warehouse": "WH-01", "status": "Ready for Dispatch", "picker": "Priya Nair", "packer": "Priya Nair", "exceptionStatus": "None"
+        },
+        {
+            "id": "ORD-1006", "customer": "MetroElectronics", "customerTier": "VIP",
+            "items": [{"sku": "SKU-112", "name": "Brushless Impact Drill 20V", "qty": 3, "price": 89.99, "zone": "D", "shelf": 1, "rack": 2, "bin": 3}],
+            "total": 269.97, "date": datetime.utcnow()-timedelta(hours=14), "deadline": datetime.utcnow()+timedelta(hours=12),
+            "shipMethod": "Express", "warehouse": "WH-01", "status": "Dispatched", "picker": "Arjun Mehta", "packer": "Vikram Patel", "exceptionStatus": "None"
+        }
     ]
-    ship_methods = ['Express','Standard','Same-Day','Economy']
-    order_statuses = ['New','Confirmed','Picking','Packing','Quality Check','Ready for Dispatch','Dispatched']
-    
-    orders_data = []
-    # Specific demo scenario order 1
-    orders_data.append({
-        "id":"ORD-1001","customer":"TechCorp Industries","customerTier":"VIP",
-        "items":[{"sku":"SKU-103","name":"Wireless Headphones Pro","qty":10,"price":89.99,"zone":"A","shelf":1,"rack":5,"bin":3}],
-        "total":899.90,"date":datetime.utcnow()-timedelta(hours=3),"deadline":datetime.utcnow()+timedelta(hours=2),
-        "shipMethod":"Express","warehouse":"WH-01","status":"New","picker":None,"packer":None,"exceptionStatus":"None"
-    })
-    # Specific demo scenario order 2
-    orders_data.append({
-        "id":"ORD-1002","customer":"RetailCo Stores","customerTier":"Regular",
-        "items":[{"sku":"SKU-103","name":"Wireless Headphones Pro","qty":5,"price":89.99,"zone":"A","shelf":1,"rack":5,"bin":3}],
-        "total":449.95,"date":datetime.utcnow()-timedelta(hours=5),"deadline":datetime.utcnow()+timedelta(days=5),
-        "shipMethod":"Standard","warehouse":"WH-01","status":"New","picker":None,"packer":None,"exceptionStatus":"None"
-    })
-    
-    for i in range(3, 31):
-        items = []
-        for _ in range(random.randint(1,4)):
-            p = random.choice(products_data)
-            qty = random.randint(1,8)
-            items.append({"sku":p["sku"],"name":p["name"],"qty":qty,"price":p["price"],"zone":p["zone"],"shelf":p["shelf"],"rack":p["rack"],"bin":p["bin"]})
-        
-        total = sum(it["qty"]*it["price"] for it in items)
-        cust = random.choice(customers)
-        status = random.choice(order_statuses)
-        
-        orders_data.append({
-            "id":f"ORD-{1000+i}","customer":cust["name"],"customerTier":cust["tier"],
-            "items":items,"total":total,"date":datetime.utcnow()-timedelta(hours=random.randint(1,48)),
-            "deadline":datetime.utcnow()+timedelta(days=random.randint(-1,7)),
-            "shipMethod":random.choice(ship_methods),"warehouse":"WH-01",
-            "status":status,"picker":None,"packer":None,"exceptionStatus": "None"
-        })
     orders_col.insert_many(orders_data)
 
     # Exceptions
     exceptions_col.insert_many([
-        {"id":"EX-101","type":"Insufficient Stock","order":"ORD-1001","sku":"SKU-103","severity":"Critical","status":"Open","created":datetime.utcnow()-timedelta(minutes=30),"assigned":"Vikram Patel","recommendation":"Allocate available 7 units to ORD-1001 (Critical priority)."}
+        {"id": "EX-101", "type": "Insufficient Stock", "order": "ORD-1001", "sku": "SKU-101", "severity": "Critical", "status": "Open", "created": datetime.utcnow()-timedelta(minutes=30), "assigned": "Vikram Patel", "recommendation": "Allocate available 7 units to ORD-1001 (Critical priority)."}
     ])
     
     print("Seeding complete!")
