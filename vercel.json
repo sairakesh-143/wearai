@@ -23,6 +23,6 @@
   "env": {
     "MONGO_URI": "@mongo_uri",
     "SECRET_KEY": "@secret_key",
-    "DB_NAME": "smart_wms"
+    "DB_NAME": "wearai_db"
   }
 }

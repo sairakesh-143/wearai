@@ -16,9 +16,9 @@ from fastapi.responses import FileResponse
 import uuid
 
 # ==================== CONFIG ====================
-MONGO_URI = "mongodb://localhost:27017/"
-DB_NAME = "smart_wms"
-SECRET_KEY = "your-super-secret-jwt-key-change-in-production"
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
+DB_NAME = os.getenv("DB_NAME", "wearai_db")
+SECRET_KEY = os.getenv("SECRET_KEY", "wearai-super-secret-jwt-key-sai-rakesh")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 1440
 
@@ -228,10 +228,10 @@ def seed_database():
     
     # Users
     users_data = [
-        {"id":"1","name":"Ramya Sharma","role":"admin","email":"ramya@smartwms.io","password":get_password_hash("demo1234"),"avatar":"RS","zone":"All"},
-        {"id":"2","name":"Vikram Patel","role":"manager","email":"vikram@smartwms.io","password":get_password_hash("demo1234"),"avatar":"VP","zone":"All"},
-        {"id":"3","name":"Arjun Mehta","role":"staff","email":"arjun@smartwms.io","password":get_password_hash("demo1234"),"avatar":"AM","zone":"A"},
-        {"id":"4","name":"Priya Nair","role":"staff","email":"priya@smartwms.io","password":get_password_hash("demo1234"),"avatar":"PN","zone":"B"}
+        {"id":"1","name":"Sai Rakesh","role":"admin","email":"rakesh@wearai.io","password":get_password_hash("demo1234"),"avatar":"SR","zone":"All"},
+        {"id":"2","name":"Vikram Patel","role":"manager","email":"vikram@wearai.io","password":get_password_hash("demo1234"),"avatar":"VP","zone":"All"},
+        {"id":"3","name":"Arjun Mehta","role":"staff","email":"arjun@wearai.io","password":get_password_hash("demo1234"),"avatar":"AM","zone":"A"},
+        {"id":"4","name":"Priya Nair","role":"staff","email":"priya@wearai.io","password":get_password_hash("demo1234"),"avatar":"PN","zone":"B"}
     ]
     users_col.insert_many(users_data)
 
@@ -312,7 +312,11 @@ def seed_database():
 
 
 # ==================== FASTAPI APP ====================
-app = FastAPI(title="SmartWMS API")
+app = FastAPI(
+    title="WearAI API",
+    description="Intelligent AI Warehouse Operations & Optimization Platform - Developed by Sai Rakesh (@sairakesh-143)",
+    version="2.4.0"
+)
 
 app.add_middleware(
     CORSMiddleware,

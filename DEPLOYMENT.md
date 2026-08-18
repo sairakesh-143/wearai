@@ -1,130 +1,74 @@
-# SmartWMS Vercel Deployment Guide
+# 🚀 WearAI — Deployment Guide
 
-## Prerequisites
-- GitHub account with your repository pushed
-- Vercel account (free at https://vercel.com)
-- MongoDB Atlas account (for cloud database)
+Guide for deploying **WearAI** (Intelligent Warehouse Operations Platform) to Vercel and MongoDB Atlas.
 
-## Step-by-Step Deployment
+---
 
-### 1. **Prepare Your Repository**
-✅ Project structure is already set up:
+## 📋 Prerequisites
+- **GitHub Repository**: [sairakesh-143/wearai](https://github.com/sairakesh-143/wearai)
+- **Vercel Account**: [vercel.com](https://vercel.com) (Free tier supported)
+- **MongoDB Atlas Cluster**: [mongodb.com/cloud/atlas](https://www.mongodb.com/cloud/atlas)
+
+---
+
+## 🏗️ Architecture on Vercel
+
 ```
-SmartWMS/
+wearai/
 ├── api/
-│   ├── index.py (FastAPI backend)
-│   └── requirements.txt
+│   └── index.py        # Serverless backend (FastAPI)
 ├── public/
-│   └── index.html (Frontend)
-├── vercel.json (Configuration)
-├── .env.example (Environment variables template)
-└── .gitignore
+│   └── index.html      # Static Single-Page App (SPA)
+├── requirements.txt    # Python packages
+└── vercel.json         # Route mappings & build config
 ```
 
-### 2. **Push to GitHub**
+---
+
+## 📦 Step-by-Step Deployment
+
+### 1. Push Latest Code to GitHub
 ```powershell
-cd C:\Users\grand\OneDrive\Desktop\SmartWMS
 git add .
-git commit -m "Set up for Vercel deployment"
+git commit -m "Update project branding to WearAI by Sai Rakesh"
 git push origin main
 ```
 
-### 3. **Set Up MongoDB Atlas (if not already done)**
-1. Go to https://www.mongodb.com/cloud/atlas
-2. Create a free cluster
-3. Create a database user
-4. Get your connection string (looks like: `mongodb+srv://user:password@cluster.mongodb.net/?retryWrites=true&w=majority`)
-5. Note this down - you'll need it for Vercel
+### 2. Set Up MongoDB Atlas
+1. Sign in to [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
+2. Create a free shared cluster (e.g. M0 tier).
+3. Under **Database Access**, create a user (e.g. `wearai_admin`).
+4. Under **Network Access**, add IP `0.0.0.0/0` (allow all incoming traffic for serverless functions).
+5. Copy your connection string:
+   ```
+   mongodb+srv://wearai_admin:<password>@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority
+   ```
 
-### 4. **Deploy to Vercel**
+### 3. Deploy on Vercel
+1. Go to [vercel.com/new](https://vercel.com/new).
+2. Import the `sairakesh-143/wearai` repository.
+3. In the **Environment Variables** section, add:
 
-#### Option A: Using Vercel Dashboard (Recommended)
-1. Go to https://vercel.com/new
-2. Click "Import Git Repository"
-3. Select your GitHub repository
-4. Vercel auto-detects the configuration from `vercel.json`
-5. Click "Environment Variables"
-6. Add these variables:
-   - **MONGO_URI**: Your MongoDB connection string
-   - **SECRET_KEY**: A secure random key (generate one)
-   - **DB_NAME**: `smart_wms`
+| Variable Name | Description | Example Value |
+|---|---|---|
+| `MONGO_URI` | MongoDB Atlas Connection String | `mongodb+srv://...` |
+| `DB_NAME` | Database Name | `wearai_db` |
+| `SECRET_KEY` | JWT Secret Key | `wearai-production-secret-key-2026` |
+| `ALGORITHM` | Algorithm | `HS256` |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | Token Lifetime | `1440` |
 
-7. Click "Deploy" ✅
+4. Click **Deploy**.
 
-#### Option B: Using Vercel CLI
-```powershell
-# Install Vercel CLI (if not already installed)
-npm install -g vercel
+---
 
-# Login to Vercel
-vercel login
+## 🔍 Verification
 
-# Deploy
-vercel --prod
+Once deployed:
+- **Web App**: `https://<your-app>.vercel.app`
+- **Swagger Docs**: `https://<your-app>.vercel.app/docs`
+- **Health Check**: `https://<your-app>.vercel.app/api/health`
 
-# When prompted, add environment variables:
-# - MONGO_URI
-# - SECRET_KEY
-```
+---
 
-### 5. **Environment Variables Setup in Vercel Dashboard**
-
-1. Go to your project settings
-2. Navigate to "Settings" → "Environment Variables"
-3. Add:
-
-| Variable | Value | Example |
-|----------|-------|---------|
-| `MONGO_URI` | Your MongoDB connection string | `mongodb+srv://user:pass@cluster.mongodb.net/?retryWrites=true&w=majority` |
-| `SECRET_KEY` | A strong random string | Generate with: `openssl rand -hex 32` |
-| `DB_NAME` | Database name | `smart_wms` |
-| `ALGORITHM` | JWT algorithm | `HS256` |
-| `ACCESS_TOKEN_EXPIRE_MINUTES` | Token expiry | `1440` |
-
-### 6. **Verify Your Deployment**
-
-After deployment completes:
-1. Your site is live at: `https://your-project-name.vercel.app`
-2. Check API health: `https://your-project-name.vercel.app/api/health`
-3. Check frontend: `https://your-project-name.vercel.app`
-
-### 7. **Troubleshooting**
-
-**Issue**: "Build failed"
-- Check that all dependencies in `api/requirements.txt` are correct
-- Ensure `api/index.py` exists with FastAPI app
-
-**Issue**: "API endpoints not working"
-- Verify `MONGO_URI` is correct and database is accessible
-- Check environment variables are set in Vercel dashboard
-
-**Issue**: "Module not found"
-- Ensure `requirements.txt` is in the `api/` folder
-- Restart deployment after fixing
-
-### 8. **Update Code**
-Simply push changes to GitHub, and Vercel auto-deploys:
-```powershell
-git add .
-git commit -m "Your changes"
-git push origin main
-```
-
-## Important Notes
-- ⚠️ Never commit `.env` files to Git (it's in `.gitignore`)
-- 🔐 Keep `SECRET_KEY` secret - use strong random strings
-- 📝 Check `.env.example` for all required variables
-- 🔄 Deployments auto-trigger on push to main branch
-
-## API Base URL
-Update your frontend API calls to use:
-```javascript
-const API_URL = process.env.NODE_ENV === 'production' 
-  ? '/api' 
-  : 'http://localhost:8000/api';
-```
-
-## Need Help?
-- Vercel Docs: https://vercel.com/docs
-- FastAPI Docs: https://fastapi.tiangolo.com/
-- MongoDB Atlas: https://docs.atlas.mongodb.com/
+## 👨‍💻 Maintainer
+**Sai Rakesh** ([@sairakesh-143](https://github.com/sairakesh-143))

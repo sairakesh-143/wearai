@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SmartWMS — Intelligent Warehouse Operations Platform</title>
+<title>WearAI — Intelligent AI Warehouse Operations Platform | By Sai Rakesh</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
@@ -132,14 +132,14 @@ const CUSTOMERS = [
 ];
 
 const EMPLOYEES = [
-  {id:1,name:'Ramya Sharma',role:'admin',email:'ramya@smartwms.io',avatar:'RS',zone:'All'},
-  {id:2,name:'Vikram Patel',role:'manager',email:'vikram@smartwms.io',avatar:'VP',zone:'All'},
-  {id:3,name:'Arjun Mehta',role:'staff',email:'arjun@smartwms.io',avatar:'AM',zone:'A'},
-  {id:4,name:'Priya Nair',role:'staff',email:'priya@smartwms.io',avatar:'PN',zone:'B'},
-  {id:5,name:'Rohan Das',role:'staff',email:'rohan@smartwms.io',avatar:'RD',zone:'C'},
-  {id:6,name:'Sneha Reddy',role:'staff',email:'sneha@smartwms.io',avatar:'SR',zone:'D'},
-  {id:7,name:'Karthik Iyer',role:'staff',email:'karthik@smartwms.io',avatar:'KI',zone:'A'},
-  {id:8,name:'Divya Joshi',role:'staff',email:'divya@smartwms.io',avatar:'DJ',zone:'B'}
+  {id:1,name:'Sai Rakesh',role:'admin',email:'rakesh@wearai.io',avatar:'SR',zone:'All'},
+  {id:2,name:'Vikram Patel',role:'manager',email:'vikram@wearai.io',avatar:'VP',zone:'All'},
+  {id:3,name:'Arjun Mehta',role:'staff',email:'arjun@wearai.io',avatar:'AM',zone:'A'},
+  {id:4,name:'Priya Nair',role:'staff',email:'priya@wearai.io',avatar:'PN',zone:'B'},
+  {id:5,name:'Rohan Das',role:'staff',email:'rohan@wearai.io',avatar:'RD',zone:'C'},
+  {id:6,name:'Sneha Reddy',role:'staff',email:'sneha@wearai.io',avatar:'SR',zone:'D'},
+  {id:7,name:'Karthik Iyer',role:'staff',email:'karthik@wearai.io',avatar:'KI',zone:'A'},
+  {id:8,name:'Divya Joshi',role:'staff',email:'divya@wearai.io',avatar:'DJ',zone:'B'}
 ];
 
 const SHIP_METHODS = ['Express','Standard','Same-Day','Economy'];
@@ -217,7 +217,7 @@ const NOTIFICATIONS = [
 ];
 
 const ACTIVITY_LOGS = [
-  {user:'Ramya Sharma',action:'Logged in',target:'System',time:new Date(Date.now()-5*3600000),prev:'-',next:'Active'},
+  {user:'Sai Rakesh',action:'Logged in',target:'System',time:new Date(Date.now()-5*3600000),prev:'-',next:'Active'},
   {user:'Vikram Patel',action:'Approved allocation',target:'ORD-1003',time:new Date(Date.now()-4*3600000),prev:'Pending',next:'Allocated'},
   {user:'Arjun Mehta',action:'Started picking',target:'ORD-1004',time:new Date(Date.now()-3*3600000),prev:'Assigned',next:'Picking'},
   {user:'System',action:'Flagged low stock',target:'SKU-103',time:new Date(Date.now()-10*60000),prev:'In Stock',next:'Critical Stock'},
@@ -587,15 +587,15 @@ function renderLogin(){
         <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 shadow-lg mb-4">
           <i data-lucide="warehouse" class="w-8 h-8 text-white"></i>
         </div>
-        <h1 class="text-2xl font-bold text-slate-800">SmartWMS</h1>
-        <p class="text-slate-500 text-sm mt-1">Intelligent Warehouse Operations Platform</p>
+        <h1 class="text-2xl font-bold text-slate-800">WearAI</h1>
+        <p class="text-slate-500 text-sm mt-1">Autonomous AI Warehouse Operations Platform</p>
       </div>
       <div class="space-y-4">
         <div>
           <label class="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
           <div class="relative">
             <i data-lucide="mail" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-            <input type="email" value="ramya@smartwms.io" class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm" placeholder="Enter your email"/>
+            <input type="email" value="rakesh@wearai.io" class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm" placeholder="Enter your email"/>
           </div>
         </div>
         <div>
@@ -656,8 +656,8 @@ function renderSidebar(){
           <i data-lucide="warehouse" class="w-5 h-5 text-white"></i>
         </div>
         <div>
-          <h1 class="text-white font-bold text-sm">SmartWMS</h1>
-          <p class="text-xs text-slate-500">Operations Platform</p>
+          <h1 class="text-white font-bold text-sm">WearAI</h1>
+          <p class="text-xs text-slate-500">Warehouse AI Operations</p>
         </div>
       </div>
     </div>
@@ -1799,6 +1799,21 @@ function renderSettings(){
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="bg-gradient-to-r from-brand-600 via-indigo-600 to-purple-700 rounded-xl p-5 text-white col-span-full shadow-lg">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2 mb-1.5">
+              <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-white/20 backdrop-blur">WearAI Platform</span>
+              <span class="text-xs text-brand-200">v2.4.0 (AI Edition)</span>
+            </div>
+            <h3 class="text-xl font-bold">Created & Managed by Sai Rakesh</h3>
+            <p class="text-xs text-brand-100 mt-1 max-w-xl">Autonomous AI-driven Warehouse Management Platform with real-time stock conflict resolution, dynamic allocation, intelligent routing, and predictive replenishment.</p>
+          </div>
+          <a href="https://github.com/sairakesh-143/wearai" target="_blank" class="px-4 py-2 bg-white text-brand-700 rounded-lg text-xs font-bold hover:bg-brand-50 transition-all flex items-center gap-2 shadow-md flex-shrink-0">
+            <i data-lucide="github" class="w-4 h-4"></i> GitHub Repository
+          </a>
+        </div>
+      </div>
       <div class="bg-white rounded-xl p-5 border border-slate-200">
         <h3 class="font-bold text-slate-800 mb-4">Profile</h3>
         <div class="space-y-3">

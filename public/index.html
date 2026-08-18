@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SmartWMS — Intelligent Warehouse Operations Platform</title>
+<title>WearAI — Intelligent AI Warehouse Operations Platform | By Sai Rakesh</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
@@ -47,4 +47,2350 @@ tailwind.config = {
 </head>
 <body class="h-full">
 <div id="app"></div>
-<div id="toast-container" class="fixed top-4 right-4 z-[9999] space-y-2"></div></output>
+<div id="toast-container" class="fixed top-4 right-4 z-[9999] space-y-2"></div>
+<div id="modal-container"></div>
+<script>
+// ==================== MOCK DATA ====================
+const CATEGORIES = ['Electronics','Office Supplies','Home & Living','Tools','Accessories'];
+const ZONES = [
+  {id:'A',name:'Zone A — Electronics',color:'#3b82f6'},
+  {id:'B',name:'Zone B — Office Supplies',color:'#10b981'},
+  {id:'C',name:'Zone C — Home & Living',color:'#f59e0b'},
+  {id:'D',name:'Zone D — Tools & Accessories',color:'#8b5cf6'}
+];
+const SUPPLIERS = ['TechSource Inc','GlobalGoods Co','PrimeSupply Ltd','FastChain Trading','Metro Distributors','Excel Logistics'];
+const CARRIERS = ['FedEx','UPS','DHL','BlueDart','Shadowfax'];
+
+const PRODUCT_DEFS = [
+  ['Wireless Headphones','Electronics',89.99,'A',1,5,3],['Bluetooth Speaker','Electronics',59.99,'A',1,7,2],
+  ['USB-C Cable 6ft','Electronics',12.99,'A',2,3,1],['Laptop Stand Adjustable','Electronics',45.00,'A',2,8,4],
+  ['Wireless Mouse','Electronics',29.99,'A',3,2,5],['Mechanical Keyboard','Electronics',129.99,'A',3,6,2],
+  ['HD Webcam 1080p','Electronics',79.99,'A',3,9,1],['Power Bank 20000mAh','Electronics',49.99,'A',4,4,3],
+  ['HDMI Cable 10ft','Electronics',18.99,'A',4,1,6],['USB Hub 7-Port','Electronics',34.99,'A',4,5,4],
+  ['Monitor Arm Mount','Electronics',89.00,'A',5,2,7],['Laptop Sleeve 15"','Electronics',24.99,'A',5,7,1],
+  ['Wireless Earbuds Pro','Electronics',149.99,'A',6,3,5],['Tablet Stand Aluminum','Electronics',35.00,'A',6,8,2],
+  ['LED Desk Lamp','Electronics',39.99,'A',7,1,4],['Cable Organizer Kit','Electronics',14.99,'A',7,4,8],
+  ['Surge Protector','Electronics',27.99,'A',8,2,6],['Screen Protector Pack','Electronics',9.99,'A',8,5,3],
+  ['Phone Charger Kit','Electronics',22.99,'A',9,1,2],['Portable SSD 1TB','Electronics',119.99,'A',9,3,7],
+  ['Notebook A5 Hardcover','Office Supplies',8.99,'B',1,2,1],['Gel Pen Set 12pc','Office Supplies',11.99,'B',1,5,3],
+  ['Stapler Heavy Duty','Office Supplies',16.99,'B',2,8,4],['Tape Dispenser','Office Supplies',7.49,'B',2,3,6],
+  ['Post-it Notes Variety','Office Supplies',6.99,'B',3,1,2],['Whiteboard Markers 8pc','Office Supplies',13.99,'B',3,7,5],
+  ['File Folder Box','Office Supplies',4.99,'B',4,2,8],['Binder Clips Assorted','Office Supplies',5.49,'B',4,6,1],
+  ['Scientific Calculator','Office Supplies',24.99,'B',5,3,4],['Desk Calendar 2025','Office Supplies',9.99,'B',5,8,7],
+  ['Highlighters 6pc','Office Supplies',4.49,'B',6,1,3],['Index Cards 100ct','Office Supplies',3.49,'B',6,5,8],
+  ['LED Bulb E27 9W','Home & Living',6.99,'C',1,2,4],['Throw Pillow Cover','Home & Living',19.99,'C',1,5,7],
+  ['Picture Frame 8x10','Home & Living',14.99,'C',2,8,2],['Wall Clock Analog','Home & Living',26.99,'C',2,3,5],
+  ['Plant Pot Ceramic','Home & Living',22.00,'C',3,1,8],['Bath Towel Set','Home & Living',34.99,'C',3,6,3],
+  ['Insulated Water Bottle','Home & Living',18.99,'C',4,4,1],['Coffee Mug Ceramic','Home & Living',7.99,'C',4,9,6],
+  ['Cordless Drill 20V','Tools',89.99,'D',1,2,3],['Screwdriver Set 32pc','Tools',24.99,'D',1,5,7],
+  ['Adjustable Wrench','Tools',14.99,'D',2,8,2],['Measuring Tape 25ft','Tools',9.99,'D',2,3,5],
+  ['Tool Box Organizer','Tools',39.99,'D',3,1,8],['Hammer Fiberglass','Tools',16.99,'D',3,6,4],
+  ['Pliers Set 5pc','Tools',29.99,'D',4,2,1],['Level Tool 24"','Tools',19.99,'D',4,7,6],
+  ['Utility Knife Pro','Tools',8.49,'D',5,3,4],['Safety Goggles','Tools',5.99,'D',5,8,2]
+];
+
+const PRODUCTS = PRODUCT_DEFS.map((p,i)=>{
+  const sku = `SKU-${String(101+i).padStart(3,'0')}`;
+  const stockLevels = i===2 ? 7 : Math.random()>0.85 ? 0 : Math.floor(Math.random()*180)+5;
+  const reorderLevel = 25;
+  const reorderQty = 100;
+  let status = 'In Stock';
+  if(stockLevels===0) status='Out of Stock';
+  else if(stockLevels<=10) status='Critical Stock';
+  else if(stockLevels<=reorderLevel) status='Low Stock';
+  const dailyDemand = Math.floor(Math.random()*12)+2;
+  return {
+    id:i+1, sku, name:p[0], category:p[1], price:p[2], zone:p[3], shelf:p[4], rack:p[5], bin:p[6],
+    stock: stockLevels, reserved: 0, reorderLevel, reorderQty, dailyDemand,
+    supplier: SUPPLIERS[i%SUPPLIERS.length], status,
+    image: `https://picsum.photos/seed/${sku}/200/200.jpg`
+  };
+});
+
+// Set specific products for edge cases
+PRODUCTS[2] = {...PRODUCTS[2], name:'Wireless Headphones Pro', stock:7, reserved:0, reorderLevel:20, reorderQty:100, dailyDemand:8, status:'Critical Stock'};
+PRODUCTS[5].stock = 0; PRODUCTS[5].status='Out of Stock';
+PRODUCTS[10].stock = 8; PRODUCTS[10].status='Critical Stock';
+PRODUCTS[15].stock = 18; PRODUCTS[15].status='Low Stock';
+PRODUCTS[20].stock = 12; PRODUCTS[20].status='Critical Stock';
+PRODUCTS[25].stock = 0; PRODUCTS[25].status='Out of Stock';
+PRODUCTS[30].stock = 15; PRODUCTS[30].status='Low Stock';
+PRODUCTS[35].stock = 5; PRODUCTS[35].status='Critical Stock';
+PRODUCTS[40].stock = 22; PRODUCTS[40].status='Low Stock';
+
+const CUSTOMERS = [
+  {name:'TechCorp Industries',tier:'VIP',email:'procurement@techcorp.com'},
+  {name:'RetailCo Stores',tier:'Regular',email:'orders@retailco.com'},
+  {name:'PrimeMart Chain',tier:'VIP',email:'supply@primemart.com'},
+  {name:'CityTech Solutions',tier:'Premium',email:'buy@citytech.io'},
+  {name:'GlobalTrade Inc',tier:'Regular',email:'purchase@globaltrade.com'},
+  {name:'NextGen Retail',tier:'Premium',email:'ops@nextgen.com'},
+  {name:'MetroElectronics',tier:'VIP',email:'orders@metroe.com'},
+  {name:'QuickShip Commerce',tier:'Regular',email:'buy@quickship.com'},
+  {name:'ValueBuy Group',tier:'Premium',email:'procurement@valuebuy.com'},
+  {name:'ApexTraders',tier:'Regular',email:'sales@apextraders.com'}
+];
+
+const EMPLOYEES = [
+  {id:1,name:'Sai Rakesh',role:'admin',email:'rakesh@wearai.io',avatar:'SR',zone:'All'},
+  {id:2,name:'Vikram Patel',role:'manager',email:'vikram@wearai.io',avatar:'VP',zone:'All'},
+  {id:3,name:'Arjun Mehta',role:'staff',email:'arjun@wearai.io',avatar:'AM',zone:'A'},
+  {id:4,name:'Priya Nair',role:'staff',email:'priya@wearai.io',avatar:'PN',zone:'B'},
+  {id:5,name:'Rohan Das',role:'staff',email:'rohan@wearai.io',avatar:'RD',zone:'C'},
+  {id:6,name:'Sneha Reddy',role:'staff',email:'sneha@wearai.io',avatar:'SR',zone:'D'},
+  {id:7,name:'Karthik Iyer',role:'staff',email:'karthik@wearai.io',avatar:'KI',zone:'A'},
+  {id:8,name:'Divya Joshi',role:'staff',email:'divya@wearai.io',avatar:'DJ',zone:'B'}
+];
+
+const SHIP_METHODS = ['Express','Standard','Same-Day','Economy'];
+const ORDER_STATUSES = ['New','Confirmed','Allocated','Partially Allocated','Picking','Picked','Packing','Quality Check','Ready for Dispatch','Dispatched','Delivered'];
+const PRIORITIES = ['Critical','High','Medium','Low'];
+
+function genOrders(){
+  const orders = [];
+  // Demo scenario orders first
+  orders.push({
+    id:'ORD-1001', customer:'TechCorp Industries', customerTier:'VIP',
+    items:[{sku:'SKU-103',name:'Wireless Headphones Pro',qty:10,price:89.99,zone:'A',shelf:1,rack:5,bin:3}],
+    total:899.90, date:new Date(Date.now()-3*3600000), deadline:new Date(Date.now()+2*3600000),
+    shipMethod:'Express', warehouse:'WH-01', status:'New', picker:null, packer:null,
+    exceptionStatus:'None', createdAt:new Date(Date.now()-3*3600000)
+  });
+  orders.push({
+    id:'ORD-1002', customer:'RetailCo Stores', customerTier:'Regular',
+    items:[{sku:'SKU-103',name:'Wireless Headphones Pro',qty:5,price:89.99,zone:'A',shelf:1,rack:5,bin:3}],
+    total:449.95, date:new Date(Date.now()-5*3600000), deadline:new Date(Date.now()+5*24*3600000),
+    shipMethod:'Standard', warehouse:'WH-01', status:'New', picker:null, packer:null,
+    exceptionStatus:'None', createdAt:new Date(Date.now()-5*3600000)
+  });
+
+  for(let i=3;i<=30;i++){
+    const cust = CUSTOMERS[Math.floor(Math.random()*CUSTOMERS.length)];
+    const itemCount = Math.floor(Math.random()*4)+1;
+    const items = [];
+    for(let j=0;j<itemCount;j++){
+      const p = PRODUCTS[Math.floor(Math.random()*PRODUCTS.length)];
+      const qty = Math.floor(Math.random()*8)+1;
+      items.push({sku:p.sku,name:p.name,qty,price:p.price,zone:p.zone,shelf:p.shelf,rack:p.rack,bin:p.bin});
+    }
+    const total = items.reduce((s,it)=>s+it.qty*it.price,0);
+    const statusIdx = Math.floor(Math.random()*ORDER_STATUSES.length);
+    const status = ORDER_STATUSES[statusIdx];
+    const deadline = new Date(Date.now()+(Math.floor(Math.random()*7)-1)*24*3600000);
+    const date = new Date(Date.now()-Math.floor(Math.random()*48)*3600000);
+    const picker = statusIdx>=3 && statusIdx<=5 ? EMPLOYEES[2+Math.floor(Math.random()*4)].name : null;
+    const packer = statusIdx>=5 && statusIdx<=7 ? EMPLOYEES[2+Math.floor(Math.random()*4)].name : null;
+    const hasException = Math.random()>0.8;
+    const excType = hasException ? ['Missing Item','Damaged Item','Insufficient Stock','Delayed Picking','Quality Check Failure'][Math.floor(Math.random()*5)] : 'None';
+    orders.push({
+      id:`ORD-${1000+i}`, customer:cust.name, customerTier:cust.tier, items, total,
+      date, deadline, shipMethod:SHIP_METHODS[Math.floor(Math.random()*SHIP_METHODS.length)],
+      warehouse:`WH-0${Math.floor(Math.random()*2)+1}`, status, picker, packer,
+      exceptionStatus:excType, createdAt:date
+    });
+  }
+  return orders;
+}
+
+const ORDERS = genOrders();
+
+const EXCEPTIONS = [
+  {id:'EX-101',type:'Insufficient Stock',order:'ORD-1001',sku:'SKU-103',severity:'Critical',status:'Open',created:new Date(Date.now()-30*60000),assigned:'Vikram Patel',recommendation:'Allocate available 7 units to ORD-1001 (Critical priority). Reserve remaining 3 units. Generate reorder for 100 units.'},
+  {id:'EX-102',type:'Missing Item',order:'ORD-1005',sku:'SKU-115',severity:'High',status:'Investigating',created:new Date(Date.now()-2*3600000),assigned:'Arjun Mehta',recommendation:'Search alternate warehouse location WH-02. Check reserved inventory. If not found, reallocate from safety stock.'},
+  {id:'EX-103',type:'Damaged Item',order:'ORD-1008',sku:'SKU-128',severity:'Medium',status:'Open',created:new Date(Date.now()-4*3600000),assigned:'Priya Nair',recommendation:'Replace damaged item from available stock. Update inventory. File damage report with supplier.'},
+  {id:'EX-104',type:'Delayed Picking',order:'ORD-1012',sku:'Multiple',severity:'High',status:'Open',created:new Date(Date.now()-90*60000),assigned:'Rohan Das',recommendation:'Reassign picking task to available picker in Zone C. Adjust dispatch timeline.'},
+  {id:'EX-105',type:'Quality Check Failure',order:'ORD-1015',sku:'SKU-140',severity:'Critical',status:'Open',created:new Date(Date.now()-15*60000),assigned:'Sneha Reddy',recommendation:'Re-run quality check. If failed again, create replacement order and notify customer of delay.'},
+  {id:'EX-106',type:'Dispatch Delay',order:'ORD-1009',sku:'Multiple',severity:'High',status:'Investigating',created:new Date(Date.now()-45*60000),assigned:'Vikram Patel',recommendation:'Contact carrier for priority pickup. If delay >30min, switch to alternate carrier.'},
+  {id:'EX-107',type:'Inventory Mismatch',order:'ORD-1018',sku:'SKU-120',severity:'Medium',status:'Open',created:new Date(Date.now()-3*3600000),assigned:'Karthik Iyer',recommendation:'Recount physical inventory. Update system records. Audit recent transactions for this SKU.'},
+  {id:'EX-108',type:'Wrong Item',order:'ORD-1020',sku:'SKU-125',severity:'High',status:'Open',created:new Date(Date.now()-20*60000),assigned:'Divya Joshi',recommendation:'Return wrong item to inventory. Pick correct SKU. Re-run quality check before packing.'}
+];
+
+const NOTIFICATIONS = [
+  {id:1,type:'critical',title:'Critical Stock Alert',message:'SKU-103 (Wireless Headphones Pro) has only 7 units left — below reorder level of 20.',time:new Date(Date.now()-5*60000),read:false},
+  {id:2,type:'critical',title:'Stock Allocation Conflict',message:'ORD-1001 and ORD-1002 both require SKU-103. Only 7 units available.',time:new Date(Date.now()-10*60000),read:false},
+  {id:3,type:'warning',title:'Out of Stock',message:'SKU-106 (Mechanical Keyboard) is completely out of stock.',time:new Date(Date.now()-30*60000),read:false},
+  {id:4,type:'warning',title:'Picking Delay',message:'Picker Arjun Mehta is 15 minutes behind schedule on ORD-1012.',time:new Date(Date.now()-45*60000),read:false},
+  {id:5,type:'attention',title:'Quality Check Failed',message:'ORD-1015 failed quality check — damaged packaging detected.',time:new Date(Date.now()-20*60000),read:false},
+  {id:6,type:'info',title:'Order Dispatched',message:'ORD-1003 has been dispatched via FedEx. Tracking: FX123456789.',time:new Date(Date.now()-2*3600000),read:true},
+  {id:7,type:'warning',title:'Dispatch Delay',message:'ORD-1009 dispatch delayed by 35 minutes. Carrier notified.',time:new Date(Date.now()-50*60000),read:false},
+  {id:8,type:'info',title:'Reorder Placed',message:'Reorder for 200 units of SKU-110 has been placed with TechSource Inc.',time:new Date(Date.now()-3*3600000),read:true}
+];
+
+const ACTIVITY_LOGS = [
+  {user:'Sai Rakesh',action:'Logged in',target:'System',time:new Date(Date.now()-5*3600000),prev:'-',next:'Active'},
+  {user:'Vikram Patel',action:'Approved allocation',target:'ORD-1003',time:new Date(Date.now()-4*3600000),prev:'Pending',next:'Allocated'},
+  {user:'Arjun Mehta',action:'Started picking',target:'ORD-1004',time:new Date(Date.now()-3*3600000),prev:'Assigned',next:'Picking'},
+  {user:'System',action:'Flagged low stock',target:'SKU-103',time:new Date(Date.now()-10*60000),prev:'In Stock',next:'Critical Stock'},
+  {user:'System',action:'Created exception',target:'EX-101',time:new Date(Date.now()-30*60000),prev:'-',next:'Open'},
+  {user:'Priya Nair',action:'Reported missing item',target:'ORD-1005 / SKU-115',time:new Date(Date.now()-2*3600000),prev:'Picking',next:'Exception'},
+  {user:'Rohan Das',action:'Completed packing',target:'ORD-1006',time:new Date(Date.now()-90*60000),prev:'Packing',next:'Quality Check'},
+  {user:'Sneha Reddy',action:'Failed quality check',target:'ORD-1015',time:new Date(Date.now()-20*60000),prev:'Quality Check',next:'Exception'}
+];
+
+const FEED_EVENTS = [
+  {type:'critical',message:'Order ORD-1001 marked CRITICAL — delivery deadline in 2 hours',time:new Date(Date.now()-2*60000)},
+  {type:'warning',message:'SKU-103 running low — only 7 units remaining',time:new Date(Date.now()-5*60000)},
+  {type:'info',message:'Picker Arjun Mehta started picking ORD-1004',time:new Date(Date.now()-8*60000)},
+  {type:'warning',message:'Picker reported missing item in ORD-1005',time:new Date(Date.now()-15*60000)},
+  {type:'success',message:'Order ORD-1006 successfully packed',time:new Date(Date.now()-25*60000)},
+  {type:'warning',message:'Dispatch delayed by 35 minutes for ORD-1009',time:new Date(Date.now()-35*60000)},
+  {type:'info',message:'Quality check passed for ORD-1007',time:new Date(Date.now()-45*60000)},
+  {type:'success',message:'Order ORD-1003 dispatched via FedEx',time:new Date(Date.now()-60*60000)},
+  {type:'critical',message:'SKU-106 out of stock — reorder urgently needed',time:new Date(Date.now()-90*60000)},
+  {type:'info',message:'Inventory updated: 200 units of SKU-110 received',time:new Date(Date.now()-120*60000)}
+];
+
+// ==================== STATE ====================
+const state = {
+  user: null,
+  view: 'login',
+  sidebarOpen: window.innerWidth > 1024,
+  searchQuery: '',
+  filters: { priority:'all', status:'all', zone:'all' },
+  toasts: [],
+  feed: [...FEED_EVENTS],
+  notifications: [...NOTIFICATIONS],
+  activityLog: [...ACTIVITY_LOGS],
+  selectedOrder: null,
+  demoTriggered: false,
+  currentPage: { orders:1, inventory:1, exceptions:1 },
+  pageSize: 8
+};
+
+// ==================== UTILS ====================
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const fmtCur = (n) => '$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtDate = (d) => { const dt=new Date(d); return dt.toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); };
+const fmtDateShort = (d) => { const dt=new Date(d); return dt.toLocaleDateString('en-US',{month:'short',day:'numeric'}); };
+const timeAgo = (d) => {
+  const diff = Date.now()-new Date(d).getTime();
+  const min = Math.floor(diff/60000);
+  if(min<1) return 'just now';
+  if(min<60) return `${min}m ago`;
+  const hr = Math.floor(min/60);
+  if(hr<24) return `${hr}h ago`;
+  return `${Math.floor(hr/24)}d ago`;
+};
+const hoursUntil = (d) => { return Math.floor((new Date(d).getTime()-Date.now())/3600000); };
+
+function showToast(type,msg){
+  const colors = {success:'bg-emerald-600',error:'bg-red-600',warning:'bg-amber-500',info:'bg-brand-600'};
+  const icons = {success:'check-circle',error:'x-circle',warning:'alert-triangle',info:'info'};
+  const id = 'toast-'+Date.now();
+  const html = `
+    <div id="${id}" class="toast-enter ${colors[type]} text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 min-w-[300px] max-w-md">
+      <i data-lucide="${icons[type]}" class="w-5 h-5 flex-shrink-0"></i>
+      <span class="text-sm font-medium flex-1">${esc(msg)}</span>
+      <button onclick="document.getElementById('${id}').remove()" class="opacity-70 hover:opacity-100"><i data-lucide="x" class="w-4 h-4"></i></button>
+    </div>`;
+  document.getElementById('toast-container').insertAdjacentHTML('beforeend',html);
+  lucide.createIcons();
+  setTimeout(()=>{ const el=document.getElementById(id); if(el) el.remove(); },4000);
+}
+
+function showModal(html){
+  document.getElementById('modal-container').innerHTML = `
+    <div class="fixed inset-0 bg-black/50 z-[9998] flex items-center justify-center p-4 fade-in" onclick="if(event.target===this)closeModal()">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-auto slide-in">${html}</div>
+    </div>`;
+  lucide.createIcons();
+}
+function closeModal(){ document.getElementById('modal-container').innerHTML=''; }
+
+function confirmDialog(title,msg,onConfirm){
+  showModal(`
+    <div class="p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center">
+          <i data-lucide="alert-triangle" class="w-6 h-6 text-amber-600"></i>
+        </div>
+        <h3 class="text-lg font-bold text-slate-800">${esc(title)}</h3>
+      </div>
+      <p class="text-slate-600 mb-6">${esc(msg)}</p>
+      <div class="flex justify-end gap-3">
+        <button onclick="closeModal()" class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium text-sm">Cancel</button>
+        <button id="confirm-btn" class="px-4 py-2 rounded-lg bg-brand-600 text-white hover:bg-brand-700 font-medium text-sm">Confirm</button>
+      </div>
+    </div>`);
+  document.getElementById('confirm-btn').onclick = ()=>{ closeModal(); onConfirm(); };
+}
+
+// ==================== COMPONENTS ====================
+function badge(text,color){
+  const colors = {
+    green:'bg-emerald-100 text-emerald-700',red:'bg-red-100 text-red-700',
+    amber:'bg-amber-100 text-amber-700',blue:'bg-blue-100 text-blue-700',
+    purple:'bg-purple-100 text-purple-700',gray:'bg-slate-100 text-slate-600',
+    indigo:'bg-indigo-100 text-indigo-700',pink:'bg-pink-100 text-pink-700'
+  };
+  return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${colors[color]||colors.gray}">${esc(text)}</span>`;
+}
+
+function priorityBadge(p){
+  const map = {Critical:'red',High:'amber',Medium:'blue',Low:'gray'};
+  const dot = {Critical:'bg-red-500',High:'bg-amber-500',Medium:'bg-blue-500',Low:'bg-slate-400'};
+  return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-${map[p]}-100 text-${map[p]}-700">
+    <span class="w-1.5 h-1.5 rounded-full ${dot[p]} ${p==='Critical'?'pulse-dot':''}"></span>${p}</span>`;
+}
+
+function statusBadge(s){
+  const map = {
+    'New':'gray','Confirmed':'blue','Allocated':'indigo','Partially Allocated':'amber',
+    'Picking':'purple','Picked':'blue','Packing':'purple','Quality Check':'amber',
+    'Ready for Dispatch':'green','Dispatched':'green','Delivered':'green',
+    'In Stock':'green','Low Stock':'amber','Critical Stock':'red','Out of Stock':'red',
+    'Reserved':'blue','Damaged':'red','Open':'red','Investigating':'amber','Resolved':'green','Closed':'gray'
+  };
+  return badge(s, map[s]||'gray');
+}
+
+function statCard(title,value,icon,color,sub,onClick){
+  return `<div class="bg-white rounded-xl p-4 border border-slate-200 card-hover cursor-pointer ${onClick?`onclick="${onClick}"`:''}">
+    <div class="flex items-start justify-between">
+      <div>
+        <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">${esc(title)}</p>
+        <p class="text-2xl font-bold text-slate-800 mt-1">${value}</p>
+        ${sub?`<p class="text-xs text-slate-400 mt-1">${sub}</p>`:''}
+      </div>
+      <div class="w-10 h-10 rounded-lg ${color} flex items-center justify-center flex-shrink-0">
+        <i data-lucide="${icon}" class="w-5 h-5 text-white"></i>
+      </div>
+    </div>
+  </div>`;
+}
+
+function progressBar(val,max,color='bg-brand-500'){
+  const pct = Math.min(100,(val/max)*100);
+  return `<div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+    <div class="${color} h-2 rounded-full transition-all duration-500" style="width:${pct}%"></div>
+  </div>`;
+}
+
+function avatar(name,bg='bg-brand-600'){
+  const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2);
+  return `<div class="w-8 h-8 rounded-full ${bg} flex items-center justify-center text-white text-xs font-bold">${initials}</div>`;
+}
+
+// ==================== ENGINE: PRIORITY ====================
+function calcPriority(order){
+  let score = 0;
+  const reasons = [];
+  const hrsLeft = hoursUntil(order.deadline);
+  if(hrsLeft < 0){ score += 40; reasons.push('Past deadline'); }
+  else if(hrsLeft < 4){ score += 35; reasons.push(`Deadline in ${hrsLeft}h`); }
+  else if(hrsLeft < 24){ score += 20; reasons.push(`Deadline in ${Math.floor(hrsLeft)}h`); }
+  else if(hrsLeft < 72){ score += 10; reasons.push(`Deadline in ${Math.floor(hrsLeft/24)}d`); }
+
+  if(order.customerTier === 'VIP'){ score += 25; reasons.push('VIP customer'); }
+  else if(order.customerTier === 'Premium'){ score += 15; reasons.push('Premium customer'); }
+
+  if(order.shipMethod === 'Express' || order.shipMethod === 'Same-Day'){ score += 15; reasons.push(`${order.shipMethod} shipping`); }
+
+  if(order.total > 500){ score += 10; reasons.push('High order value'); }
+
+  if(order.exceptionStatus !== 'None'){ score += 15; reasons.push(`Exception: ${order.exceptionStatus}`); }
+
+  let priority = 'Low';
+  if(score >= 70) priority = 'Critical';
+  else if(score >= 50) priority = 'High';
+  else if(score >= 25) priority = 'Medium';
+
+  return { priority, score, reasons };
+}
+
+// ==================== ENGINE: ALLOCATION ====================
+function checkAllocationConflict(sku){
+  const product = PRODUCTS.find(p=>p.sku===sku);
+  if(!product) return null;
+  const competing = ORDERS.filter(o=>o.status==='New'||o.status==='Confirmed')
+    .filter(o=>o.items.some(it=>it.sku===sku));
+  if(competing.length === 0) return null;
+  const totalDemand = competing.reduce((s,o)=>s+(o.items.find(it=>it.sku===sku)?.qty||0),0);
+  if(totalDemand <= product.stock) return null;
+  competing.forEach(o=>{ o._priority = calcPriority(o); });
+  competing.sort((a,b)=>b._priority.score - a._priority.score);
+  return { sku, product, competing, available: product.stock, totalDemand, shortfall: totalDemand - product.stock };
+}
+
+function resolveAllocation(sku){
+  const conflict = checkAllocationConflict(sku);
+  if(!conflict) return null;
+  let remaining = conflict.available;
+  const decisions = [];
+  for(const order of conflict.competing){
+    const need = order.items.find(it=>it.sku===sku)?.qty || 0;
+    const allocated = Math.min(need, remaining);
+    remaining -= allocated;
+    decisions.push({
+      orderId: order.id, priority: order._priority.priority, score: order._priority.score,
+      requested: need, allocated, remaining: need - allocated,
+      fullyAllocated: allocated === need, customer: order.customer, customerTier: order.customerTier,
+      reasons: order._priority.reasons
+    });
+  }
+  return { ...conflict, decisions, recommendation: decisions[0].allocated > 0 ?
+    `Allocate ${decisions[0].allocated} units to ${decisions[0].orderId} (${decisions[0].priority} priority — ${decisions[0].reasons.join(', ')})` : 'No stock available' };
+}
+
+// ==================== ENGINE: LOW STOCK ====================
+function detectLowStock(){
+  return PRODUCTS.filter(p=>p.stock <= p.reorderLevel).map(p=>{
+    const daysRemaining = p.stock > 0 ? (p.stock / p.dailyDemand).toFixed(1) : 0;
+    let risk = 'Low';
+    if(p.stock === 0) risk = 'Critical';
+    else if(parseFloat(daysRemaining) < 2) risk = 'High';
+    else if(parseFloat(daysRemaining) < 5) risk = 'Medium';
+    return { ...p, daysRemaining, risk };
+  }).sort((a,b)=>parseFloat(a.daysRemaining)-parseFloat(b.daysRemaining));
+}
+
+// ==================== ENGINE: BOTTLENECKS ====================
+function detectBottlenecks(){
+  const bottlenecks = [];
+  const pickingOrders = ORDERS.filter(o=>o.status==='Picking');
+  const packingOrders = ORDERS.filter(o=>o.status==='Packing');
+  const qcOrders = ORDERS.filter(o=>o.status==='Quality Check');
+  const readyOrders = ORDERS.filter(o=>o.status==='Ready for Dispatch');
+  if(packingOrders.length > 4) bottlenecks.push({stage:'Packing',count:packingOrders.length,avgTime:'34min',expected:'20min',deviation:'+70%',impact:'Orders delayed in packing queue',recommendation:'Assign 2 additional packers during peak hours. Rebalance workload across stations.'});
+  if(pickingOrders.length > 3) bottlenecks.push({stage:'Picking',count:pickingOrders.length,avgTime:'18min',expected:'12min',deviation:'+50%',impact:'Picking queue backing up',recommendation:'Reassign pickers from low-activity zones. Optimize picking routes for Zone B.'});
+  if(qcOrders.length > 2) bottlenecks.push({stage:'Quality Check',count:qcOrders.length,avgTime:'8min',expected:'5min',deviation:'+60%',impact:'QC bottleneck before dispatch',recommendation:'Add temporary QC station. Streamline checklist for standard orders.'});
+  if(readyOrders.length > 3) bottlenecks.push({stage:'Dispatch',count:readyOrders.length,avgTime:'45min',expected:'25min',deviation:'+80%',impact:'Dispatch queue backing up',recommendation:'Contact alternate carrier for priority pickup. Expedite dispatch for critical orders.'});
+  // Zone-based bottleneck
+  const zoneB = ORDERS.filter(o=>o.status==='Picking' && o.items.some(it=>it.zone==='B'));
+  if(zoneB.length > 2) bottlenecks.push({stage:'Zone B Picking',count:zoneB.length,avgTime:'22min',expected:'12min',deviation:'+83%',impact:'Zone B has 27% slower picking performance',recommendation:'Rebalance picking tasks between Zone A and Zone B. Assign additional picker to Zone B.'});
+  return bottlenecks;
+}
+
+// ==================== ENGINE: PICKING ROUTE ====================
+function optimizeRoute(order){
+  const items = order.items.map(it=>({sku:it.sku,name:it.name,qty:it.qty,zone:it.zone,shelf:it.shelf,rack:it.rack,bin:it.bin}));
+  items.sort((a,b)=>{
+    if(a.zone !== b.zone) return a.zone.localeCompare(b.zone);
+    if(a.shelf !== b.shelf) return a.shelf - b.shelf;
+    if(a.rack !== b.rack) return a.rack - b.rack;
+    return a.bin - b.bin;
+  });
+  const distance = items.length * 15 + Math.floor(Math.random()*30);
+  const time = Math.ceil(distance * 0.8 + items.length * 2);
+  const efficiency = Math.max(60, 95 - items.length * 3);
+  return { route: items, distance, time, efficiency, locations: items.length };
+}
+
+// ==================== ENGINE: RECOMMENDATIONS ====================
+function generateRecommendations(){
+  const recs = [];
+  // Low stock recs
+  const lowStock = detectLowStock();
+  lowStock.slice(0,3).forEach(p=>{
+    recs.push({
+      id:'rec-low-'+p.sku, type:'Inventory', icon:'package', color:'amber',
+      problem:`${p.sku} may run out within ${p.daysRemaining} days`,
+      data:`Current: ${p.stock} units | Daily demand: ${p.dailyDemand} | Reorder level: ${p.reorderLevel}`,
+      decision:`Reorder ${p.reorderQty} units from ${p.supplier}`,
+      impact:`Prevents stockout and maintains fulfillment rate for ~${Math.floor(p.reorderQty/p.dailyDemand)} days`,
+      action:'Place Reorder', actionType:'reorder', actionData:{sku:p.sku,qty:p.reorderQty,supplier:p.supplier}
+    });
+  });
+  // Allocation conflict rec
+  const conflict = resolveAllocation('SKU-103');
+  if(conflict){
+    recs.push({
+      id:'rec-alloc-1', type:'Allocation', icon:'git-branch', color:'red',
+      problem:`Stock conflict on SKU-103 — ${conflict.totalDemand} units demanded, only ${conflict.available} available`,
+      data:`ORD-1001 (${conflict.competing[0]._priority.priority}) needs ${conflict.competing[0].items.find(i=>i.sku==='SKU-103').qty} | ORD-1002 (${conflict.competing[1]._priority.priority}) needs ${conflict.competing[1].items.find(i=>i.sku==='SKU-103').qty}`,
+      decision:`Allocate ${conflict.decisions[0].allocated} units to ${conflict.decisions[0].orderId} (Critical priority). Mark as Partially Allocated.`,
+      impact:`Critical VIP order partially fulfilled. Exception created. Reorder triggered automatically.`,
+      action:'Apply Allocation', actionType:'allocate', actionData:{conflict}
+    });
+  }
+  // Bottleneck recs
+  const bottlenecks = detectBottlenecks();
+  bottlenecks.slice(0,2).forEach(b=>{
+    recs.push({
+      id:'rec-bn-'+b.stage, type:'Staffing', icon:'users', color:'purple',
+      problem:`${b.stage} bottleneck detected — ${b.deviation} slower than average`,
+      data:`Current queue: ${b.count} orders | Avg time: ${b.avgTime} | Expected: ${b.expected}`,
+      decision:b.recommendation,
+      impact:`Reduces average processing time by ~30%. Prevents cascade delays.`,
+      action:'View Analytics', actionType:'navigate', actionData:{view:'analytics'}
+    });
+  });
+  // Picking optimization rec
+  recs.push({
+    id:'rec-pick-1', type:'Picking', icon:'route', color:'blue',
+    problem:'Picking routes can be optimized for Zone A orders',
+    data:'4 orders in Zone A with unoptimized picking sequences | Avg travel: 85m per order',
+    decision:'Process Zone A orders in shelf sequence (A1→A5→A8→A9) to minimize travel',
+    impact:'Reduces average picking time by 35%. Saves ~12 minutes per picker per shift.',
+    action:'View Picking', actionType:'navigate', actionData:{view:'picking'}
+  });
+  // Exception rec
+  const openExc = EXCEPTIONS.filter(e=>e.status==='Open');
+  if(openExc.length > 0){
+    recs.push({
+      id:'rec-exc-1', type:'Exception', icon:'alert-circle', color:'red',
+      problem:`${openExc.length} open exceptions need immediate attention`,
+      data:`${openExc.filter(e=>e.severity==='Critical').length} Critical | ${openExc.filter(e=>e.severity==='High').length} High severity`,
+      decision:'Prioritize Critical exceptions first. Search alternate locations for missing items.',
+      impact:`Prevents order delays and customer dissatisfaction. Resolves bottleneck in exception queue.`,
+      action:'View Exceptions', actionType:'navigate', actionData:{view:'exceptions'}
+    });
+  }
+  return recs;
+}
+
+// ==================== LIVE FEED ====================
+const FEED_POOL = [
+  {type:'info',message:'Order {ORD} assigned to picker'},
+  {type:'success',message:'Order {ORD} picking completed'},
+  {type:'info',message:'Packing started for order {ORD}'},
+  {type:'success',message:'Order {ORD} passed quality check'},
+  {type:'warning',message:'SKU-{SKU} stock below reorder level'},
+  {type:'info',message:'Dispatch assigned for order {ORD}'},
+  {type:'success',message:'Order {ORD} dispatched successfully'},
+  {type:'warning',message:'Picker reported delay on order {ORD}'},
+  {type:'info',message:'Inventory recount completed for Zone {ZONE}'},
+  {type:'critical',message:'Urgent: Order {ORD} deadline approaching'}
+];
+
+function addFeedEvent(){
+  const template = FEED_POOL[Math.floor(Math.random()*FEED_POOL.length)];
+  const ordNum = 1000 + Math.floor(Math.random()*30);
+  const skuNum = 101 + Math.floor(Math.random()*50);
+  const zone = ['A','B','C','D'][Math.floor(Math.random()*4)];
+  const msg = template.message.replace('{ORD}',`ORD-${ordNum}`).replace('{SKU}',String(skuNum).padStart(3,'0')).replace('{ZONE}',zone);
+  state.feed.unshift({type:template.type,message:msg,time:new Date()});
+  if(state.feed.length > 20) state.feed.pop();
+  if(state.view === 'dashboard'){ renderFeed(); }
+}
+
+function addActivityLog(user,action,target,prev,next){
+  state.activityLog.unshift({user,action,target,time:new Date(),prev,next});
+  if(state.activityLog.length > 50) state.activityLog.pop();
+}
+
+// ==================== CHART MANAGEMENT ====================
+let charts = {};
+function destroyCharts(){ Object.keys(charts).forEach(k=>{ if(charts[k]) { charts[k].destroy(); delete charts[k]; } }); }
+
+// ==================== VIEWS ====================
+function renderLogin(){
+  return `
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-brand-900 to-slate-800 p-4">
+    <div class="absolute inset-0 overflow-hidden">
+      <div class="absolute top-0 left-1/4 w-96 h-96 bg-brand-500/20 rounded-full blur-3xl"></div>
+      <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl"></div>
+    </div>
+    <div class="relative bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl p-8 w-full max-w-md fade-in">
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 shadow-lg mb-4">
+          <i data-lucide="warehouse" class="w-8 h-8 text-white"></i>
+        </div>
+        <h1 class="text-2xl font-bold text-slate-800">WearAI</h1>
+        <p class="text-slate-500 text-sm mt-1">Autonomous AI Warehouse Operations Platform</p>
+      </div>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
+          <div class="relative">
+            <i data-lucide="mail" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+            <input type="email" value="rakesh@wearai.io" class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm" placeholder="Enter your email"/>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
+          <div class="relative">
+            <i data-lucide="lock" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+            <input type="password" value="demo1234" class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm" placeholder="Enter your password"/>
+          </div>
+        </div>
+        <button onclick="actions.login()" class="w-full py-2.5 bg-gradient-to-r from-brand-600 to-brand-700 text-white rounded-lg font-semibold text-sm hover:shadow-lg transition-all">
+          Sign In
+        </button>
+      </div>
+      <div class="mt-6 pt-6 border-t border-slate-200">
+        <p class="text-xs text-slate-500 text-center mb-3">Quick login as role:</p>
+        <div class="grid grid-cols-3 gap-2">
+          <button onclick="actions.quickLogin('admin')" class="flex flex-col items-center gap-1.5 p-3 rounded-lg border border-slate-200 hover:border-brand-400 hover:bg-brand-50 transition-all">
+            <i data-lucide="shield-check" class="w-5 h-5 text-brand-600"></i>
+            <span class="text-xs font-medium text-slate-700">Admin</span>
+          </button>
+          <button onclick="actions.quickLogin('manager')" class="flex flex-col items-center gap-1.5 p-3 rounded-lg border border-slate-200 hover:border-brand-400 hover:bg-brand-50 transition-all">
+            <i data-lucide="clipboard-list" class="w-5 h-5 text-emerald-600"></i>
+            <span class="text-xs font-medium text-slate-700">Manager</span>
+          </button>
+          <button onclick="actions.quickLogin('staff')" class="flex flex-col items-center gap-1.5 p-3 rounded-lg border border-slate-200 hover:border-brand-400 hover:bg-brand-50 transition-all">
+            <i data-lucide="package" class="w-5 h-5 text-amber-600"></i>
+            <span class="text-xs font-medium text-slate-700">Staff</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderSidebar(){
+  if(!state.user) return '';
+  const navItems = [
+    {id:'dashboard',label:'Dashboard',icon:'layout-dashboard'},
+    {id:'orders',label:'Orders',icon:'shopping-cart'},
+    {id:'inventory',label:'Inventory',icon:'package'},
+    {id:'allocation',label:'Allocation',icon:'git-branch',badge:'!'},
+    {id:'picking',label:'Picking',icon:'map-pin'},
+    {id:'packing',label:'Packing',icon:'box'},
+    {id:'qualityCheck',label:'Quality Check',icon:'check-square'},
+    {id:'dispatch',label:'Dispatch',icon:'truck'},
+    {id:'exceptions',label:'Exceptions',icon:'alert-triangle',badge:EXCEPTIONS.filter(e=>e.status==='Open').length},
+    {id:'analytics',label:'Analytics',icon:'bar-chart-3'},
+    {id:'smartDecisions',label:'Smart Decisions',icon:'brain',badge:'AI'},
+    {id:'notifications',label:'Notifications',icon:'bell',badge:state.notifications.filter(n=>!n.read).length},
+    {id:'settings',label:'Settings',icon:'settings'}
+  ];
+  const roleLabels = {admin:'Administrator',manager:'Warehouse Manager',staff:'Warehouse Staff'};
+  return `
+  <aside class="fixed lg:sticky top-0 left-0 h-screen w-64 bg-slate-900 text-slate-300 z-50 transform ${state.sidebarOpen?'translate-x-0':'-translate-x-full'} lg:translate-x-0 transition-transform sidebar-scroll overflow-y-auto">
+    <div class="p-4 border-b border-slate-700/50">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center shadow-lg">
+          <i data-lucide="warehouse" class="w-5 h-5 text-white"></i>
+        </div>
+        <div>
+          <h1 class="text-white font-bold text-sm">WearAI</h1>
+          <p class="text-xs text-slate-500">Warehouse AI Operations</p>
+        </div>
+      </div>
+    </div>
+    <nav class="p-3 space-y-0.5">
+      ${navItems.map(item=>`
+        <button onclick="navigate('${item.id}')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-all ${state.view===item.id?'active':''}">
+          <i data-lucide="${item.icon}" class="w-4 h-4 flex-shrink-0"></i>
+          <span class="flex-1 text-left">${item.label}</span>
+          ${item.badge? `<span class="px-1.5 py-0.5 rounded-full text-xs font-bold ${item.badge==='AI'?'bg-purple-500/30 text-purple-300':item.badge==='!'?'bg-red-500 text-white':'bg-red-500 text-white'}">${item.badge}</span>`:''}
+        </button>
+      `).join('')}
+    </nav>
+    <div class="absolute bottom-0 left-0 right-0 p-3 border-t border-slate-700/50 bg-slate-900">
+      <div class="flex items-center gap-3">
+        ${avatar(state.user.name,'bg-gradient-to-br from-brand-500 to-brand-700')}
+        <div class="flex-1 min-w-0">
+          <p class="text-white text-sm font-medium truncate">${state.user.name}</p>
+          <p class="text-xs text-slate-500">${roleLabels[state.user.role]}</p>
+        </div>
+        <button onclick="actions.logout()" class="text-slate-500 hover:text-red-400" title="Logout">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+  ${state.sidebarOpen?`<div class="fixed inset-0 bg-black/30 z-40 lg:hidden" onclick="state.sidebarOpen=false;render()"></div>`:''}`;
+}
+
+function renderTopbar(){
+  const unreadCount = state.notifications.filter(n=>!n.read).length;
+  return `
+  <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-lg border-b border-slate-200 px-4 lg:px-6 py-3">
+    <div class="flex items-center gap-4">
+      <button onclick="state.sidebarOpen=!state.sidebarOpen;render()" class="lg:hidden p-2 rounded-lg hover:bg-slate-100">
+        <i data-lucide="menu" class="w-5 h-5 text-slate-600"></i>
+      </button>
+      <div class="flex-1 max-w-md relative">
+        <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+        <input type="text" value="${state.searchQuery}" oninput="state.searchQuery=this.value;handleSearch()" placeholder="Search orders, SKU, products, customers..." class="w-full pl-10 pr-4 py-2 rounded-lg bg-slate-100 border border-transparent focus:bg-white focus:border-brand-300 focus:ring-2 focus:ring-brand-100 text-sm outline-none"/>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="navigate('notifications')" class="relative p-2 rounded-lg hover:bg-slate-100">
+          <i data-lucide="bell" class="w-5 h-5 text-slate-600"></i>
+          ${unreadCount?`<span class="absolute top-1 right-1 w-4 h-4 rounded-full bg-red-500 text-white text-xs flex items-center justify-center font-bold">${unreadCount}</span>`:''}
+        </button>
+        <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-dot"></span>
+          <span class="text-xs font-medium text-emerald-700">System Live</span>
+        </div>
+      </div>
+    </div>
+  </header>`;
+}
+
+function renderDashboard(){
+  const totalOrders = ORDERS.length;
+  const pendingOrders = ORDERS.filter(o=>['New','Confirmed'].includes(o.status)).length;
+  const urgentOrders = ORDERS.filter(o=>calcPriority(o).priority==='Critical').length;
+  const pickingOrders = ORDERS.filter(o=>o.status==='Picking').length;
+  const packingOrders = ORDERS.filter(o=>o.status==='Packing').length;
+  const readyOrders = ORDERS.filter(o=>o.status==='Ready for Dispatch').length;
+  const dispatched = ORDERS.filter(o=>o.status==='Dispatched'||o.status==='Delivered').length;
+  const lowStock = PRODUCTS.filter(p=>p.status==='Low Stock'||p.status==='Critical Stock').length;
+  const outOfStock = PRODUCTS.filter(p=>p.status==='Out of Stock').length;
+  const damagedItems = EXCEPTIONS.filter(e=>e.type==='Damaged Item').length;
+  const delayedOrders = ORDERS.filter(o=>o.exceptionStatus!=='None').length;
+  const inventoryValue = PRODUCTS.reduce((s,p)=>s+(p.stock*p.price),0);
+  const fulfillmentRate = totalOrders > 0 ? Math.round((dispatched/totalOrders)*100) : 0;
+
+  return `
+  <div class="fade-in space-y-6">
+    <!-- Demo Scenario Banner -->
+    <div class="bg-gradient-to-r from-red-50 to-amber-50 border border-red-200 rounded-xl p-4 flex items-start gap-4">
+      <div class="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
+        <i data-lucide="zap" class="w-5 h-5 text-red-600"></i>
+      </div>
+      <div class="flex-1">
+        <h3 class="font-bold text-slate-800 text-sm">⚠️ Active Stock Allocation Conflict Detected</h3>
+        <p class="text-sm text-slate-600 mt-0.5">ORD-1001 (Critical) and ORD-1002 (Medium) both need SKU-103. Only 7 of 15 units available. <button onclick="navigate('allocation')" class="text-brand-600 font-semibold hover:underline">View Decision →</button></p>
+      </div>
+    </div>
+
+    <!-- KPI Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+      ${statCard('Total Orders',totalOrders,'shopping-cart','bg-brand-500',`${pendingOrders} pending`)}
+      ${statCard('Urgent Orders',`<span class="text-red-600">${urgentOrders}</span>`,'alert-octagon','bg-red-500','Needs immediate action')}
+      ${statCard('Being Picked',pickingOrders,'map-pin','bg-purple-500',`${packingOrders} in packing`)}
+      ${statCard('Ready to Ship',readyOrders,'package-check','bg-emerald-500',`${dispatched} dispatched`)}
+      ${statCard('Low Stock',`<span class="text-amber-600">${lowStock}</span>`,'trending-down','bg-amber-500',`${outOfStock} out of stock`)}
+      ${statCard('Inventory Value',fmtCur(inventoryValue),'dollar-sign','bg-indigo-500','Total stock value')}
+      ${statCard('Fulfillment Rate',`${fulfillmentRate}%`,'target','bg-emerald-500',`${dispatched}/${totalOrders} orders`)}
+      ${statCard('Delayed Orders',`<span class="text-red-600">${delayedOrders}</span>`,'clock-alert','bg-red-500','Has exceptions')}
+      ${statCard('Damaged Items',damagedItems,'alert-triangle','bg-orange-500','Needs handling')}
+      ${statCard('Active Exceptions',EXCEPTIONS.filter(e=>e.status==='Open').length,'alert-circle','bg-red-500','Awaiting resolution')}
+      ${statCard('Pickers Active','4','users','bg-blue-500','Across 4 zones')}
+      ${statCard('Avg Pick Time','12min','timer','bg-teal-500','Per order')}
+    </div>
+
+    <!-- Charts Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="bg-white rounded-xl p-5 border border-slate-200">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="font-bold text-slate-800">Orders by Status</h3>
+            <p class="text-xs text-slate-500">Current distribution across pipeline</p>
+          </div>
+          <i data-lucide="pie-chart" class="w-5 h-5 text-slate-400"></i>
+        </div>
+        <div class="h-64"><canvas id="chartOrderStatus"></canvas></div>
+      </div>
+      <div class="bg-white rounded-xl p-5 border border-slate-200">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="font-bold text-slate-800">Orders by Priority</h3>
+            <p class="text-xs text-slate-500">Priority-based distribution</p>
+          </div>
+          <i data-lucide="bar-chart-3" class="w-5 h-5 text-slate-400"></i>
+        </div>
+        <div class="h-64"><canvas id="chartPriority"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Performance & Trends -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div class="bg-white rounded-xl p-5 border border-slate-200 lg:col-span-2">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="font-bold text-slate-800">Daily Fulfillment Rate</h3>
+            <p class="text-xs text-slate-500">Last 7 days performance</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span class="text-xs text-slate-600">Fulfilled</span>
+            <span class="w-2 h-2 rounded-full bg-amber-500 ml-3"></span>
+            <span class="text-xs text-slate-600">Pending</span>
+          </div>
+        </div>
+        <div class="h-56"><canvas id="chartFulfillment"></canvas></div>
+      </div>
+      <div class="bg-white rounded-xl p-5 border border-slate-200">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="font-bold text-slate-800">Top Products</h3>
+            <p class="text-xs text-slate-500">By order frequency</p>
+          </div>
+          <i data-lucide="trending-up" class="w-5 h-5 text-slate-400"></i>
+        </div>
+        <div class="space-y-3">
+          ${[...PRODUCTS].sort((a,b)=>b.dailyDemand-a.dailyDemand).slice(0,5).map((p,i)=>`
+            <div class="flex items-center gap-3">
+              <span class="text-xs font-bold text-slate-400 w-4">${i+1}</span>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-slate-700 truncate">${p.name}</p>
+                <div class="flex items-center gap-2 mt-1">
+                  ${progressBar(p.dailyDemand,12,'bg-brand-500')}
+                  <span class="text-xs text-slate-500 w-8 text-right">${p.dailyDemand}/day</span>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Feed & Low Stock -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="bg-white rounded-xl p-5 border border-slate-200">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-dot"></span>
+            <h3 class="font-bold text-slate-800">Live Operations Feed</h3>
+          </div>
+          <span class="text-xs text-slate-400">Real-time</span>
+        </div>
+        <div id="feed-container" class="space-y-2 max-h-80 overflow-y-auto">
+          ${renderFeedItems()}
+        </div>
+      </div>
+      <div class="bg-white rounded-xl p-5 border border-slate-200">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-bold text-slate-800">Low Stock Alerts</h3>
+          <button onclick="navigate('inventory')" class="text-xs text-brand-600 font-semibold hover:underline">View All →</button>
+        </div>
+        <div class="space-y-3 max-h-80 overflow-y-auto">
+          ${detectLowStock().slice(0,6).map(p=>`
+            <div class="flex items-center gap-3 p-3 rounded-lg ${p.risk==='Critical'?'bg-red-50':p.risk==='High'?'bg-amber-50':'bg-yellow-50'}">
+              <div class="w-8 h-8 rounded-lg ${p.risk==='Critical'?'bg-red-100':'bg-amber-100'} flex items-center justify-center flex-shrink-0">
+                <i data-lucide="package" class="w-4 h-4 ${p.risk==='Critical'?'text-red-600':'text-amber-600'}"></i>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2">
+                  <p class="text-sm font-medium text-slate-700 truncate">${p.name}</p>
+                  <span class="text-xs text-slate-400">${p.sku}</span>
+                </div>
+                <p class="text-xs text-slate-500">Stock: <span class="font-semibold ${p.stock===0?'text-red-600':'text-amber-600'}">${p.stock}</span> · ${p.daysRemaining>0?`${p.daysRemaining} days left`:'OUT OF STOCK'}</p>
+              </div>
+              ${badge(p.risk,p.risk==='Critical'?'red':'amber')}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderFeedItems(){
+  const colors = {critical:'border-l-red-500 bg-red-50',warning:'border-l-amber-500 bg-amber-50',info:'border-l-blue-500 bg-blue-50',success:'border-l-emerald-500 bg-emerald-50'};
+  return state.feed.slice(0,15).map(e=>`
+    <div class="flex items-start gap-3 p-2.5 rounded-lg border-l-2 ${colors[e.type]||colors.info}">
+      <p class="text-sm text-slate-700 flex-1">${esc(e.message)}</p>
+      <span class="text-xs text-slate-400 whitespace-nowrap">${timeAgo(e.time)}</span>
+    </div>
+  `).join('');
+}
+
+function renderFeed(){
+  const container = document.getElementById('feed-container');
+  if(container) container.innerHTML = renderFeedItems();
+}
+
+function renderOrders(){
+  let filtered = [...ORDERS];
+  if(state.searchQuery){
+    const q = state.searchQuery.toLowerCase();
+    filtered = filtered.filter(o=>o.id.toLowerCase().includes(q)||o.customer.toLowerCase().includes(q)||o.items.some(it=>it.sku.toLowerCase().includes(q)||it.name.toLowerCase().includes(q)));
+  }
+  if(state.filters.priority!=='all') filtered = filtered.filter(o=>calcPriority(o).priority===state.filters.priority);
+  if(state.filters.status!=='all') filtered = filtered.filter(o=>o.status===state.filters.status);
+
+  const totalPages = Math.ceil(filtered.length/state.pageSize);
+  const page = Math.min(state.currentPage.orders, totalPages||1);
+  const start = (page-1)*state.pageSize;
+  const paged = filtered.slice(start,start+state.pageSize);
+
+  return `
+  <div class="fade-in space-y-4">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div>
+        <h2 class="text-xl font-bold text-slate-800">Order Management</h2>
+        <p class="text-sm text-slate-500">${filtered.length} orders · ${filtered.filter(o=>calcPriority(o).priority==='Critical').length} critical</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="actions.showNewOrderModal()" class="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-700">
+          <i data-lucide="plus" class="w-4 h-4"></i> New Order
+        </button>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white rounded-xl p-4 border border-slate-200 flex flex-wrap items-center gap-3">
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-medium text-slate-500">Priority:</span>
+        <select onchange="state.filters.priority=this.value;state.currentPage.orders=1;render()" class="text-sm border border-slate-300 rounded-lg px-2 py-1.5">
+          <option value="all">All</option>
+          <option value="Critical" ${state.filters.priority==='Critical'?'selected':''}>Critical</option>
+          <option value="High" ${state.filters.priority==='High'?'selected':''}>High</option>
+          <option value="Medium" ${state.filters.priority==='Medium'?'selected':''}>Medium</option>
+          <option value="Low" ${state.filters.priority==='Low'?'selected':''}>Low</option>
+        </select>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-medium text-slate-500">Status:</span>
+        <select onchange="state.filters.status=this.value;state.currentPage.orders=1;render()" class="text-sm border border-slate-300 rounded-lg px-2 py-1.5">
+          <option value="all">All</option>
+          ${ORDER_STATUSES.map(s=>`<option value="${s}" ${state.filters.status===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+      <button onclick="state.filters={priority:'all',status:'all',zone:'all'};state.currentPage.orders=1;render()" class="text-xs text-slate-500 hover:text-slate-700">Clear filters</button>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-slate-50 border-b border-slate-200">
+            <tr>
+              <th class="text-left px-4 py-3 font-semibold text-slate-600">Order ID</th>
+              <th class="text-left px-4 py-3 font-semibold text-slate-600">Customer</th>
+              <th class="text-left px-4 py-3 font-semibold text-slate-600">Items</th>
+              <th class="text-left px-4 py-3 font-semibold text-slate-600">Total</th>
+              <th class="text-left px-4 py-3 font-semibold text-slate-600">Priority</th>
+              <th class="text-left px-4 py-3 font-semibold text-slate-600">Status</th>
+              <th class="text-left px-4 py-3 font-semibold text-slate-600">Deadline</th>
+              <th class="text-left px-4 py-3 font-semibold text-slate-600">Exception</th>
+              <th class="text-right px-4 py-3 font-semibold text-slate-600">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            ${paged.length===0?`<tr><td colspan="9" class="text-center py-12 text-slate-400">
+              <div class="flex flex-col items-center gap-2">
+                <i data-lucide="inbox" class="w-10 h-10 text-slate-300"></i>
+                <p>No orders found</p>
+              </div></td></tr>`:paged.map(o=>{
+              const pri = calcPriority(o);
+              const hrsLeft = hoursUntil(o.deadline);
+              return `
+              <tr class="hover:bg-slate-50 transition-colors">
+                <td class="px-4 py-3 font-mono font-semibold text-brand-600">${o.id}</td>
+                <td class="px-4 py-3">
+                  <div class="font-medium text-slate-700">${esc(o.customer)}</div>
+                  <div class="text-xs text-slate-400">${o.customerTier}</div>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="text-xs text-slate-600">${o.items.length} item(s)</div>
+                  <div class="text-xs text-slate-400 truncate max-w-[120px]">${o.items.map(i=>i.name).join(', ')}</div>
+                </td>
+                <td class="px-4 py-3 font-semibold text-slate-700">${fmtCur(o.total)}</td>
+                <td class="px-4 py-3">${priorityBadge(pri.priority)}</td>
+                <td class="px-4 py-3">${statusBadge(o.status)}</td>
+                <td class="px-4 py-3">
+                  <div class="text-xs ${hrsLeft<4?'text-red-600 font-semibold':hrsLeft<24?'text-amber-600':'text-slate-600'}">${fmtDateShort(o.deadline)}</div>
+                  <div class="text-xs text-slate-400">${hrsLeft<0?`${Math.abs(hrsLeft)}h overdue`:`${hrsLeft}h left`}</div>
+                </td>
+                <td class="px-4 py-3">${o.exceptionStatus!=='None'?badge(o.exceptionStatus,'red'):'<span class="text-slate-300 text-xs">—</span>'}</td>
+                <td class="px-4 py-3 text-right">
+                  <button onclick="actions.viewOrder('${o.id}')" class="text-brand-600 hover:text-brand-700 text-xs font-semibold">View</button>
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+      ${totalPages>1?`
+      <div class="flex items-center justify-between px-4 py-3 border-t border-slate-200">
+        <span class="text-xs text-slate-500">Page ${page} of ${totalPages}</span>
+        <div class="flex gap-1">
+          <button onclick="state.currentPage.orders=${page-1};render()" ${page<=1?'disabled':''} class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs disabled:opacity-40 enabled:hover:bg-slate-50">Prev</button>
+          <button onclick="state.currentPage.orders=${page+1};render()" ${page>=totalPages?'disabled':''} class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs disabled:opacity-40 enabled:hover:bg-slate-50">Next</button>
+        </div>
+      </div>`:''}
+    </div>
+  </div>`;
+}
+
+function renderInventory(){
+  let filtered = [...PRODUCTS];
+  if(state.searchQuery){
+    const q = state.searchQuery.toLowerCase();
+    filtered = filtered.filter(p=>p.sku.toLowerCase().includes(q)||p.name.toLowerCase().includes(q)||p.category.toLowerCase().includes(q));
+  }
+  return `
+  <div class="fade-in space-y-4">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div>
+        <h2 class="text-xl font-bold text-slate-800">Inventory Management</h2>
+        <p class="text-sm text-slate-500">${PRODUCTS.length} products · ${PRODUCTS.filter(p=>p.status==='In Stock').length} in stock · ${PRODUCTS.filter(p=>p.status==='Out of Stock').length} out of stock</p>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="navigate('smartDecisions')" class="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-semibold hover:bg-purple-700">
+          <i data-lucide="brain" class="w-4 h-4"></i> Smart Reorder
+        </button>
+      </div>
+    </div>
+
+    <!-- Stock Summary -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      ${statCard('In Stock',PRODUCTS.filter(p=>p.status==='In Stock').length,'check-circle','bg-emerald-500')}
+      ${statCard('Low Stock',PRODUCTS.filter(p=>p.status==='Low Stock').length,'trending-down','bg-amber-500')}
+      ${statCard('Critical',PRODUCTS.filter(p=>p.status==='Critical Stock').length,'alert-octagon','bg-orange-500')}
+      ${statCard('Out of Stock',PRODUCTS.filter(p=>p.status==='Out of Stock').length,'x-circle','bg-red-500')}
+    </div>
+
+    <!-- Inventory Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+      ${filtered.slice(0,24).map(p=>{
+        const stockColor = p.status==='Out of Stock'?'red':p.status==='Critical Stock'?'red':p.status==='Low Stock'?'amber':'green';
+        const stockPct = Math.min(100,(p.stock/100)*100);
+        return `
+        <div class="bg-white rounded-xl p-4 border border-slate-200 card-hover">
+          <div class="flex items-start gap-3">
+            <img src="${p.image}" alt="${p.name}" class="w-14 h-14 rounded-lg object-cover bg-slate-100"/>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-start justify-between gap-2">
+                <div class="min-w-0">
+                  <p class="font-semibold text-sm text-slate-800 truncate">${p.name}</p>
+                  <p class="text-xs text-slate-400 font-mono">${p.sku}</p>
+                </div>
+                ${statusBadge(p.status)}
+              </div>
+            </div>
+          </div>
+          <div class="mt-3 space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slate-500">Stock Level</span>
+              <span class="font-bold text-slate-700">${p.stock} <span class="text-slate-400 font-normal">/ ${p.reorderLevel} reorder</span></span>
+            </div>
+            ${progressBar(p.stock,p.reorderLevel*2, p.status==='Out of Stock'?'bg-red-500':p.status==='Critical Stock'?'bg-red-500':p.status==='Low Stock'?'bg-amber-500':'bg-emerald-500')}
+            <div class="flex items-center justify-between text-xs text-slate-500">
+              <span><i data-lucide="map-pin" class="w-3 h-3 inline"></i> Zone ${p.zone} · S${p.shelf}/R${p.rack}/B${p.bin}</span>
+              <span class="font-medium">${fmtCur(p.price)}</span>
+            </div>
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slate-400">Demand: ${p.dailyDemand}/day</span>
+              <span class="text-slate-400">${p.supplier}</span>
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+function renderAllocation(){
+  const conflict = resolveAllocation('SKU-103');
+  const lowStock = detectLowStock();
+  return `
+  <div class="fade-in space-y-4">
+    <div>
+      <h2 class="text-xl font-bold text-slate-800">Smart Inventory Allocation</h2>
+      <p class="text-sm text-slate-500">AI-powered conflict resolution and stock distribution</p>
+    </div>
+
+    ${conflict?`
+    <!-- Demo Scenario: Active Conflict -->
+    <div class="bg-gradient-to-br from-red-50 to-amber-50 border-2 border-red-200 rounded-xl p-5">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-lg bg-red-500 flex items-center justify-center">
+          <i data-lucide="git-branch" class="w-5 h-5 text-white"></i>
+        </div>
+        <div>
+          <h3 class="font-bold text-slate-800">Stock Allocation Conflict Detected</h3>
+          <p class="text-sm text-slate-600">${conflict.product.name} (${conflict.sku}) — ${conflict.totalDemand} units demanded, only ${conflict.available} available</p>
+        </div>
+      </div>
+
+      <!-- Conflict Visualization -->
+      <div class="bg-white rounded-lg p-4 mb-4">
+        <div class="flex items-center justify-center gap-4 mb-4">
+          <div class="text-center">
+            <div class="w-16 h-16 rounded-xl bg-red-100 flex items-center justify-center mb-2">
+              <i data-lucide="alert-octagon" class="w-8 h-8 text-red-600"></i>
+            </div>
+            <p class="text-xs font-semibold text-slate-600">Shortfall</p>
+            <p class="text-lg font-bold text-red-600">${conflict.shortfall} units</p>
+          </div>
+          <div class="text-center px-6">
+            <p class="text-xs text-slate-400 mb-1">Total Demand</p>
+            <p class="text-2xl font-bold text-slate-800">${conflict.totalDemand}</p>
+            <div class="flex items-center justify-center gap-1 my-2">
+              <i data-lucide="minus" class="w-4 h-4 text-red-400"></i>
+            </div>
+            <p class="text-xs text-slate-400 mb-1">Available</p>
+            <p class="text-2xl font-bold text-amber-600">${conflict.available}</p>
+            <div class="flex items-center justify-center gap-1 my-2">
+              <i data-lucide="equal" class="w-4 h-4 text-slate-400"></i>
+            </div>
+            <p class="text-xs text-slate-400 mb-1">Shortfall</p>
+            <p class="text-2xl font-bold text-red-600">${conflict.shortfall}</p>
+          </div>
+        </div>
+
+        <!-- Competing Orders -->
+        <div class="space-y-3">
+          ${conflict.decisions.map((d,i)=>`
+            <div class="border-2 ${i===0?'border-red-300 bg-red-50/50':'border-slate-200 bg-slate-50/50'} rounded-lg p-3">
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-3">
+                  <span class="font-mono font-bold text-brand-600">${d.orderId}</span>
+                  ${priorityBadge(d.priority)}
+                  <span class="text-xs text-slate-500">${d.customer} (${d.customerTier})</span>
+                </div>
+                <div class="text-xs text-slate-500">
+                  Requested: <span class="font-bold text-slate-700">${d.requested}</span> · 
+                  Allocated: <span class="font-bold ${d.fullyAllocated?'text-emerald-600':'text-amber-600'}">${d.allocated}</span> ${d.remaining>0?`· Short: <span class="font-bold text-red-600">${d.remaining}</span>`:''}
+                </div>
+              </div>
+              <div class="flex items-center gap-2 mb-2">
+                ${progressBar(d.allocated,d.requested, d.fullyAllocated?'bg-emerald-500':'bg-amber-500')}
+                <span class="text-xs font-semibold ${d.fullyAllocated?'text-emerald-600':'text-amber-600'}">${d.fullyAllocated?'Fully Allocated':'Partially Allocated'}</span>
+              </div>
+              <div class="flex flex-wrap gap-1">
+                ${d.reasons.map(r=>`<span class="text-xs px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-600">${r}</span>`).join('')}
+              </div>
+              ${i===0?`
+              <div class="mt-2 p-2 rounded bg-brand-50 border border-brand-200">
+                <p class="text-xs text-brand-700 font-medium"><i data-lucide="lightbulb" class="w-3 h-3 inline"></i> Recommended: Allocate ${d.allocated}/${d.requested} units to this order (highest priority score: ${d.score})</p>
+              </div>`:''}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Decision Panel -->
+      <div class="bg-white rounded-lg p-4">
+        <div class="flex items-start gap-3 mb-3">
+          <div class="w-8 h-8 rounded-lg bg-brand-100 flex items-center justify-center flex-shrink-0">
+            <i data-lucide="brain" class="w-4 h-4 text-brand-600"></i>
+          </div>
+          <div class="flex-1">
+            <h4 class="font-bold text-sm text-slate-800">AI Decision Recommendation</h4>
+            <p class="text-sm text-slate-600 mt-1">${conflict.recommendation}</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+          <div class="text-center p-2 rounded-lg bg-slate-50">
+            <p class="text-xs text-slate-500">Requested</p>
+            <p class="text-lg font-bold text-slate-800">${conflict.totalDemand}</p>
+          </div>
+          <div class="text-center p-2 rounded-lg bg-amber-50">
+            <p class="text-xs text-slate-500">Available</p>
+            <p class="text-lg font-bold text-amber-600">${conflict.available}</p>
+          </div>
+          <div class="text-center p-2 rounded-lg bg-emerald-50">
+            <p class="text-xs text-slate-500">Allocated</p>
+            <p class="text-lg font-bold text-emerald-600">${conflict.decisions[0].allocated}</p>
+          </div>
+          <div class="text-center p-2 rounded-lg bg-red-50">
+            <p class="text-xs text-slate-500">Remaining Need</p>
+            <p class="text-lg font-bold text-red-600">${conflict.shortfall}</p>
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button onclick="actions.applyAllocation('${conflict.sku}')" class="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-700">
+            <i data-lucide="check" class="w-4 h-4"></i> Apply AI Decision
+          </button>
+          <button onclick="actions.overrideAllocation('${conflict.sku}')" class="flex items-center gap-2 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm font-semibold hover:bg-slate-50">
+            <i data-lucide="edit-3" class="w-4 h-4"></i> Override Decision
+          </button>
+          <button onclick="actions.triggerReorder('${conflict.sku}', 100)" class="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-semibold hover:bg-amber-700">
+            <i data-lucide="shopping-bag" class="w-4 h-4"></i> Trigger Reorder (100 units)
+          </button>
+        </div>
+      </div>
+    </div>`:`<div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4"><p class="text-sm text-emerald-700">No allocation conflicts detected.</p></div>`}
+
+    <!-- Low Stock Reorder Recommendations -->
+    <div class="bg-white rounded-xl p-5 border border-slate-200">
+      <h3 class="font-bold text-slate-800 mb-4">Low Stock — Reorder Recommendations</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-slate-50 border-b border-slate-200">
+            <tr>
+              <th class="text-left px-4 py-2 font-semibold text-slate-600">SKU</th>
+              <th class="text-left px-4 py-2 font-semibold text-slate-600">Product</th>
+              <th class="text-left px-4 py-2 font-semibold text-slate-600">Current</th>
+              <th class="text-left px-4 py-2 font-semibold text-slate-600">Reorder Level</th>
+              <th class="text-left px-4 py-2 font-semibold text-slate-600">Daily Demand</th>
+              <th class="text-left px-4 py-2 font-semibold text-slate-600">Days Left</th>
+              <th class="text-left px-4 py-2 font-semibold text-slate-600">Risk</th>
+              <th class="text-left px-4 py-2 font-semibold text-slate-600">Reorder Qty</th>
+              <th class="text-right px-4 py-2 font-semibold text-slate-600">Action</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            ${lowStock.map(p=>`
+              <tr class="hover:bg-slate-50">
+                <td class="px-4 py-2 font-mono text-xs">${p.sku}</td>
+                <td class="px-4 py-2 font-medium text-slate-700">${p.name}</td>
+                <td class="px-4 py-2"><span class="font-bold ${p.stock===0?'text-red-600':p.stock<=10?'text-orange-600':'text-amber-600'}">${p.stock}</span></td>
+                <td class="px-4 py-2 text-slate-600">${p.reorderLevel}</td>
+                <td class="px-4 py-2 text-slate-600">${p.dailyDemand}/day</td>
+                <td class="px-4 py-2 ${p.daysRemaining<2?'text-red-600 font-bold':'text-amber-600'}">${p.daysRemaining>0?p.daysRemaining+' days':'OUT'}</td>
+                <td class="px-4 py-2">${badge(p.risk,p.risk==='Critical'?'red':p.risk==='High'?'amber':'blue')}</td>
+                <td class="px-4 py-2 font-semibold text-slate-700">${p.reorderQty}</td>
+                <td class="px-4 py-2 text-right"><button onclick="actions.triggerReorder('${p.sku}',${p.reorderQty})" class="text-brand-600 hover:text-brand-700 text-xs font-semibold">Reorder Now</button></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderPicking(){
+  const pickingOrders = ORDERS.filter(o=>o.status==='Picking'||o.status==='Confirmed'||o.status==='Allocated').slice(0,6);
+  return `
+  <div class="fade-in space-y-4">
+    <div>
+      <h2 class="text-xl font-bold text-slate-800">Picking Management</h2>
+      <p class="text-sm text-slate-500">Optimized picking routes and task assignments</p>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      ${statCard('Pending Tasks',ORDERS.filter(o=>o.status==='Confirmed'||o.status==='Allocated').length,'clock','bg-amber-500')}
+      ${statCard('Active Picking',ORDERS.filter(o=>o.status==='Picking').length,'map-pin','bg-purple-500')}
+      ${statCard('Completed Today','8','check-circle','bg-emerald-500')}
+      ${statCard('Avg Pick Time','12min','timer','bg-blue-500')}
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <!-- Picking Tasks -->
+      <div class="lg:col-span-1 space-y-3">
+        <h3 class="font-bold text-slate-800 text-sm">Active Picking Tasks</h3>
+        ${pickingOrders.map(o=>{
+          const pri = calcPriority(o);
+          return `
+          <div class="bg-white rounded-xl p-4 border border-slate-200 card-hover cursor-pointer" onclick="actions.selectPickingTask('${o.id}')">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-mono font-bold text-brand-600 text-sm">${o.id}</span>
+              ${priorityBadge(pri.priority)}
+            </div>
+            <p class="text-xs text-slate-600 mb-2">${o.items.length} items · ${o.items.reduce((s,i)=>s+i.qty,0)} units</p>
+            <div class="flex items-center gap-2 text-xs text-slate-500">
+              <i data-lucide="map-pin" class="w-3 h-3"></i>
+              <span>Zones: ${[...new Set(o.items.map(i=>i.zone))].join(', ')}</span>
+            </div>
+            <div class="mt-2 flex items-center justify-between">
+              <span class="text-xs text-slate-400">${o.customer}</span>
+              ${o.picker?`<span class="text-xs text-slate-600">${o.picker}</span>`:`<button onclick="event.stopPropagation();actions.assignPicker('${o.id}')" class="text-xs text-brand-600 font-semibold">Assign →</button>`}
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+
+      <!-- Route Optimization -->
+      <div class="lg:col-span-2 bg-white rounded-xl p-5 border border-slate-200">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="font-bold text-slate-800">Optimized Picking Route</h3>
+            <p class="text-xs text-slate-500">Minimized travel distance · Sorted by zone → shelf → rack</p>
+          </div>
+          <div class="flex items-center gap-2 px-3 py-1 rounded-lg bg-emerald-50 border border-emerald-200">
+            <i data-lucide="zap" class="w-3.5 h-3.5 text-emerald-600"></i>
+            <span class="text-xs font-semibold text-emerald-700">AI Optimized</span>
+          </div>
+        </div>
+
+        ${pickingOrders[0]?(()=>{
+          const route = optimizeRoute(pickingOrders[0]);
+          return `
+          <div class="grid grid-cols-3 gap-3 mb-4">
+            <div class="text-center p-3 rounded-lg bg-slate-50">
+              <p class="text-xs text-slate-500">Est. Distance</p>
+              <p class="text-xl font-bold text-slate-800">${route.distance}m</p>
+            </div>
+            <div class="text-center p-3 rounded-lg bg-slate-50">
+              <p class="text-xs text-slate-500">Est. Time</p>
+              <p class="text-xl font-bold text-slate-800">${route.time}min</p>
+            </div>
+            <div class="text-center p-3 rounded-lg bg-emerald-50">
+              <p class="text-xs text-slate-500">Efficiency</p>
+              <p class="text-xl font-bold text-emerald-600">${route.efficiency}%</p>
+            </div>
+          </div>
+
+          <!-- Route Visualization -->
+          <div class="bg-slate-50 rounded-lg p-4 mb-4">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold text-slate-600">Recommended Route for ${pickingOrders[0].id}</span>
+              <span class="text-xs text-slate-400">${route.locations} locations</span>
+            </div>
+            <div class="flex items-center gap-1 overflow-x-auto pb-2">
+              ${route.route.map((loc,i)=>`
+                <div class="flex items-center gap-1 flex-shrink-0">
+                  <div class="flex flex-col items-center">
+                    <div class="w-10 h-10 rounded-lg ${i===0?'bg-brand-600 text-white':'bg-white border-2 border-brand-300 text-brand-700'} flex items-center justify-center font-bold text-xs">
+                      ${i+1}
+                    </div>
+                    <div class="text-xs text-slate-500 mt-1 text-center">
+                      <div class="font-semibold">${loc.zone}${loc.shelf}</div>
+                      <div>R${loc.rack}/B${loc.bin}</div>
+                    </div>
+                  </div>
+                  ${i<route.route.length-1?`<i data-lucide="arrow-right" class="w-4 h-4 text-slate-400 mx-1"></i>`:''}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Item Details -->
+          <div class="space-y-2">
+            <h4 class="text-xs font-semibold text-slate-600 uppercase tracking-wide">Pick List</h4>
+            ${route.route.map((loc,i)=>`
+              <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50">
+                <div class="w-7 h-7 rounded-full bg-brand-100 flex items-center justify-center text-xs font-bold text-brand-700">${i+1}</div>
+                <div class="flex-1">
+                  <p class="text-sm font-medium text-slate-700">${loc.name}</p>
+                  <p class="text-xs text-slate-400 font-mono">${loc.sku}</p>
+                </div>
+                <div class="text-right">
+                  <p class="text-sm font-bold text-slate-700">${loc.qty} units</p>
+                  <p class="text-xs text-slate-400">Zone ${loc.zone} · S${loc.shelf}/R${loc.rack}/B${loc.bin}</p>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="flex gap-2 mt-4">
+            <button onclick="actions.startPicking('${pickingOrders[0].id}')" class="flex-1 px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-700">Start Picking</button>
+            <button onclick="actions.completePicking('${pickingOrders[0].id}')" class="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-semibold hover:bg-emerald-700">Mark Complete</button>
+          </div>
+          `;
+        })():'<p class="text-slate-400 text-sm">No active picking tasks</p>'}
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderPacking(){
+  const packingOrders = ORDERS.filter(o=>o.status==='Packing'||o.status==='Picked').slice(0,8);
+  return `
+  <div class="fade-in space-y-4">
+    <div>
+      <h2 class="text-xl font-bold text-slate-800">Packing Station</h2>
+      <p class="text-sm text-slate-500">Manage packing tasks and packaging</p>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      ${statCard('In Queue',ORDERS.filter(o=>o.status==='Picked').length,'inbox','bg-amber-500')}
+      ${statCard('Packing',ORDERS.filter(o=>o.status==='Packing').length,'box','bg-purple-500')}
+      ${statCard('Completed Today','12','check-circle','bg-emerald-500')}
+      ${statCard('Avg Time','8min','timer','bg-blue-500')}
+    </div>
+
+    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <div class="p-4 border-b border-slate-200">
+        <h3 class="font-bold text-slate-800 text-sm">Packing Queue</h3>
+      </div>
+      <div class="divide-y divide-slate-100">
+        ${packingOrders.length===0?'<p class="p-8 text-center text-slate-400">No orders in packing queue</p>':
+        packingOrders.map(o=>{
+          const pri = calcPriority(o);
+          return `
+          <div class="p-4 hover:bg-slate-50 flex items-center gap-4">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-3 mb-1">
+                <span class="font-mono font-bold text-brand-600">${o.id}</span>
+                ${priorityBadge(pri.priority)}
+                ${statusBadge(o.status)}
+              </div>
+              <div class="flex items-center gap-4 text-xs text-slate-500">
+                <span><i data-lucide="user" class="w-3 h-3 inline"></i> ${o.customer}</span>
+                <span><i data-lucide="package" class="w-3 h-3 inline"></i> ${o.items.length} items</span>
+                <span><i data-lucide="dollar-sign" class="w-3 h-3 inline"></i> ${fmtCur(o.total)}</span>
+                <span><i data-lucide="clock" class="w-3 h-3 inline"></i> ${hoursUntil(o.deadline)}h to deadline</span>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              ${o.status==='Picked'?`<button onclick="actions.startPacking('${o.id}')" class="px-3 py-1.5 bg-brand-600 text-white rounded-lg text-xs font-semibold hover:bg-brand-700">Start Packing</button>`:''}
+              ${o.status==='Packing'?`<button onclick="actions.completePacking('${o.id}')" class="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700">Complete</button>`:''}
+              <button onclick="actions.reportIssue('${o.id}','packing')" class="px-3 py-1.5 border border-red-300 text-red-600 rounded-lg text-xs font-semibold hover:bg-red-50">Report Issue</button>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderQualityCheck(){
+  const qcOrders = ORDERS.filter(o=>o.status==='Quality Check'||o.status==='Packing').slice(0,6);
+  return `
+  <div class="fade-in space-y-4">
+    <div>
+      <h2 class="text-xl font-bold text-slate-800">Quality Check Station</h2>
+      <p class="text-sm text-slate-500">Pre-dispatch verification and quality assurance</p>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      ${statCard('Pending QC',qcOrders.length,'clipboard-check','bg-amber-500')}
+      ${statCard('Passed Today','10','check-circle','bg-emerald-500')}
+      ${statCard('Failed Today','2','x-circle','bg-red-500')}
+      ${statCard('Pass Rate','83%','percent','bg-blue-500')}
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="bg-white rounded-xl p-5 border border-slate-200">
+        <h3 class="font-bold text-slate-800 mb-4">QC Checklist</h3>
+        <div class="space-y-3">
+          ${['Correct products verified','Correct quantity confirmed','Product condition checked','Packaging condition verified','Shipping label attached','Customer information validated'].map((item,i)=>`
+            <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
+              <input type="checkbox" ${i<4?'checked':''} class="w-4 h-4 rounded text-brand-600 focus:ring-brand-500" />
+              <span class="text-sm text-slate-700">${item}</span>
+              <span class="ml-auto text-xs ${i<4?'text-emerald-600':'text-slate-400'}">${i<4?'✓ Passed':'Pending'}</span>
+            </label>
+          `).join('')}
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl p-5 border border-slate-200">
+        <h3 class="font-bold text-slate-800 mb-4">Orders Awaiting QC</h3>
+        <div class="space-y-2">
+          ${qcOrders.map(o=>{
+            const pri = calcPriority(o);
+            return `
+            <div class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:border-brand-300">
+              <div class="flex-1">
+                <div class="flex items-center gap-2">
+                  <span class="font-mono font-bold text-brand-600 text-sm">${o.id}</span>
+                  ${priorityBadge(pri.priority)}
+                </div>
+                <p class="text-xs text-slate-500 mt-1">${o.customer} · ${o.items.length} items</p>
+              </div>
+              <div class="flex gap-1">
+                <button onclick="actions.passQC('${o.id}')" class="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700">Pass</button>
+                <button onclick="actions.failQC('${o.id}')" class="px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs font-semibold hover:bg-red-700">Fail</button>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderDispatch(){
+  const dispatchOrders = ORDERS.filter(o=>o.status==='Ready for Dispatch'||o.status==='Dispatched'||o.status==='Delivered').slice(0,10);
+  return `
+  <div class="fade-in space-y-4">
+    <div>
+      <h2 class="text-xl font-bold text-slate-800">Dispatch Tracking</h2>
+      <p class="text-sm text-slate-500">Monitor dispatch status and carrier tracking</p>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      ${statCard('Ready to Dispatch',ORDERS.filter(o=>o.status==='Ready for Dispatch').length,'package-check','bg-emerald-500')}
+      ${statCard('Dispatched Today','5','truck','bg-blue-500')}
+      ${statCard('In Transit','3','navigation','bg-purple-500')}
+      ${statCard('Delivered','2','home','bg-emerald-600')}
+    </div>
+
+    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-slate-50 border-b border-slate-200">
+            <tr>
+              <th class="text-left px-4 py-3 font-semibold text-slate-600">Order ID</th>
+              <th class="text-left px-4 py-3 font-semibold text-slate-600">Customer</th>
+              <th class="text-left px-4 py-3 font-semibold text-slate-600">Shipping Method</th>
+              <th class="text-left px-4 py-3 font-semibold text-slate-600">Carrier</th>
+              <th class="text-left px-4 py-3 font-semibold text-slate-600">Tracking #</th>
+              <th class="text-left px-4 py-3 font-semibold text-slate-600">Status</th>
+              <th class="text-left px-4 py-3 font-semibold text-slate-600">Delay</th>
+              <th class="text-right px-4 py-3 font-semibold text-slate-600">Action</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            ${dispatchOrders.map(o=>{
+              const carrier = CARRIERS[Math.floor(Math.random()*CARRIERS.length)];
+              const tracking = o.status==='Dispatched'||o.status==='Delivered' ? `${carrier.substring(0,2).toUpperCase()}${Math.floor(Math.random()*900000000)+100000000}` : '—';
+              const delay = o.exceptionStatus==='Dispatch Delay' ? '35 min' : '—';
+              return `
+              <tr class="hover:bg-slate-50">
+                <td class="px-4 py-3 font-mono font-semibold text-brand-600">${o.id}</td>
+                <td class="px-4 py-3 text-slate-700">${esc(o.customer)}</td>
+                <td class="px-4 py-3">${badge(o.shipMethod,o.shipMethod==='Express'||o.shipMethod==='Same-Day'?'amber':'blue')}</td>
+                <td class="px-4 py-3 text-slate-600">${carrier}</td>
+                <td class="px-4 py-3 font-mono text-xs text-slate-500">${tracking}</td>
+                <td class="px-4 py-3">${statusBadge(o.status)}</td>
+                <td class="px-4 py-3 ${delay!=='—'?'text-red-600 font-semibold':'text-slate-400'}">${delay}</td>
+                <td class="px-4 py-3 text-right">
+                  ${o.status==='Ready for Dispatch'?`<button onclick="actions.dispatch('${o.id}')" class="text-brand-600 hover:text-brand-700 text-xs font-semibold">Dispatch →</button>`:'<span class="text-slate-300 text-xs">—</span>'}
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderExceptions(){
+  return `
+  <div class="fade-in space-y-4">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div>
+        <h2 class="text-xl font-bold text-slate-800">Exception Center</h2>
+        <p class="text-sm text-slate-500">${EXCEPTIONS.filter(e=>e.status==='Open').length} open · ${EXCEPTIONS.filter(e=>e.severity==='Critical').length} critical</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      ${statCard('Open',EXCEPTIONS.filter(e=>e.status==='Open').length,'alert-circle','bg-red-500')}
+      ${statCard('Investigating',EXCEPTIONS.filter(e=>e.status==='Investigating').length,'search','bg-amber-500')}
+      ${statCard('Resolved','0','check-circle','bg-emerald-500')}
+      ${statCard('Critical',EXCEPTIONS.filter(e=>e.severity==='Critical').length,'alert-octagon','bg-red-600')}
+    </div>
+
+    <div class="space-y-3">
+      ${EXCEPTIONS.map(e=>`
+        <div class="bg-white rounded-xl p-4 border border-slate-200 border-l-4 ${e.severity==='Critical'?'border-l-red-500':e.severity==='High'?'border-l-amber-500':'border-l-blue-500'}">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mb-2">
+                <span class="font-mono font-bold text-slate-800">${e.id}</span>
+                ${badge(e.type,e.type==='Missing Item'||e.type==='Damaged Item'||e.type==='Insufficient Stock'?'red':e.type.includes('Delay')?'amber':'purple')}
+                ${badge(e.severity,e.severity==='Critical'?'red':e.severity==='High'?'amber':'blue')}
+                ${statusBadge(e.status)}
+              </div>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs mb-3">
+                <div><span class="text-slate-400">Order:</span> <span class="font-mono font-semibold text-brand-600">${e.order}</span></div>
+                <div><span class="text-slate-400">SKU:</span> <span class="font-mono">${e.sku}</span></div>
+                <div><span class="text-slate-400">Assigned:</span> <span class="text-slate-600">${e.assigned}</span></div>
+                <div><span class="text-slate-400">Created:</span> <span class="text-slate-600">${timeAgo(e.created)}</span></div>
+              </div>
+              <div class="bg-brand-50 rounded-lg p-3 flex items-start gap-2">
+                <i data-lucide="lightbulb" class="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5"></i>
+                <div>
+                  <p class="text-xs font-semibold text-brand-700 mb-0.5">Recommended Action</p>
+                  <p class="text-xs text-slate-600">${e.recommendation}</p>
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col gap-2 flex-shrink-0">
+              ${e.status==='Open'?`
+                <button onclick="actions.resolveException('${e.id}')" class="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700">Resolve</button>
+                <button onclick="actions.investigateException('${e.id}')" class="px-3 py-1.5 border border-slate-300 text-slate-700 rounded-lg text-xs font-semibold hover:bg-slate-50">Investigate</button>
+              `:'<span class="text-xs text-slate-400 px-3 py-1.5">In Progress</span>'}
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  </div>`;
+}
+
+function renderAnalytics(){
+  const bottlenecks = detectBottlenecks();
+  return `
+  <div class="fade-in space-y-4">
+    <div>
+      <h2 class="text-xl font-bold text-slate-800">Analytics & Bottleneck Detection</h2>
+      <p class="text-sm text-slate-500">Performance metrics and operational insights</p>
+    </div>
+
+    <!-- Bottleneck Alerts -->
+    <div class="space-y-3">
+      ${bottlenecks.length>0?`
+        <div class="flex items-center gap-2 mb-2">
+          <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
+          <h3 class="font-bold text-slate-800">⚠️ Bottlenecks Detected</h3>
+        </div>
+      ${bottlenecks.map(b=>`
+        <div class="bg-gradient-to-r from-red-50 to-amber-50 border border-red-200 rounded-xl p-4">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
+              <i data-lucide="alert-octagon" class="w-5 h-5 text-red-600"></i>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mb-1">
+                <h4 class="font-bold text-slate-800 text-sm">${b.stage} Bottleneck</h4>
+                <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-700">${b.deviation} slower</span>
+              </div>
+              <p class="text-sm text-slate-600 mb-2">${b.impact}</p>
+              <div class="grid grid-cols-3 gap-3 mb-2 text-xs">
+                <div><span class="text-slate-400">Current queue:</span> <span class="font-bold text-slate-700">${b.count} orders</span></div>
+                <div><span class="text-slate-400">Avg time:</span> <span class="font-bold text-red-600">${b.avgTime}</span></div>
+                <div><span class="text-slate-400">Expected:</span> <span class="font-bold text-slate-600">${b.expected}</span></div>
+              </div>
+              <div class="bg-white/70 rounded-lg p-2 flex items-start gap-2">
+                <i data-lucide="lightbulb" class="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5"></i>
+                <p class="text-sm text-slate-700"><span class="font-semibold">Recommendation:</span> ${b.recommendation}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('')}`:`<div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4"><p class="text-sm text-emerald-700">No bottlenecks detected. Operations running smoothly.</p></div>`}
+    </div>
+
+    <!-- Performance Metrics -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+      ${statCard('Avg Processing Time','45min','clock','bg-blue-500','Per order')}
+      ${statCard('Avg Picking Time','12min','map-pin','bg-purple-500','Per task')}
+      ${statCard('Avg Packing Time','8min','box','bg-indigo-500','Per order')}
+      ${statCard('Avg Dispatch Time','25min','truck','bg-teal-500','Per order')}
+      ${statCard('Fulfillment Rate','87%','target','bg-emerald-500','On-time delivery')}
+      ${statCard('On-time Dispatch','92%','clock-check','bg-emerald-500','This month')}
+      ${statCard('Picking Accuracy','96%','crosshair','bg-blue-500','Correct items')}
+      ${statCard('Exception Rate','8%','alert-circle','bg-amber-500','Orders with exceptions')}
+    </div>
+
+    <!-- Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="bg-white rounded-xl p-5 border border-slate-200">
+        <h3 class="font-bold text-slate-800 mb-4">Processing Time by Stage</h3>
+        <div class="h-64"><canvas id="chartProcessingTime"></canvas></div>
+      </div>
+      <div class="bg-white rounded-xl p-5 border border-slate-200">
+        <h3 class="font-bold text-slate-800 mb-4">Weekly Performance Trend</h3>
+        <div class="h-64"><canvas id="chartPerformance"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Zone Performance -->
+    <div class="bg-white rounded-xl p-5 border border-slate-200">
+      <h3 class="font-bold text-slate-800 mb-4">Zone-wise Performance</h3>
+      <div class="space-y-4">
+        ${ZONES.map(z=>{
+          const zoneOrders = ORDERS.filter(o=>o.items.some(it=>it.zone===z.id));
+          const accuracy = 85 + Math.floor(Math.random()*15);
+          const avgTime = 8 + Math.floor(Math.random()*15);
+          return `
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <div class="flex items-center gap-2">
+                <div class="w-3 h-3 rounded-full" style="background:${z.color}"></div>
+                <span class="text-sm font-medium text-slate-700">${z.name}</span>
+              </div>
+              <div class="flex items-center gap-4 text-xs text-slate-500">
+                <span>${zoneOrders.length} orders</span>
+                <span>Accuracy: <span class="font-bold ${accuracy>90?'text-emerald-600':'text-amber-600'}">${accuracy}%</span></span>
+                <span>Avg time: <span class="font-bold text-slate-700">${avgTime}min</span></span>
+              </div>
+            </div>
+            ${progressBar(accuracy,100,accuracy>90?'bg-emerald-500':'bg-amber-500')}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderSmartDecisions(){
+  const recs = generateRecommendations();
+  const colors = {red:'bg-red-50 border-red-200',amber:'bg-amber-50 border-amber-200',blue:'bg-blue-50 border-blue-200',purple:'bg-purple-50 border-purple-200',green:'bg-emerald-50 border-emerald-200'};
+  const iconColors = {red:'bg-red-100 text-red-600',amber:'bg-amber-100 text-amber-600',blue:'bg-blue-100 text-blue-600',purple:'bg-purple-100 text-purple-600',green:'bg-emerald-100 text-emerald-600'};
+  return `
+  <div class="fade-in space-y-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center">
+        <i data-lucide="brain" class="w-5 h-5 text-white"></i>
+      </div>
+      <div>
+        <h2 class="text-xl font-bold text-slate-800">Smart Decision Center</h2>
+        <p class="text-sm text-slate-500">AI-powered recommendations · ${recs.length} active</p>
+      </div>
+    </div>
+
+    <!-- Demo Scenario Highlight -->
+    <div class="bg-gradient-to-r from-brand-600 to-purple-600 rounded-xl p-5 text-white">
+      <div class="flex items-center gap-3 mb-3">
+        <i data-lucide="zap" class="w-6 h-6"></i>
+        <h3 class="font-bold text-lg">Live Demo: Stock Allocation Conflict Resolution</h3>
+      </div>
+      <p class="text-sm text-white/90 mb-3">ORD-1001 (Critical, VIP customer, 2h deadline) and ORD-1002 (Medium, regular customer, 5 days) both need SKU-103 (Wireless Headphones Pro). Only 7 of 15 units available.</p>
+      <div class="bg-white/10 backdrop-blur rounded-lg p-3 mb-3">
+        <p class="text-sm"><span class="font-semibold">AI Decision:</span> Allocate 7 units to ORD-1001 → Mark as "Partially Allocated" → Reserve remaining 3 units → Create exception EX-101 → Trigger reorder for 100 units → Notify warehouse manager</p>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="navigate('allocation')" class="px-4 py-2 bg-white text-brand-700 rounded-lg text-sm font-bold hover:bg-white/90">View Full Decision →</button>
+        <button onclick="actions.runDemoScenario()" class="px-4 py-2 bg-white/20 text-white rounded-lg text-sm font-semibold hover:bg-white/30">Execute Demo Scenario</button>
+      </div>
+    </div>
+
+    <!-- Recommendations Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      ${recs.map(r=>`
+        <div class="${colors[r.color]} border rounded-xl p-5">
+          <div class="flex items-start gap-3 mb-3">
+            <div class="w-10 h-10 rounded-lg ${iconColors[r.color]} flex items-center justify-center flex-shrink-0">
+              <i data-lucide="${r.icon}" class="w-5 h-5"></i>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-xs font-bold uppercase tracking-wide text-slate-500">${r.type}</span>
+              </div>
+              <h3 class="font-bold text-slate-800 text-sm">${r.problem}</h3>
+            </div>
+          </div>
+          <div class="space-y-2 mb-4">
+            <div class="bg-white/60 rounded-lg p-2">
+              <p class="text-xs font-semibold text-slate-500 mb-0.5">Data Considered</p>
+              <p class="text-xs text-slate-600">${r.data}</p>
+            </div>
+            <div class="bg-white/60 rounded-lg p-2">
+              <p class="text-xs font-semibold text-slate-500 mb-0.5">Recommended Decision</p>
+              <p class="text-sm text-slate-700 font-medium">${r.decision}</p>
+            </div>
+            <div class="bg-white/60 rounded-lg p-2">
+              <p class="text-xs font-semibold text-slate-500 mb-0.5">Expected Impact</p>
+              <p class="text-xs text-slate-600">${r.impact}</p>
+            </div>
+          </div>
+          <button onclick="actions.applyRecommendation('${r.id}')" class="w-full px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-700 flex items-center justify-center gap-2">
+            <i data-lucide="play" class="w-4 h-4"></i> ${r.action}
+          </button>
+        </div>
+      `).join('')}
+    </div>
+
+    <!-- Decision Flow -->
+    <div class="bg-white rounded-xl p-5 border border-slate-200">
+      <h3 class="font-bold text-slate-800 mb-4">Decision Flow: Data → Analysis → Decision → Action → Result</h3>
+      <div class="flex items-center gap-2 overflow-x-auto pb-2">
+        ${[
+          {icon:'database',label:'Data Collection',desc:'Inventory, orders, deadlines',color:'bg-blue-500'},
+          {icon:'analyze',label:'Analysis',desc:'Conflict detection, priority scoring',color:'bg-purple-500'},
+          {icon:'brain',label:'Decision',desc:'AI recommendation generated',color:'bg-brand-600'},
+          {icon:'play',label:'Action',desc:'Allocation applied, exception created',color:'bg-amber-500'},
+          {icon:'check-circle',label:'Result',desc:'Order partially fulfilled, reorder triggered',color:'bg-emerald-500'}
+        ].map((step,i)=>`
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <div class="flex flex-col items-center text-center w-32">
+              <div class="w-12 h-12 rounded-xl ${step.color} flex items-center justify-center mb-2">
+                <i data-lucide="${step.icon}" class="w-6 h-6 text-white"></i>
+              </div>
+              <p class="text-xs font-bold text-slate-700">${step.label}</p>
+              <p class="text-xs text-slate-400 mt-0.5">${step.desc}</p>
+            </div>
+            ${i<4?`<i data-lucide="chevron-right" class="w-5 h-5 text-slate-300"></i>`:''}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderNotifications(){
+  return `
+  <div class="fade-in space-y-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-xl font-bold text-slate-800">Notifications</h2>
+        <p class="text-sm text-slate-500">${state.notifications.filter(n=>!n.read).length} unread</p>
+      </div>
+      <button onclick="actions.markAllRead()" class="text-sm text-brand-600 font-semibold hover:underline">Mark all read</button>
+    </div>
+
+    <div class="space-y-2">
+      ${state.notifications.map(n=>{
+        const colors = {critical:'border-l-red-500 bg-red-50',warning:'border-l-amber-500 bg-amber-50',attention:'border-l-yellow-500 bg-yellow-50',info:'border-l-blue-500 bg-blue-50'};
+        const icons = {critical:'alert-octagon',warning:'alert-triangle',attention:'eye',info:'info'};
+        const iconColors = {critical:'text-red-600',warning:'text-amber-600',attention:'text-yellow-600',info:'text-blue-600'};
+        return `
+        <div class="${colors[n.type]} border-l-4 rounded-r-xl p-4 flex items-start gap-3 ${n.read?'opacity-60':''}">
+          <i data-lucide="${icons[n.type]}" class="w-5 h-5 ${iconColors[n.type]} flex-shrink-0 mt-0.5"></i>
+          <div class="flex-1">
+            <div class="flex items-center justify-between mb-1">
+              <h3 class="font-semibold text-slate-800 text-sm">${n.title}</h3>
+              <span class="text-xs text-slate-400">${timeAgo(n.time)}</span>
+            </div>
+            <p class="text-sm text-slate-600">${esc(n.message)}</p>
+          </div>
+          ${!n.read?`<button onclick="actions.markRead(${n.id})" class="text-xs text-brand-600 font-semibold">Mark read</button>`:''}
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+function renderSettings(){
+  return `
+  <div class="fade-in space-y-4">
+    <div>
+      <h2 class="text-xl font-bold text-slate-800">Settings</h2>
+      <p class="text-sm text-slate-500">System configuration and preferences</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="bg-gradient-to-r from-brand-600 via-indigo-600 to-purple-700 rounded-xl p-5 text-white col-span-full shadow-lg">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2 mb-1.5">
+              <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-white/20 backdrop-blur">WearAI Platform</span>
+              <span class="text-xs text-brand-200">v2.4.0 (AI Edition)</span>
+            </div>
+            <h3 class="text-xl font-bold">Created & Managed by Sai Rakesh</h3>
+            <p class="text-xs text-brand-100 mt-1 max-w-xl">Autonomous AI-driven Warehouse Management Platform with real-time stock conflict resolution, dynamic allocation, intelligent routing, and predictive replenishment.</p>
+          </div>
+          <a href="https://github.com/sairakesh-143/wearai" target="_blank" class="px-4 py-2 bg-white text-brand-700 rounded-lg text-xs font-bold hover:bg-brand-50 transition-all flex items-center gap-2 shadow-md flex-shrink-0">
+            <i data-lucide="github" class="w-4 h-4"></i> GitHub Repository
+          </a>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl p-5 border border-slate-200">
+        <h3 class="font-bold text-slate-800 mb-4">Profile</h3>
+        <div class="space-y-3">
+          <div>
+            <label class="block text-xs font-medium text-slate-500 mb-1">Name</label>
+            <input type="text" value="${state.user.name}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500"/>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-500 mb-1">Email</label>
+            <input type="email" value="${state.user.email}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500"/>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-500 mb-1">Role</label>
+            <input type="text" value="${state.user.role}" disabled class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 capitalize"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl p-5 border border-slate-200">
+        <h3 class="font-bold text-slate-800 mb-4">System Configuration</h3>
+        <div class="space-y-3">
+          <label class="flex items-center justify-between p-3 rounded-lg border border-slate-200">
+            <div>
+              <p class="text-sm font-medium text-slate-700">Auto-allocation Engine</p>
+              <p class="text-xs text-slate-400">Automatically resolve stock conflicts</p>
+            </div>
+            <input type="checkbox" checked class="w-4 h-4 rounded text-brand-600"/>
+          </label>
+          <label class="flex items-center justify-between p-3 rounded-lg border border-slate-200">
+            <div>
+              <p class="text-sm font-medium text-slate-700">Smart Notifications</p>
+              <p class="text-xs text-slate-400">AI-powered alert prioritization</p>
+            </div>
+            <input type="checkbox" checked class="w-4 h-4 rounded text-brand-600"/>
+          </label>
+          <label class="flex items-center justify-between p-3 rounded-lg border border-slate-200">
+            <div>
+              <p class="text-sm font-medium text-slate-700">Bottleneck Detection</p>
+              <p class="text-xs text-slate-400">Real-time performance monitoring</p>
+            </div>
+            <input type="checkbox" checked class="w-4 h-4 rounded text-brand-600"/>
+          </label>
+          <label class="flex items-center justify-between p-3 rounded-lg border border-slate-200">
+            <div>
+              <p class="text-sm font-medium text-slate-700">Auto Reorder</p>
+              <p class="text-xs text-slate-400">Trigger reorders at threshold</p>
+            </div>
+            <input type="checkbox" class="w-4 h-4 rounded text-brand-600"/>
+          </label>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl p-5 border border-slate-200">
+        <h3 class="font-bold text-slate-800 mb-4">Activity Log</h3>
+        <div class="space-y-2 max-h-64 overflow-y-auto">
+          ${state.activityLog.slice(0,10).map(log=>`
+            <div class="flex items-start gap-3 p-2 rounded-lg hover:bg-slate-50">
+              ${avatar(log.user,log.user==='System'?'bg-slate-500':'bg-brand-600')}
+              <div class="flex-1 min-w-0">
+                <p class="text-sm text-slate-700"><span class="font-semibold">${log.user}</span> ${log.action} <span class="text-brand-600 font-mono text-xs">${log.target}</span></p>
+                <p class="text-xs text-slate-400">${timeAgo(log.time)} · ${log.prev} → ${log.next}</p>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl p-5 border border-slate-200">
+        <h3 class="font-bold text-slate-800 mb-4">Warehouse Zones</h3>
+        <div class="space-y-2">
+          ${ZONES.map(z=>`
+            <div class="flex items-center justify-between p-3 rounded-lg border border-slate-200">
+              <div class="flex items-center gap-3">
+                <div class="w-3 h-3 rounded-full" style="background:${z.color}"></div>
+                <span class="text-sm font-medium text-slate-700">${z.name}</span>
+              </div>
+              <span class="text-xs text-slate-500">${PRODUCTS.filter(p=>p.zone===z.id).length} products</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ==================== ACTIONS ====================
+const actions = {
+  login(){ actions.quickLogin('admin'); },
+  quickLogin(role){
+    const user = EMPLOYEES.find(e=>e.role===role) || EMPLOYEES[0];
+    state.user = user;
+    state.view = 'dashboard';
+    showToast('success',`Welcome back, ${user.name}!`);
+    addActivityLog(user.name,'Logged in','System','-','Active');
+    render();
+    startLiveFeed();
+  },
+  logout(){
+    state.user = null;
+    state.view = 'login';
+    destroyCharts();
+    render();
+  },
+  viewOrder(orderId){
+    const order = ORDERS.find(o=>o.id===orderId);
+    if(!order) return;
+    const pri = calcPriority(order);
+    showModal(`
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="text-lg font-bold text-slate-800">${order.id}</h3>
+            <p class="text-sm text-slate-500">${order.customer} · ${order.customerTier} customer</p>
+          </div>
+          <button onclick="closeModal()" class="p-2 hover:bg-slate-100 rounded-lg"><i data-lucide="x" class="w-5 h-5 text-slate-500"></i></button>
+        </div>
+        <div class="space-y-4">
+          <div class="grid grid-cols-2 gap-3">
+            <div class="bg-slate-50 rounded-lg p-3">
+              <p class="text-xs text-slate-500">Status</p>
+              <div class="mt-1">${statusBadge(order.status)}</div>
+            </div>
+            <div class="bg-slate-50 rounded-lg p-3">
+              <p class="text-xs text-slate-500">Priority</p>
+              <div class="mt-1">${priorityBadge(pri.priority)}</div>
+            </div>
+            <div class="bg-slate-50 rounded-lg p-3">
+              <p class="text-xs text-slate-500">Total Value</p>
+              <p class="text-lg font-bold text-slate-800">${fmtCur(order.total)}</p>
+            </div>
+            <div class="bg-slate-50 rounded-lg p-3">
+              <p class="text-xs text-slate-500">Shipping</p>
+              <p class="text-sm font-semibold text-slate-700">${order.shipMethod}</p>
+            </div>
+          </div>
+          <div>
+            <p class="text-xs font-semibold text-slate-500 uppercase mb-2">Priority Reasoning</p>
+            <div class="flex flex-wrap gap-1">
+              ${pri.reasons.map(r=>`<span class="text-xs px-2 py-1 rounded bg-brand-50 text-brand-700 border border-brand-200">${r}</span>`).join('')}
+            </div>
+          </div>
+          <div>
+            <p class="text-xs font-semibold text-slate-500 uppercase mb-2">Order Items</p>
+            <div class="space-y-2">
+              ${order.items.map(it=>`
+                <div class="flex items-center justify-between p-2 rounded-lg border border-slate-200">
+                  <div>
+                    <p class="text-sm font-medium text-slate-700">${it.name}</p>
+                    <p class="text-xs text-slate-400 font-mono">${it.sku} · Zone ${it.zone} S${it.shelf}/R${it.rack}/B${it.bin}</p>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-sm font-bold">${it.qty} × ${fmtCur(it.price)}</p>
+                    <p class="text-xs text-slate-500">${fmtCur(it.qty*it.price)}</p>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          ${order.exceptionStatus!=='None'?`<div class="bg-red-50 border border-red-200 rounded-lg p-3"><p class="text-sm text-red-700"><i data-lucide="alert-triangle" class="w-4 h-4 inline"></i> Exception: ${order.exceptionStatus}</p></div>`:''}
+        </div>
+      </div>
+    `);
+  },
+  applyAllocation(sku){
+    const result = resolveAllocation(sku);
+    if(!result) return;
+    result.decisions.forEach(d=>{
+      const order = ORDERS.find(o=>o.id===d.orderId);
+      if(order){
+        order.status = d.fullyAllocated ? 'Allocated' : 'Partially Allocated';
+        const product = PRODUCTS.find(p=>p.sku===sku);
+        if(product){
+          product.stock -= d.allocated;
+          product.reserved += d.allocated;
+        }
+      }
+    });
+    showToast('success',`Allocation applied: ${result.decisions[0].allocated} units to ${result.decisions[0].orderId}`);
+    addActivityLog(state.user.name,`allocated ${result.decisions[0].allocated}/${result.decisions[0].requested} units of ${sku} to`,result.decisions[0].orderId,'New','Partially Allocated');
+    addFeedEvent2('success',`${result.decisions[0].allocated} units of ${sku} allocated to ${result.decisions[0].orderId}`);
+    render();
+  },
+  overrideAllocation(sku){
+    showModal(`
+      <div class="p-6">
+        <h3 class="text-lg font-bold text-slate-800 mb-4">Override Allocation Decision</h3>
+        <p class="text-sm text-slate-600 mb-4">Select how to distribute available stock:</p>
+        <div class="space-y-3">
+          <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50">
+            <input type="radio" name="override" value="critical" checked class="w-4 h-4 text-brand-600"/>
+            <div><p class="text-sm font-medium">Allocate to Critical (ORD-1001)</p><p class="text-xs text-slate-500">7 units to ORD-1001, 0 to ORD-1002</p></div>
+          </label>
+          <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50">
+            <input type="radio" name="override" value="split" class="w-4 h-4 text-brand-600"/>
+            <div><p class="text-sm font-medium">Split Equally</p><p class="text-xs text-slate-500">3 units to ORD-1001, 4 to ORD-1002</p></div>
+          </label>
+          <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50">
+            <input type="radio" name="override" value="medium" class="w-4 h-4 text-brand-600"/>
+            <div><p class="text-sm font-medium">Allocate to Medium (ORD-1002)</p><p class="text-xs text-slate-500">5 units to ORD-1002, 2 to ORD-1001</p></div>
+          </label>
+        </div>
+        <div class="flex justify-end gap-2 mt-4">
+          <button onclick="closeModal()" class="px-4 py-2 border border-slate-300 rounded-lg text-sm">Cancel</button>
+          <button onclick="closeModal();showToast('info','Override applied');render()" class="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-semibold">Apply Override</button>
+        </div>
+      </div>
+    `);
+  },
+  triggerReorder(sku,qty){
+    const product = PRODUCTS.find(p=>p.sku===sku);
+    if(!product) return;
+    showToast('success',`Reorder placed: ${qty} units of ${product.name} from ${product.supplier}`);
+    addActivityLog(state.user.name,'placed reorder for',`${sku} (${qty} units)`,'-','Ordered');
+    addFeedEvent2('info',`Reorder placed: ${qty} units of ${sku} from ${product.supplier}`);
+    state.notifications.unshift({
+      id:Date.now(),type:'info',title:'Reorder Placed',
+      message:`${qty} units of ${product.name} (${sku}) ordered from ${product.supplier}.`,
+      time:new Date(),read:false
+    });
+    render();
+  },
+  startPicking(orderId){
+    const order = ORDERS.find(o=>o.id===orderId);
+    if(!order) return;
+    order.status = 'Picking';
+    order.picker = state.user.name;
+    showToast('info',`Picking started for ${orderId}`);
+    addActivityLog(state.user.name,'started picking',orderId,'Confirmed','Picking');
+    addFeedEvent2('info',`Picker ${state.user.name} started picking ${orderId}`);
+    render();
+  },
+  completePicking(orderId){
+    const order = ORDERS.find(o=>o.id===orderId);
+    if(!order) return;
+    order.status = 'Picked';
+    showToast('success',`Picking completed for ${orderId}`);
+    addActivityLog(state.user.name,'completed picking',orderId,'Picking','Picked');
+    addFeedEvent2('success',`Picking completed for ${orderId}`);
+    render();
+  },
+  assignPicker(orderId){
+    const order = ORDERS.find(o=>o.id===orderId);
+    if(!order) return;
+    order.picker = state.user.name;
+    order.status = 'Picking';
+    showToast('info',`Assigned to ${order.picker}`);
+    render();
+  },
+  startPacking(orderId){
+    const order = ORDERS.find(o=>o.id===orderId);
+    if(!order) return;
+    order.status = 'Packing';
+    order.packer = state.user.name;
+    showToast('info',`Packing started for ${orderId}`);
+    addActivityLog(state.user.name,'started packing',orderId,'Picked','Packing');
+    render();
+  },
+  completePacking(orderId){
+    const order = ORDERS.find(o=>o.id===orderId);
+    if(!order) return;
+    order.status = 'Quality Check';
+    showToast('success',`Packing completed for ${orderId}`);
+    addActivityLog(state.user.name,'completed packing',orderId,'Packing','Quality Check');
+    render();
+  },
+  passQC(orderId){
+    const order = ORDERS.find(o=>o.id===orderId);
+    if(!order) return;
+    order.status = 'Ready for Dispatch';
+    showToast('success',`${orderId} passed quality check`);
+    addActivityLog(state.user.name,'passed QC for',orderId,'Quality Check','Ready for Dispatch');
+    addFeedEvent2('success',`Quality check passed for ${orderId}`);
+    render();
+  },
+  failQC(orderId){
+    const order = ORDERS.find(o=>o.id===orderId);
+    if(!order) return;
+    order.status = 'Quality Check';
+    order.exceptionStatus = 'Quality Check Failure';
+    EXCEPTIONS.unshift({
+      id:`EX-${100+EXCEPTIONS.length+1}`,type:'Quality Check Failure',order:orderId,
+      sku:'Multiple',severity:'Critical',status:'Open',created:new Date(),
+      assigned:state.user.name,
+      recommendation:'Re-run quality check. If failed again, create replacement order and notify customer of delay.'
+    });
+    showToast('error',`${orderId} failed quality check — exception created`);
+    addActivityLog(state.user.name,'failed QC for',orderId,'Quality Check','Exception');
+    addFeedEvent2('critical',`Quality check FAILED for ${orderId} — exception created`);
+    state.notifications.unshift({
+      id:Date.now(),type:'critical',title:'Quality Check Failed',
+      message:`${orderId} failed quality check. Exception created.`,
+      time:new Date(),read:false
+    });
+    render();
+  },
+  dispatch(orderId){
+    const order = ORDERS.find(o=>o.id===orderId);
+    if(!order) return;
+    order.status = 'Dispatched';
+    showToast('success',`${orderId} dispatched successfully`);
+    addActivityLog(state.user.name,'dispatched',orderId,'Ready for Dispatch','Dispatched');
+    addFeedEvent2('success',`Order ${orderId} dispatched`);
+    render();
+  },
+  resolveException(exId){
+    const exc = EXCEPTIONS.find(e=>e.id===exId);
+    if(!exc) return;
+    exc.status = 'Resolved';
+    showToast('success',`Exception ${exId} resolved`);
+    addActivityLog(state.user.name,'resolved exception',exId,'Open','Resolved');
+    render();
+  },
+  investigateException(exId){
+    const exc = EXCEPTIONS.find(e=>e.id===exId);
+    if(!exc) return;
+    exc.status = 'Investigating';
+    showToast('info',`Investigating ${exId}`);
+    render();
+  },
+  reportIssue(orderId,stage){
+    showModal(`
+      <div class="p-6">
+        <h3 class="text-lg font-bold text-slate-800 mb-4">Report Issue — ${orderId}</h3>
+        <div class="space-y-3">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Issue Type</label>
+            <select id="issue-type" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+              <option value="missing">Missing Item</option>
+              <option value="damaged">Damaged Item</option>
+              <option value="wrong">Wrong Item</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">SKU</label>
+            <input type="text" id="issue-sku" placeholder="SKU-XXX" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm"/>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Description</label>
+            <textarea id="issue-desc" rows="3" placeholder="Describe the issue..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm"></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Severity</label>
+            <select id="issue-sev" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+              <option>Critical</option><option>High</option><option>Medium</option><option>Low</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 mt-4">
+          <button onclick="closeModal()" class="px-4 py-2 border border-slate-300 rounded-lg text-sm">Cancel</button>
+          <button onclick="actions.submitIssue('${orderId}')" class="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-semibold">Submit Report</button>
+        </div>
+      </div>
+    `);
+  },
+  submitIssue(orderId){
+    const type = document.getElementById('issue-type').value;
+    const sku = document.getElementById('issue-sku').value || 'SKU-XXX';
+    const desc = document.getElementById('issue-desc').value || 'No description';
+    const sev = document.getElementById('issue-sev').value;
+    const excType = type==='missing'?'Missing Item':type==='damaged'?'Damaged Item':'Wrong Item';
+    EXCEPTIONS.unshift({
+      id:`EX-${100+EXCEPTIONS.length+1}`,type:excType,order:orderId,sku,severity:sev,
+      status:'Open',created:new Date(),assigned:state.user.name,
+      recommendation: type==='missing'?'Search alternate warehouse location. Check reserved inventory. Reallocate from safety stock.' : 'Replace item from available stock. File damage report with supplier.'
+    });
+    const order = ORDERS.find(o=>o.id===orderId);
+    if(order) order.exceptionStatus = excType;
+    closeModal();
+    showToast('warning',`Issue reported — exception created for ${orderId}`);
+    addActivityLog(state.user.name,'reported '+excType+' for',orderId,'-','Exception');
+    addFeedEvent2('warning',`${excType} reported for ${orderId} (${sku})`);
+    state.notifications.unshift({
+      id:Date.now(),type:'warning',title:excType,
+      message:`${excType} reported for ${orderId} — ${sku}. Exception created.`,
+      time:new Date(),read:false
+    });
+    render();
+  },
+  applyRecommendation(recId){
+    const recs = generateRecommendations();
+    const rec = recs.find(r=>r.id===recId);
+    if(!rec) return;
+    if(rec.actionType==='reorder'){
+      actions.triggerReorder(rec.actionData.sku, rec.actionData.qty);
+    } else if(rec.actionType==='allocate'){
+      actions.applyAllocation('SKU-103');
+    } else if(rec.actionType==='navigate'){
+      navigate(rec.actionData.view);
+    }
+  },
+  runDemoScenario(){
+    actions.applyAllocation('SKU-103');
+    setTimeout(()=>{
+      actions.triggerReorder('SKU-103',100);
+      showToast('success','Demo scenario executed — check Allocation page for results');
+    },500);
+  },
+  markRead(id){
+    const n = state.notifications.find(n=>n.id===id);
+    if(n) n.read = true;
+    render();
+  },
+  markAllRead(){
+    state.notifications.forEach(n=>n.read=true);
+    render();
+  },
+  selectPickingTask(orderId){
+    actions.viewOrder(orderId);
+  },
+  showNewOrderModal(){
+    showModal(`
+      <div class="p-6">
+        <h3 class="text-lg font-bold text-slate-800 mb-4">Create New Order</h3>
+        <div class="space-y-3">
+          <div><label class="block text-xs font-medium text-slate-500 mb-1">Customer</label>
+            <select class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+              ${CUSTOMERS.map(c=>`<option>${c.name} (${c.tier})</option>`).join('')}
+            </select>
+          </div>
+          <div><label class="block text-xs font-medium text-slate-500 mb-1">Product</label>
+            <select class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+              ${PRODUCTS.slice(0,20).map(p=>`<option value="${p.sku}">${p.name} (${p.sku}) — ${fmtCur(p.price)}</option>`).join('')}
+            </select>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="block text-xs font-medium text-slate-500 mb-1">Quantity</label><input type="number" value="1" min="1" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm"/></div>
+            <div><label class="block text-xs font-medium text-slate-500 mb-1">Shipping</label>
+              <select class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                ${SHIP_METHODS.map(s=>`<option>${s}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 mt-4">
+          <button onclick="closeModal()" class="px-4 py-2 border border-slate-300 rounded-lg text-sm">Cancel</button>
+          <button onclick="closeModal();showToast('success','Order created successfully');render()" class="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-semibold">Create Order</button>
+        </div>
+      </div>
+    `);
+  }
+};
+
+function addFeedEvent2(type,message){
+  state.feed.unshift({type,message,time:new Date()});
+  if(state.feed.length>20) state.feed.pop();
+  if(state.view==='dashboard') renderFeed();
+}
+
+// ==================== SEARCH ====================
+function handleSearch(){
+  if(state.searchQuery.length>0 && state.view!=='orders' && state.view!=='inventory'){
+    navigate('orders');
+  } else {
+    render();
+  }
+}
+
+// ==================== CHARTS ====================
+function renderCharts(){
+  destroyCharts();
+  if(state.view==='dashboard'){
+    // Order status doughnut
+    const statusCtx = document.getElementById('chartOrderStatus');
+    if(statusCtx){
+      const statusCounts = {};
+      ORDERS.forEach(o=>{ statusCounts[o.status]=(statusCounts[o.status]||0)+1; });
+      charts.status = new Chart(statusCtx,{
+        type:'doughnut',
+        data:{labels:Object.keys(statusCounts),datasets:[{data:Object.values(statusCounts),backgroundColor:['#6366f1','#3b82f6','#8b5cf6','#a855f7','#f59e0b','#10b981','#ef4444','#06b6d4','#84cc16','#f97316','#14b8a6'],borderWidth:0}]},
+        options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{position:'right',labels:{boxWidth:10,padding:8,font:{size:10}}}}}
+      });
+    }
+    // Priority bar
+    const priCtx = document.getElementById('chartPriority');
+    if(priCtx){
+      const priCounts = {Critical:0,High:0,Medium:0,Low:0};
+      ORDERS.forEach(o=>{ priCounts[calcPriority(o).priority]++; });
+      charts.priority = new Chart(priCtx,{
+        type:'bar',
+        data:{labels:['Critical','High','Medium','Low'],datasets:[{data:[priCounts.Critical,priCounts.High,priCounts.Medium,priCounts.Low],backgroundColor:['#ef4444','#f59e0b','#3b82f6','#94a3b8'],borderWidth:0,borderRadius:6}]},
+        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{display:false},ticks:{font:{size:10}}},x:{grid:{display:false},ticks:{font:{size:11}}}}}
+      });
+    }
+    // Fulfillment line
+    const fulCtx = document.getElementById('chartFulfillment');
+    if(fulCtx){
+      const labels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+      charts.ful = new Chart(fulCtx,{
+        type:'line',
+        data:{labels,datasets:[
+          {label:'Fulfilled',data:[12,18,15,22,28,25,30],borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.1)',fill:true,tension:.4},
+          {label:'Pending',data:[8,5,10,6,4,7,3],borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,.1)',fill:true,tension:.4}
+        ]},
+        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'#f1f5f9'},ticks:{font:{size:10}}},x:{grid:{display:false},ticks:{font:{size:10}}}}}
+      });
+    }
+  }
+  if(state.view==='analytics'){
+    const ptCtx = document.getElementById('chartProcessingTime');
+    if(ptCtx){
+      charts.pt = new Chart(ptCtx,{
+        type:'bar',
+        data:{labels:['Picking','Packing','QC','Dispatch'],datasets:[{label:'Avg Time (min)',data:[12,8,5,25],backgroundColor:['#8b5cf6','#6366f1','#f59e0b','#06b6d4'],borderRadius:6},{label:'Expected (min)',data:[10,6,4,20],backgroundColor:['#c4b5fd','#a5b4fc','#fcd34d','#67e8f9'],borderRadius:6}]},
+        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:10}}}},scales:{y:{beginAtZero:true,grid:{color:'#f1f5f9'},ticks:{font:{size:10}}},x:{grid:{display:false},ticks:{font:{size:11}}}}}
+      });
+    }
+    const perfCtx = document.getElementById('chartPerformance');
+    if(perfCtx){
+      charts.perf = new Chart(perfCtx,{
+        type:'line',
+        data:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],datasets:[
+          {label:'Fulfillment %',data:[82,87,85,90,92,88,94],borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.1)',fill:true,tension:.4},
+          {label:'On-time %',data:[78,85,88,86,91,89,93],borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.1)',fill:true,tension:.4}
+        ]},
+        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:10}}}},scales:{y:{beginAtZero:false,min:70,max:100,grid:{color:'#f1f5f9'},ticks:{font:{size:10}}},x:{grid:{display:false},ticks:{font:{size:10}}}}}
+      });
+    }
+  }
+}
+
+// ==================== LIVE FEED ====================
+let feedInterval = null;
+function startLiveFeed(){
+  if(feedInterval) clearInterval(feedInterval);
+  feedInterval = setInterval(addFeedEvent, 15000);
+}
+
+// ==================== ROUTER ====================
+function navigate(view){
+  state.view = view;
+  state.sidebarOpen = window.innerWidth <= 1024 ? false : state.sidebarOpen;
+  render();
+}
+
+// ==================== RENDER ====================
+function render(){
+  destroyCharts();
+  if(!state.user){
+    document.getElementById('app').innerHTML = renderLogin();
+    lucide.createIcons();
+    return;
+  }
+
+  const views = {
+    dashboard: renderDashboard,
+    orders: renderOrders,
+    inventory: renderInventory,
+    allocation: renderAllocation,
+    picking: renderPicking,
+    packing: renderPacking,
+    qualityCheck: renderQualityCheck,
+    dispatch: renderDispatch,
+    exceptions: renderExceptions,
+    analytics: renderAnalytics,
+    smartDecisions: renderSmartDecisions,
+    notifications: renderNotifications,
+    settings: renderSettings
+  };
+
+  const viewFn = views[state.view] || renderDashboard;
+  document.getElementById('app').innerHTML = `
+    <div class="flex min-h-screen bg-slate-50">
+      ${renderSidebar()}
+      <div class="flex-1 min-w-0 flex flex-col">
+        ${renderTopbar()}
+        <main class="flex-1 p-4 lg:p-6 overflow-x-hidden">
+          ${viewFn()}
+        </main>
+      </div>
+    </div>
+  `;
+  lucide.createIcons();
+  setTimeout(renderCharts, 50);
+}
+
+// ==================== INIT ====================
+render();
+</script>
+</body>
+</html>
