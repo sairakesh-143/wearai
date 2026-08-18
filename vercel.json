@@ -6,7 +6,7 @@
       "use": "@vercel/python"
     },
     {
-      "src": "public",
+      "src": "public/**",
       "use": "@vercel/static"
     }
   ],
@@ -19,10 +19,5 @@
       "src": "/(.*)",
       "dest": "public/index.html"
     }
-  ],
-  "env": {
-    "MONGO_URI": "@mongo_uri",
-    "SECRET_KEY": "@secret_key",
-    "DB_NAME": "wearai_db"
-  }
+  ]
 }
