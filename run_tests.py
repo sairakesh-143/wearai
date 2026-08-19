@@ -108,5 +108,23 @@ class TestValidationAndEngine(unittest.TestCase):
         data = res.json()
         self.assertEqual(data["passed"], data["total"])
 
+    def test_paginated_orders_endpoint(self):
+        res = self.client.get("/api/orders?page=1&page_size=2", headers=self.headers)
+        self.assertEqual(res.status_code, 200)
+        data = res.json()
+        self.assertIn("items", data)
+        self.assertIn("total", data)
+        self.assertIn("page", data)
+        self.assertEqual(data["page"], 1)
+        self.assertLessEqual(len(data["items"]), 2)
+
+    def test_filtered_inventory_endpoint(self):
+        res = self.client.get("/api/inventory?category=Electronics", headers=self.headers)
+        self.assertEqual(res.status_code, 200)
+        data = res.json()
+        self.assertTrue(isinstance(data, list))
+        self.assertTrue(all(p.get("category") == "Electronics" for p in data))
+
 if __name__ == "__main__":
     unittest.main()
+

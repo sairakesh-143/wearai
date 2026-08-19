@@ -34,7 +34,10 @@ class InMemoryCollection:
         for doc in self._data:
             match = True
             for k, v in filter_dict.items():
-                if isinstance(v, dict) and "$in" in v:
+                if k == "items.sku":
+                    item_skus = [it.get("sku") for it in doc.get("items", [])]
+                    if v not in item_skus: match = False; break
+                elif isinstance(v, dict) and "$in" in v:
                     if doc.get(k) not in v["$in"]: match = False; break
                 elif isinstance(v, dict) and "$nin" in v:
                     if doc.get(k) in v["$nin"]: match = False; break
@@ -48,24 +51,32 @@ class InMemoryCollection:
         return count
 
     def find_one(self, filter_dict, projection=None):
+        import copy
         for doc in self._data:
             match = True
             for k, v in filter_dict.items():
-                if doc.get(k) != v: match = False; break
+                if k == "items.sku":
+                    item_skus = [it.get("sku") for it in doc.get("items", [])]
+                    if v not in item_skus: match = False; break
+                elif doc.get(k) != v: match = False; break
             if match:
-                res = doc.copy()
+                res = copy.deepcopy(doc)
                 if projection and "_id" in projection and projection["_id"] == 0:
                     res.pop("_id", None)
                 return res
         return None
 
     def find(self, filter_dict=None, projection=None):
+        import copy
         res_list = []
         filter_dict = filter_dict or {}
         for doc in self._data:
             match = True
             for k, v in filter_dict.items():
-                if isinstance(v, dict) and "$lte" in v:
+                if k == "items.sku":
+                    item_skus = [it.get("sku") for it in doc.get("items", [])]
+                    if v not in item_skus: match = False; break
+                elif isinstance(v, dict) and "$lte" in v:
                     if doc.get(k, 999999) > v["$lte"]: match = False; break
                 elif isinstance(v, dict) and "$in" in v:
                     if doc.get(k) not in v["$in"]: match = False; break
@@ -74,7 +85,7 @@ class InMemoryCollection:
                 elif doc.get(k) != v:
                     match = False; break
             if match:
-                r = doc.copy()
+                r = copy.deepcopy(doc)
                 if projection and "_id" in projection and projection["_id"] == 0:
                     r.pop("_id", None)
                 res_list.append(r)
@@ -130,7 +141,7 @@ except Exception as e:
     activity_logs_col = InMemoryCollection()
 
 # ==================== SECURITY ====================
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["pbkdf2_sha256", "bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 def get_password_hash(password: str) -> str:
@@ -228,7 +239,16 @@ def calc_priority_engine(order: dict) -> dict:
     score = 0
     reasons = []
     
-    hrs_left = (order["deadline"] - datetime.utcnow()).total_seconds() / 3600
+    deadline = order.get("deadline")
+    if isinstance(deadline, str):
+        try:
+            deadline = datetime.fromisoformat(deadline.replace("Z", "+00:00")).replace(tzinfo=None)
+        except Exception:
+            deadline = datetime.utcnow()
+    elif not isinstance(deadline, datetime):
+        deadline = datetime.utcnow()
+        
+    hrs_left = (deadline - datetime.utcnow()).total_seconds() / 3600
     
     if hrs_left < 0:
         score += 40
@@ -467,12 +487,48 @@ async def get_dashboard_stats(current_user: dict = Depends(get_current_user)):
 
 # ==================== ORDERS ROUTES ====================
 @app.get("/api/orders")
-async def get_orders(current_user: dict = Depends(get_current_user)):
+async def get_orders(
+    page: Optional[int] = None,
+    page_size: Optional[int] = 10,
+    search: Optional[str] = None,
+    status: Optional[str] = None,
+    priority: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
     orders = list(orders_col.find({}, {"_id": 0}))
     for o in orders:
-        o["date"] = o["date"].isoformat()
-        o["deadline"] = o["deadline"].isoformat()
+        if isinstance(o.get("date"), datetime):
+            o["date"] = o["date"].isoformat()
+        if isinstance(o.get("deadline"), datetime):
+            o["deadline"] = o["deadline"].isoformat()
         o["priority"] = calc_priority_engine(o)
+
+    if search:
+        q = search.lower().strip()
+        orders = [
+            o for o in orders
+            if q in o.get("id", "").lower()
+            or q in o.get("customer", "").lower()
+            or any(q in it.get("sku", "").lower() or q in it.get("name", "").lower() for it in o.get("items", []))
+        ]
+    if status and status != "all":
+        orders = [o for o in orders if o.get("status") == status]
+    if priority and priority != "all":
+        orders = [o for o in orders if o.get("priority", {}).get("priority") == priority]
+
+    if page is not None:
+        total = len(orders)
+        p = max(1, page)
+        ps = max(1, min(100, page_size or 10))
+        start_idx = (p - 1) * ps
+        end_idx = start_idx + ps
+        return {
+            "items": orders[start_idx:end_idx],
+            "total": total,
+            "page": p,
+            "pageSize": ps,
+            "totalPages": math.ceil(total / ps) if total > 0 else 1
+        }
     return orders
 
 @app.get("/api/orders/{order_id}")
@@ -480,15 +536,50 @@ async def get_order(order_id: str, current_user: dict = Depends(get_current_user
     order = orders_col.find_one({"id": order_id}, {"_id": 0})
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
-    order["date"] = order["date"].isoformat()
-    order["deadline"] = order["deadline"].isoformat()
+    if isinstance(order.get("date"), datetime):
+        order["date"] = order["date"].isoformat()
+    if isinstance(order.get("deadline"), datetime):
+        order["deadline"] = order["deadline"].isoformat()
     order["priority"] = calc_priority_engine(order)
     return order
 
 # ==================== INVENTORY ROUTES ====================
 @app.get("/api/inventory")
-async def get_inventory(current_user: dict = Depends(get_current_user)):
+async def get_inventory(
+    page: Optional[int] = None,
+    page_size: Optional[int] = 10,
+    search: Optional[str] = None,
+    category: Optional[str] = None,
+    status: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
     products = list(products_col.find({}, {"_id": 0}))
+    if search:
+        q = search.lower().strip()
+        products = [
+            p for p in products
+            if q in p.get("sku", "").lower()
+            or q in p.get("name", "").lower()
+            or q in p.get("supplier", "").lower()
+        ]
+    if category and category != "all":
+        products = [p for p in products if p.get("category") == category]
+    if status and status != "all":
+        products = [p for p in products if p.get("status") == status]
+
+    if page is not None:
+        total = len(products)
+        p = max(1, page)
+        ps = max(1, min(100, page_size or 10))
+        start_idx = (p - 1) * ps
+        end_idx = start_idx + ps
+        return {
+            "items": products[start_idx:end_idx],
+            "total": total,
+            "page": p,
+            "pageSize": ps,
+            "totalPages": math.ceil(total / ps) if total > 0 else 1
+        }
     return products
 
 @app.get("/api/inventory/low-stock")
@@ -496,8 +587,8 @@ async def get_low_stock(current_user: dict = Depends(get_current_user)):
     products = list(products_col.find({"stock": {"$lte": 25}}, {"_id": 0}))
     result = []
     for p in products:
-        days_remaining = (p["stock"] / p["dailyDemand"]) if p["dailyDemand"] > 0 and p["stock"] > 0 else 0
-        risk = "Critical" if p["stock"] == 0 else "High" if days_remaining < 2 else "Medium" if days_remaining < 5 else "Low"
+        days_remaining = (p["stock"] / p["dailyDemand"]) if p.get("dailyDemand", 0) > 0 and p.get("stock", 0) > 0 else 0
+        risk = "Critical" if p.get("stock", 0) == 0 else "High" if days_remaining < 2 else "Medium" if days_remaining < 5 else "Low"
         p["daysRemaining"] = round(days_remaining, 1)
         p["risk"] = risk
         result.append(p)
@@ -565,10 +656,31 @@ async def apply_allocation(sku: str = Body(...), current_user: dict = Depends(re
 
 # ==================== EXCEPTIONS ROUTES ====================
 @app.get("/api/exceptions")
-async def get_exceptions(current_user: dict = Depends(get_current_user)):
+async def get_exceptions(
+    page: Optional[int] = None,
+    page_size: Optional[int] = 10,
+    status: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
     exceptions = list(exceptions_col.find({}, {"_id": 0}))
     for e in exceptions:
-        e["created"] = e["created"].isoformat()
+        if isinstance(e.get("created"), datetime):
+            e["created"] = e["created"].isoformat()
+    if status and status != "all":
+        exceptions = [e for e in exceptions if e.get("status") == status]
+    if page is not None:
+        total = len(exceptions)
+        p = max(1, page)
+        ps = max(1, min(100, page_size or 10))
+        start_idx = (p - 1) * ps
+        end_idx = start_idx + ps
+        return {
+            "items": exceptions[start_idx:end_idx],
+            "total": total,
+            "page": p,
+            "pageSize": ps,
+            "totalPages": math.ceil(total / ps) if total > 0 else 1
+        }
     return exceptions
 
 # ==================== ANALYTICS ROUTES ====================
@@ -767,11 +879,29 @@ async def run_system_tests():
 
 # ==================== ACTIVITY LOG ====================
 @app.get("/api/activity-logs")
-async def get_activity_logs(current_user: dict = Depends(get_current_user)):
-    logs = list(activity_logs_col.find({}, {"_id": 0}).sort("time", -1).limit(20))
+async def get_activity_logs(
+    page: Optional[int] = None,
+    page_size: Optional[int] = 10,
+    current_user: dict = Depends(get_current_user)
+):
+    logs = list(activity_logs_col.find({}, {"_id": 0}))
     for l in logs:
-        l["time"] = l["time"].isoformat()
-    return logs
+        if isinstance(l.get("time"), datetime):
+            l["time"] = l["time"].isoformat()
+    if page is not None:
+        total = len(logs)
+        p = max(1, page)
+        ps = max(1, min(100, page_size or 10))
+        start_idx = (p - 1) * ps
+        end_idx = start_idx + ps
+        return {
+            "items": logs[start_idx:end_idx],
+            "total": total,
+            "page": p,
+            "pageSize": ps,
+            "totalPages": math.ceil(total / ps) if total > 0 else 1
+        }
+    return logs[:20]
 
 if __name__ == "__main__":
     import uvicorn

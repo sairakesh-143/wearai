@@ -1,8 +1,16 @@
-import pytest
-from fastapi.testclient import TestClient
-from main import app, products_col, orders_col, calc_priority_engine, check_allocation_conflict
+import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+import pytest
+from datetime import datetime, timedelta
+from fastapi.testclient import TestClient
+from main import app, products_col, orders_col, calc_priority_engine, check_allocation_conflict, seed_database, create_access_token
+
+seed_database()
 client = TestClient(app)
+token = create_access_token({"sub": "1", "role": "admin"})
+headers = {"Authorization": f"Bearer {token}"}
 
 # ==================== VALIDATION TESTS ====================
 def test_invalid_sku_validation():
@@ -12,7 +20,7 @@ def test_invalid_sku_validation():
         "items": [{"sku": "INVALID_SKU_FORMAT", "qty": 2}],
         "warehouse": "WH-01 Seattle Central"
     }
-    response = client.post("/api/orders", json=payload)
+    response = client.post("/api/orders", json=payload, headers=headers)
     assert response.status_code == 422
     assert "Invalid SKU format" in response.json()["detail"]
 
@@ -23,7 +31,7 @@ def test_nonexistent_sku_validation():
         "items": [{"sku": "SKU-999", "qty": 2}],
         "warehouse": "WH-01 Seattle Central"
     }
-    response = client.post("/api/orders", json=payload)
+    response = client.post("/api/orders", json=payload, headers=headers)
     assert response.status_code == 404
     assert "not registered in the inventory database" in response.json()["detail"]
 
@@ -34,19 +42,18 @@ def test_invalid_quantity_validation():
         "items": [{"sku": "SKU-101", "qty": 0}],
         "warehouse": "WH-01 Seattle Central"
     }
-    response = client.post("/api/orders", json=payload)
+    response = client.post("/api/orders", json=payload, headers=headers)
     assert response.status_code == 422
     assert "positive integer greater than 0" in response.json()["detail"]
 
 def test_insufficient_inventory_validation():
     """Test that ordering more than available stock triggers clear user-friendly error message."""
-    # SKU-101 has 7 units in stock
     payload = {
         "customer": "Test Customer",
         "items": [{"sku": "SKU-101", "qty": 999}],
         "warehouse": "WH-01 Seattle Central"
     }
-    response = client.post("/api/orders", json=payload)
+    response = client.post("/api/orders", json=payload, headers=headers)
     assert response.status_code == 400
     assert "Insufficient inventory" in response.json()["detail"]
     assert "only" in response.json()["detail"]
@@ -60,7 +67,7 @@ def test_duplicate_order_detection():
         "items": [{"sku": "SKU-102", "qty": 1}],
         "warehouse": "WH-01 Seattle Central"
     }
-    response = client.post("/api/orders", json=payload)
+    response = client.post("/api/orders", json=payload, headers=headers)
     assert response.status_code == 409
     assert "Duplicate order ID" in response.json()["detail"]
 
@@ -71,7 +78,7 @@ def test_missing_required_fields_validation():
         "items": [{"sku": "SKU-102", "qty": 1}],
         "warehouse": "WH-01 Seattle Central"
     }
-    response = client.post("/api/orders", json=payload)
+    response = client.post("/api/orders", json=payload, headers=headers)
     assert response.status_code == 422
     assert "Missing required field" in response.json()["detail"]
 
@@ -82,7 +89,7 @@ def test_invalid_warehouse_location():
         "items": [{"sku": "SKU-102", "qty": 1}],
         "warehouse": "WH-99 Mars Base"
     }
-    response = client.post("/api/orders", json=payload)
+    response = client.post("/api/orders", json=payload, headers=headers)
     assert response.status_code == 422
     assert "Invalid warehouse location" in response.json()["detail"]
 
@@ -90,7 +97,7 @@ def test_invalid_warehouse_location():
 def test_priority_engine_math():
     """Test priority engine score calculation for VIP customer past deadline."""
     order = {
-        "deadline": main_deadline_past(),
+        "deadline": datetime.utcnow() - timedelta(hours=2),
         "customerTier": "VIP",
         "shipMethod": "Express",
         "total": 600,
@@ -125,6 +132,19 @@ def test_system_tests_runner_endpoint():
     assert data["passed"] == data["total"]
     assert "successRate" in data
 
-def main_deadline_past():
-    from datetime import datetime, timedelta
-    return datetime.utcnow() - timedelta(hours=2)
+def test_paginated_orders_query():
+    response = client.get("/api/orders?page=1&page_size=2", headers=headers)
+    assert response.status_code == 200
+    data = response.json()
+    assert "items" in data
+    assert "total" in data
+    assert "page" in data
+    assert data["page"] == 1
+    assert len(data["items"]) <= 2
+
+def test_filtered_inventory_query():
+    response = client.get("/api/inventory?category=Electronics", headers=headers)
+    assert response.status_code == 200
+    data = response.json()
+    assert isinstance(data, list)
+    assert all(p.get("category") == "Electronics" for p in data)
